@@ -866,6 +866,16 @@ body:has(#fsheet:not([hidden])) #base{overflow:hidden;touch-action:none}
 .legs li span{display:flex;flex-direction:column;font-size:15px;color:var(--ink-dim)}
 .legs li b{color:var(--ink)}.legs li.got b{color:#f2d36a}.legs li small{font-size:14px}
 .nbc.place{flex-direction:column}.nbc.place .nbc-pic{width:100%;max-width:none}.nbc.place .nbc-b{min-width:0;width:100%}.nbc.place,.nbc.place *{white-space:normal}.nbc.place .nbc-hand{top:-2px;right:6px}
+#scrub{position:fixed;inset:0;z-index:70;background:rgba(10,8,5,.82);display:flex;align-items:center;justify-content:center;padding:16px}
+#scrub[hidden]{display:none!important}
+.sc-box{width:min(340px,100%);background:#2a2218;border:2px solid #5a4a32;border-radius:14px;padding:14px;color:var(--ink);font-family:var(--font-n);text-align:center}
+.sc-box h3{margin:0 0 6px;font-family:var(--font-px);font-size:13px;line-height:1.5;color:#f2d36a}
+.sc-hint{margin:0 0 10px;font-size:15px;color:var(--ink-dim);min-height:38px}.sc-hint.warn{color:#ff8a6a;font-weight:700}
+.sc-cv{display:flex;justify-content:center}.sc-cv canvas{width:min(288px,78vw);height:auto;aspect-ratio:1;border-radius:10px;touch-action:none;image-rendering:pixelated;box-shadow:inset 0 0 0 2px #4a3c2a;cursor:grab}
+.sc-bar{height:10px;border-radius:5px;background:#4a3c2a;margin:10px 0 4px;overflow:hidden}.sc-bar i{display:block;height:100%;width:0;background:#8fae55;transition:width .1s}
+.sc-row{display:flex;justify-content:space-between;font-size:15px;color:var(--ink-dim)}.sc-scr{color:#e0a070}
+.sc-btns{display:flex;gap:10px;margin-top:12px}.sc-btns button{flex:1;min-height:44px;border-radius:10px;font-family:var(--font-n);font-size:18px;font-weight:700;border:2px solid #5a4a32;background:#3a3024;color:var(--ink)}
+.sc-btns .sc-done{background:#6a8a3a;border-color:#8fae55;color:#fff}.sc-btns .sc-done:disabled{opacity:.45}
 </style>
 
 <canvas id="cv" hidden></canvas>
@@ -951,6 +961,7 @@ body:has(#fsheet:not([hidden])) #base{overflow:hidden;touch-action:none}
     <div id="bMsg"></div>
     <div class="bpanel" id="t_sell" hidden></div>
     <div id="fsheet" hidden></div>
+    <div id="scrub" hidden></div>
     <div id="raid" hidden></div>
     <div class="bpanel" id="t_gear" hidden></div>
     <div class="bpanel" id="t_skills" hidden></div>
@@ -1790,7 +1801,7 @@ function buildFlooded(){
   disc(g,250,410,7,7,"#7a4a2a");disc(g,250,410,5,5,"#a49884");for(let a=0;a<6;a++)rect(g,250+Math.cos(a)*4,410+Math.sin(a)*4,1,1,"#7a4a2a");rect(g,249,409,3,3,"#5a3a22");
   for(let k=0;k<14;k++)rect(g,500+k*2,430-k,3,2,k%3?"#8a4a2a":"#6a3a22");rect(g,524,412,2,8,"#6a3a22");
   // указатель «Заречье»
-  rect(g,168,382,2,14,"#5a5a54");rect(g,156,374,28,9,"#3a5aa0");rect(g,157,375,26,7,"#5a7ac0");for(let i=0;i<6;i++)rect(g,159+i*4,377,3,3,"#e8ecf4");for(let k=0;k<6;k++)rect(g,156+r()*28,374+r()*9,1,1,"#9a5a2a");
+  rect(g,168,382,2,14,"#5a5a54");rect(g,156,374,28,9,"#3a5aa0");for(let k=0;k<5;k++)rect(g,184+k,374+k,1,9-k*2,"#3a5aa0");rect(g,157,375,26,7,"#5a7ac0");for(let k=0;k<4;k++)rect(g,183+k,375+k,1,7-k*2,"#5a7ac0");rect(g,160,377,15,3,"#e8ecf4");for(let k=0;k<4;k++)rect(g,175+k,375+k,1,7-k*2,"#e8ecf4");for(let k=0;k<6;k++)rect(g,156+r()*28,374+r()*9,1,1,"#9a5a2a");
   
   // сваи старой пристани уходят в воду
   for(let k=0;k<7;k++){const x=480+(k%2)*14,y=146-Math.floor(k/2)*12;rect(g,x,y,3,5,"#3a2a1a");rect(g,x,y,3,1,"#6a5034");rect(g,x-2,y+5,7,1,"#a8c4cc")}
@@ -1956,13 +1967,13 @@ const shownName=it=>it.story?dirtyName(it):it.name; // в поле сразу в
 const rangeCh=()=>CHANNELS[1].open()?CHANNELS[1]:CHANNELS[0];
 const priceRange=it=>{const k=rangeCh().mult*(1+sk("torg")*.02);return[Math.max(5,Math.round(it.base*GRADES[0].m*k/5)*5),Math.round(it.base*GRADES[4].m*k/10)*10]};
 const dirtyPrice=it=>Math.max(10,Math.round(it.base*Math.min(1,it.cond+.1)*.35/10)*10);
-function rollGrade(it,self){
+function rollGrade(it,self,rm,careful){
   let g=pickW(GR_W.map(x=>x/100)),note="";
   const pd=Math.max(0,Math.min(.75,(.9-it.cond)*1.4)); // задели лопатой — сохранность хуже
   if(g<5&&R()<pd)g=Math.max(0,g-1);
-  if(self&&!it.story){const risk=own("bath")?0:Math.max(0,35-sk("master")*3-(own("bench")?10:0)+(it.wet?10:0))/100;
+  if(self&&!it.story){const risk=(own("bath")?0:Math.max(0,35-sk("master")*3-(own("bench")?10:0)+(it.wet?10:0))/100)*(rm==null?1:rm);
     if(Math.random()<risk&&g>0){g--;note="Перестарались с чисткой — сохранность упала на ступень."}
-    else if(g<4&&Math.random()<sk("master")*.04+(own("bench")?.05:0)+(own("bath")?.05:0))g++}
+    else if(g<4&&Math.random()<sk("master")*.04+(own("bench")?.05:0)+(own("bath")?.05:0)+(careful?.06:0))g++}
   if(it.story)g=Math.max(2,Math.min(4,g));
   it.gr=g;return note}
 function dirtyName(it){if(it.story)return({zheton:"Овальная пластинка",sumka:"Истлевший кожаный ком",kotelok:"Мятая посудина",flyaga:"Бутылка в истлевшем чехле",medal:"Чёрный цилиндрик"})[it.story]||"Странная вещь";return it.c===2?"Кружок, похоже на монету":it.iron?"Ржавая железка":"Окисленная вещица"}
@@ -2473,6 +2484,7 @@ const SFX={
     [392,523,659,784,1047].forEach((f,i)=>{const s=t+i*.09;sTone(c,f,s,.3,.14,"triangle");sTone(c,f*2,s,.25,.04,"sine")});
     const e=t+.5;[523,659,784,1047].forEach(f=>sTone(c,f,e,1.2,.08,"triangle"));sTone(c,131,e,1.1,.12,"sine");
     for(let i=0;i<8;i++)sTone(c,2093+i*260,e+.1+i*.07,.2,.03,"sine")},
+  scrub(){const c=sfxCtx();if(!c)return;const t=c.currentTime;sNoise(c,t,.09,.12,"bandpass",1800+Math.random()*1600,.8,.01)},
   levelup(){const c=sfxCtx();if(!c)return;const t=c.currentTime;[523,659,784].forEach((f,i)=>{const s=t+i*.07;sTone(c,f,s,.18,.16,"square");sTone(c,f*2,s,.14,.05,"sine")});
     const e=t+.21;sTone(c,1047,e,.7,.2,"sine");sTone(c,1568,e,.6,.09,"sine");sTone(c,2093,e+.05,.5,.08,"sine");sTone(c,3136,e+.1,.35,.05,"sine");
     for(let i=0;i<4;i++)sTone(c,2637+i*350,e+.12+i*.06,.15,.035,"sine")},
@@ -4169,11 +4181,56 @@ function showField(){
 }
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;renderBase()});
 function msg(t,bad){G.msg=t;G.msgBad=!!bad}
-function reveal(it,self){
-  const note=it.leg?"":rollGrade(it,self);
+function reveal(it,self,rm,careful){
+  const note=it.leg?"":rollGrade(it,self,rm,careful);
   it.clean=true;it._new={was:dirtyName(it),note,self:!!self,anim:1};
 }
-function clean(idx,self){const it=G.inv[idx];if(!it||it.clean)return;if(!self){if(G.money<CLEAN_FEE)return;G.money-=CLEAN_FEE}reveal(it,self);SFX.clean(!!it._new.note);if(it.leg)setTimeout(()=>SFX.legend(),900);else if(it.gr>=4)setTimeout(()=>SFX.levelup(),1250);msg("");openFind=it;save();renderBase()}
+// ===== ЧИСТКА САМОМУ: игрок трёт находку пальцем =====
+let scrubSt=null;
+function openScrub(idx){const it=G.inv[idx];if(!it)return;
+  const SZ=288,K=SZ/32,el=$("scrub");
+  const pic=it.story?storyItemPic(it.story):FIND_IMG[it.name]||dirtySprite(it);
+  el.innerHTML=`<div class="sc-box"><h3>Чистка: ${shownName(it)}</h3><p class="sc-hint" id="scHint">Водите пальцем по находке, чтобы счистить грязь. Не трите слишком быстро — можно поцарапать.</p>
+    <div class="sc-cv"><canvas id="scCv" width="${SZ}" height="${SZ}"></canvas></div>
+    <div class="sc-bar"><i id="scBar"></i></div><div class="sc-row"><span id="scPct">0%</span><span id="scScr" class="sc-scr"></span></div>
+    <div class="sc-btns"><button class="sc-cancel" onclick="SK.scrubCancel()">Отложить</button><button class="sc-done" id="scDone" disabled onclick="SK.scrubDone()">Готово</button></div></div>`;
+  el.hidden=false;
+  const cv=$("scCv"),g=cv.getContext("2d");g.imageSmoothingEnabled=false;
+  const img=new Image(),dirt=document.createElement("canvas");dirt.width=dirt.height=SZ;const d=dirt.getContext("2d");
+  const st=scrubSt={idx,it,cv,g,img,dirt,d,pts:[],last:null,scr:0,done:false,pct:0,tick:0,warnT:0};
+  img.onload=()=>{
+    const m=document.createElement("canvas");m.width=m.height=32;const mg=m.getContext("2d");mg.drawImage(img,0,0,32,32);const md=mg.getImageData(0,0,32,32).data;
+    const r=rng(idx*131+it.depth*7+(it.base|0)),col=it.iron?["#6a4426","#8a5a32","#5a3a20","#7a4a2a"]:["#5e5038","#6e5e40","#4e4430","#7a6a48"];
+    for(let y=0;y<32;y++)for(let x=0;x<32;x++){let on=false;for(let dy=-2;dy<=2&&!on;dy++)for(let dx=-2;dx<=2;dx++){const xx=x+dx,yy=y+dy;if(xx>=0&&yy>=0&&xx<32&&yy<32&&md[(yy*32+xx)*4+3]>40){on=true;break}}
+      if(!on)continue;if(md[(y*32+x)*4+3]>40)st.pts.push([x*K+K/2,y*K+K/2]);
+      d.fillStyle=col[Math.floor(r()*4)];d.fillRect(x*K,y*K,K,K);
+      if(r()<.35){d.fillStyle=it.iron?"#9a5a2a":"#7a8a4a";d.fillRect(x*K+Math.floor(r()*K/2),y*K+Math.floor(r()*K/2),K/2,K/2)}}
+    for(let k=0;k<70;k++){const x=r()*SZ,y=r()*SZ;const a=d.getImageData(x|0,y|0,1,1).data[3];if(!a)continue;d.fillStyle="rgba(40,30,18,.6)";d.fillRect(Math.floor(x/K)*K,Math.floor(y/K)*K,K,K)}
+    drawScrub()};
+  img.src=pic;
+  const pos=e=>{const b=cv.getBoundingClientRect();return[(e.clientX-b.left)*SZ/b.width,(e.clientY-b.top)*SZ/b.height,performance.now()]};
+  const rub=(p)=>{const[x,y,t]=p;const L=st.last;d.save();d.globalCompositeOperation="destination-out";d.lineCap="round";d.lineWidth=44;
+    if(L){d.beginPath();d.moveTo(L[0],L[1]);d.lineTo(x,y);d.stroke();const dist=Math.hypot(x-L[0],y-L[1]),dt=Math.max(1,t-L[2]),v=dist/dt;
+      if(v>2.4&&st.pct<.98){st.scr+=dist;st.warnT=t}}
+    else{d.beginPath();d.arc(x,y,22,0,7);d.fill()}
+    d.restore();st.last=p;if(t-st.tick>110){st.tick=t;SFX.scrub&&SFX.scrub()}drawScrub()};
+  cv.onpointerdown=e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);st.last=null;rub(pos(e))};
+  cv.onpointermove=e=>{if(!cv.hasPointerCapture(e.pointerId))return;e.preventDefault();rub(pos(e))};
+  cv.onpointerup=cv.onpointercancel=()=>{st.last=null}}
+function drawScrub(){const st=scrubSt;if(!st)return;const{g,img,dirt,cv}=st,SZ=cv.width;
+  g.clearRect(0,0,SZ,SZ);g.fillStyle="#2a2117";g.fillRect(0,0,SZ,SZ);g.imageSmoothingEnabled=false;g.drawImage(img,0,0,SZ,SZ);g.drawImage(dirt,0,0);
+  const scrF=Math.min(1,st.scr/(SZ*5));
+  if(scrF>0){g.strokeStyle=`rgba(255,240,220,${(.25+scrF*.5).toFixed(2)})`;g.lineWidth=1;const r=rng(st.idx+3);for(let k=0;k<Math.round(scrF*14);k++){const x=40+r()*(SZ-80),y=40+r()*(SZ-80);g.beginPath();g.moveTo(x,y);g.lineTo(x+18-r()*36,y+18-r()*36);g.stroke()}}
+  if(st.pts.length){const dd=st.d.getImageData(0,0,SZ,SZ).data;let c=0;for(const[x,y]of st.pts)if(dd[((y|0)*SZ+(x|0))*4+3]<60)c++;st.pct=c/st.pts.length}
+  const p=Math.round(st.pct*100);$("scBar").style.width=p+"%";$("scPct").textContent=`Очищено: ${p}%`;
+  $("scScr").textContent=scrF>0?`Царапины: ${scrF<.2?"мелкие":scrF<.5?"заметные":"глубокие"}`:"";
+  const warn=performance.now()-st.warnT<700;$("scHint").textContent=warn?"Осторожно! Слишком сильно — царапаете находку.":st.pct>=.9?"Готово — можно смотреть, что получилось.":"Водите пальцем по находке, чтобы счистить грязь. Не трите слишком быстро — можно поцарапать.";
+  $("scHint").classList.toggle("warn",warn);$("scDone").disabled=st.pct<.9;
+  if(st.pct>=.97&&!st.done){st.done=true;setTimeout(scrubDone,350)}}
+function scrubDone(){const st=scrubSt;if(!st||st.pct<.9)return;scrubSt=null;$("scrub").hidden=true;$("scrub").innerHTML="";
+  const scrF=Math.min(1,st.scr/(st.cv.width*5));clean(st.idx,true,.25+1.5*scrF,scrF<.05)}
+function scrubCancel(){scrubSt=null;$("scrub").hidden=true;$("scrub").innerHTML=""}
+function clean(idx,self,rm,careful){const it=G.inv[idx];if(!it||it.clean)return;if(self&&rm==null){openScrub(idx);return}if(!self){if(G.money<CLEAN_FEE)return;G.money-=CLEAN_FEE}reveal(it,self,rm,careful);SFX.clean(!!it._new.note);if(it.leg)setTimeout(()=>SFX.legend(),900);else if(it.gr>=4)setTimeout(()=>SFX.levelup(),1250);msg("");openFind=it;save();renderBase()}
 function cleanAll(self){const list=G.inv.filter(i=>!i.clean);if(!list.length)return;if(!self){const c=list.length*CLEAN_FEE;if(G.money<c)return;G.money-=c}list.forEach(i=>reveal(i,self));const bad=list.filter(i=>i._new.note).length,top=list.filter(i=>i.gr===4).length,rare=list.filter(i=>i.gr===5).length;list.forEach(i=>i._new.anim=0);SFX.clean(bad>0);if(top||rare)setTimeout(()=>SFX.levelup(),900);msg(`Почищено: ${list.length} шт.${rare?` ★ Редкая разновидность: ${rare}!`:""}${top?` Отличная сохранность: ${top}.`:""}${bad?` Испорчено при чистке: ${bad}.`:""} Нажмите на находку, чтобы узнать, что с ней делать.`,!!bad);save();renderBase()}
 function sellDirty(idx){const it=G.inv[idx];const p=dirtyPrice(it);G.money+=p;SFX.coins(4);G.inv.splice(idx,1);msg(`Скупщик забрал «${shownName(it)}» в грязи за ${rub(p)}. Какая там была сохранность — уже не узнать.`);save();renderBase()}
 function sell(idx,chId){
@@ -4275,7 +4332,7 @@ $("reset").onclick=()=>{
 };
 setTimeout(()=>{const b=$("sfxBtn");if(b)b.textContent=sfxOn?"Звуки: вкл.":"Звуки: выкл."},0);window.setSfx=setSfx;Object.defineProperty(window,"sfxOn",{get:()=>sfxOn});
 window.$=$;
-window.SK={buyGo,setPlace,buyPlace,sellLeg,toArch,toDed,openPz,pzClose:closePz,pzUnpair,pzCheck,findFilter:k=>{findFilter=k;renderBase()},openFind:i=>{openFind=G.inv[i]||null;renderFindSheet()},closeFind:()=>{openFind=null;renderFindSheet()},gearTab:k=>{gearTab=k;renderBase()},gearPick:(k,n)=>{gearSel[k]=n;renderBase();const u=document.querySelector('.upg');if(u)u.scrollIntoView({behavior:'smooth',block:'start'})},sell,sellAllBuy,payDebt,buyShop,toVit,fromVit,sellJunk,sellOneJunk,sellDirty,clean,cleanAll,buy,learn,setRegion,buyMap,go,signRaid,comicNext:()=>comicQ&&comicQ.next(),comicEnd:()=>comicQ&&comicQ.end(),comic:id=>showComic(id),storyAct:i=>storyAct(i),choose:k=>{const o=choiceQ&&choiceQ[k];if(!o||o.off)return;choiceQ=null;$("comic").hidden=true;$("comic").innerHTML="";o.run()},keepStory:i=>{const it=G.inv[i];if(!it)return;if(!G.story.clues.includes(it.story))G.story.clues.push(it.story);G.inv.splice(i,1);openFind=null;tab="ded";save();renderBase()},toTransport:()=>{tab="gear";gearTab="transport";renderBase();window.scrollTo(0,0);const p=document.getElementById("base");if(p)p.scrollTop=0}};
+window.SK={scrubDone,scrubCancel,buyGo,setPlace,buyPlace,sellLeg,toArch,toDed,openPz,pzClose:closePz,pzUnpair,pzCheck,findFilter:k=>{findFilter=k;renderBase()},openFind:i=>{openFind=G.inv[i]||null;renderFindSheet()},closeFind:()=>{openFind=null;renderFindSheet()},gearTab:k=>{gearTab=k;renderBase()},gearPick:(k,n)=>{gearSel[k]=n;renderBase();const u=document.querySelector('.upg');if(u)u.scrollIntoView({behavior:'smooth',block:'start'})},sell,sellAllBuy,payDebt,buyShop,toVit,fromVit,sellJunk,sellOneJunk,sellDirty,clean,cleanAll,buy,learn,setRegion,buyMap,go,signRaid,comicNext:()=>comicQ&&comicQ.next(),comicEnd:()=>comicQ&&comicQ.end(),comic:id=>showComic(id),storyAct:i=>storyAct(i),choose:k=>{const o=choiceQ&&choiceQ[k];if(!o||o.off)return;choiceQ=null;$("comic").hidden=true;$("comic").innerHTML="";o.run()},keepStory:i=>{const it=G.inv[i];if(!it)return;if(!G.story.clues.includes(it.story))G.story.clues.push(it.story);G.inv.splice(i,1);openFind=null;tab="ded";save();renderBase()},toTransport:()=>{tab="gear";gearTab="transport";renderBase();window.scrollTo(0,0);const p=document.getElementById("base");if(p)p.scrollTop=0}};
 
 // свайп вниз закрывает лист находки
 (()=>{const box=$("fsheet");let y0=null,dy=0,el=null,fromTop=false;
@@ -4518,7 +4575,6 @@ requestAnimationFrame(frame);
 window.__gameOk=1;{const b=document.getElementById("boot");if(b)b.remove()}
 })();
 </script>
-
 <script>(function(){var n=document.getElementById("nojs");if(n)n.parentNode.removeChild(n)})();</script>
 </body>
 </html>
