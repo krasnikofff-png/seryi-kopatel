@@ -12,6 +12,7 @@ function openScrub(idx) {
     <div class="sc-bar"><i id="scBar"></i></div><div class="sc-row"><span id="scPct">0%</span><span id="scScr" class="sc-scr"></span></div>
     <div class="sc-btns"><button class="sc-cancel" onclick="SK.scrubCancel()">Отложить</button><button class="sc-done" id="scDone" disabled onclick="SK.scrubDone()">Готово</button></div></div>`;
   el.hidden = false;
+  scrubLock(true);
   const cv = $("scCv"),
     g = cv.getContext("2d");
   g.imageSmoothingEnabled = false;
@@ -177,12 +178,21 @@ function drawScrub() {
     setTimeout(scrubDone, 350);
   }
 }
+// пока открыта чистка, страница под окном не прокручивается (на телефоне палец иначе тянет фон)
+const scrubNoScroll = e => e.preventDefault();
+function scrubLock(on) {
+  document.documentElement.classList.toggle("noscroll", on);
+  const el = $("scrub");
+  if (on) el.addEventListener("touchmove", scrubNoScroll, { passive: false });
+  else el.removeEventListener("touchmove", scrubNoScroll);
+}
 function scrubDone() {
   const st = scrubSt;
   if (!st || st.pct < 0.9) return;
   scrubSt = null;
   $("scrub").hidden = true;
   $("scrub").innerHTML = "";
+  scrubLock(false);
   const scrF = Math.min(1, st.scr / (st.cv.width * 5));
   clean(st.idx, true, 0.25 + 1.5 * scrF, scrF < 0.05);
 }
@@ -190,6 +200,7 @@ function scrubCancel() {
   scrubSt = null;
   $("scrub").hidden = true;
   $("scrub").innerHTML = "";
+  scrubLock(false);
 }
 function clean(idx, self, rm, careful) {
   const it = G.inv[idx];
@@ -425,7 +436,14 @@ function setRegion(r) {
     renderBase();
   }
 }
+function placeLocked(id) {
+  msg(placeLockTxt(id), true);
+  save();
+  renderBase();
+  window.scrollTo(0, 0);
+}
 function setPlace(id) {
+  if (!placeOpen(id)) return placeLocked(id);
   G.place = id;
   save();
   renderBase();
@@ -632,6 +650,7 @@ window.SK = {
   scrubCancel,
   buyGo,
   setPlace,
+  placeLocked,
   buyPlace,
   sellLeg,
   toArch,

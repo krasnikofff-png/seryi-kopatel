@@ -29,6 +29,12 @@ try {
   G = Object.assign(fresh(), L || {});
   G.skills = Object.assign(fresh().skills, (L && L.skills) || {});
   if (!G.maps || typeof G.maps !== "object") G.maps = {};
+  (G.inv || []).forEach(i => {
+    if (i.c === 0 && !i.clean) {
+      i.clean = true; // мусор больше не чистят
+      i.gr = 2;
+    }
+  });
 } catch (e) {
   G = fresh();
 }

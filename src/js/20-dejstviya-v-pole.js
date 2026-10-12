@@ -122,6 +122,10 @@ function finishDig() {
       (G.vdiLog = G.vdiLog || []).push([it.vdi, got.c]);
       if (G.vdiLog.length > 80) G.vdiLog.shift();
     }
+    if (it.c === 0) {
+      it.clean = true; // мусор не чистят: его сразу видно, путь один — в металлолом
+      it.gr = 2;
+    }
     if (!it.story && !it.leg) dexAdd(it.name);
     G.inv.push(it);
     SFX.clink();

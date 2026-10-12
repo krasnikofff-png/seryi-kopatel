@@ -76,7 +76,7 @@ function showRegionIntro(r) {
     I = REG_INFO[r];
   SFX.story();
   box.innerHTML = `<div class="sheet reg-intro"><small>Открыт регион</small><h2>${REGIONS[r].name}</h2><p><b>${I.land}.</b> ${I.line}</p>
-    <ul><li>Цены находок: ×${REGIONS[r].mult}</li><li>Чаще всего: ${I.layer}</li><li>Глубина: ${I.depth}</li><li>Дорога: выезд в поле в ${hhmm(I.start)}</li><li>Риски: ${I.risks}</li></ul>
+    <ul><li>Цены находок: ${multTxt(ECON.reg[REGIONS[r].mult])}</li><li>Чаще всего: ${I.layer}</li><li>Глубина: ${I.depth}</li><li>Дорога: выезд в поле в ${hhmm(I.start)}</li><li>Риски: ${I.risks}</li></ul>
     <button class="btn" onclick="$('evt').hidden=true">Понятно</button></div>`;
   box.hidden = false;
 }

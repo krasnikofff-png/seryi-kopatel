@@ -80,6 +80,17 @@ const NB_TXT = {
   }
 };
 const REG_GEN = [null, "пригороде", "области", "глуши"];
+// особое место открыто, только если туда можно поехать (или купить отчёт и сразу ехать)
+function placeOpen(id) {
+  if (id === 4) return TRANSPORT[G.transport].region >= 2 && G.det >= 4;
+  return PLACES[id].need(G);
+}
+function placeLockTxt(id) {
+  if (id === 5) return "Деревня сейчас под водой. Дно покажется летом и осенью.";
+  if (TRANSPORT[G.transport].region < 2) return "Городище — в Области. Нужен мопед или машина.";
+  return "Городище откроется с профессиональным детектором (4-й уровень).";
+}
+const multTxt = x => "×" + String(x).replace(".", ",");
 function placeCard(id) {
   const P = PLACES[id],
     t = NB_TXT[id],
@@ -111,7 +122,7 @@ function placeCard(id) {
     warn = ok ? "Дорога бесплатная, пока стоит сушь" : "Вода стоит высоко. Дно покажется летом и осенью";
   }
   return `<div class="nbc place"><div class="nbc-pic"><img src="${mapPic(P)}" alt=""></div><div class="nbc-b">${t.hand ? `<span class="nbc-hand">${t.hand}</span>` : ""}<h3>${id === 4 ? "Городище" : "Деревня"}</h3>
-    <p>${t.d}</p>${li(t.li.concat([["road", `Цены находок: ${REGIONS[P.reg].mult > 1 ? `×${REGIONS[P.reg].mult}` : "обычные"}`]]))}${btn}${warn ? `<p class="nb-warn">${warn}</p>` : ""}</div></div>`;
+    <p>${t.d}</p>${li(t.li.concat([["road", `Цены находок: ${REGIONS[P.reg].mult > 1 ? multTxt(ECON.reg[REGIONS[P.reg].mult]) : "обычные"}`]]))}${btn}${warn ? `<p class="nb-warn">${warn}</p>` : ""}</div></div>`;
 }
 function renderMaps() {
   const maxR = TRANSPORT[G.transport].region;
@@ -120,6 +131,7 @@ function renderMaps() {
     RG = REGIONS[r],
     tr = TRANSPORT[G.transport];
   const head = `<div class="nb-head"><h2>Полевой блокнот</h2><img src="${NB_ART.pine}" alt=""></div>`;
+  if (G.place && !placeOpen(G.place)) G.place = 0; // закрытое место не открываем
   const pl = G.place || 0;
   const seg = `<div class="nb-seg">${[1, 2, 3]
     .map(i =>
@@ -129,18 +141,18 @@ function renderMaps() {
     )
     .join("")}
       ${[
-        [4, "Городище", maxR >= 2],
-        [5, "Деревня", true]
+        [4, "Городище"],
+        [5, "Деревня"]
       ]
-        .map(([id, n, ok]) =>
-          ok
+        .map(([id, n]) =>
+          placeOpen(id)
             ? `<button class="pl" aria-pressed="${pl === id}" onclick="SK.setPlace(${id})">${n}</button>`
-            : `<button class="pl lock" disabled aria-disabled="true" tabindex="-1">${n} ${LOCK_SVG}</button>`
+            : `<button class="pl lock" aria-disabled="true" onclick="SK.placeLocked(${id})">${n} ${LOCK_SVG}</button>`
         )
         .join("")}</div>
     ${pl ? "" : regionCard(r)}${seasonStrip()}`;
   if (pl) return `<div class="nbw"><div class="nb">${head}${seg}${placeCard(pl)}</div></div>`;
-  const price = RG.mult > 1 ? `находки дороже в ${RG.mult} раза` : "обычные цены";
+  const price = RG.mult > 1 ? `находки дороже, ${multTxt(ECON.reg[RG.mult])}` : "обычные цены";
   const art =
     G.transport === 1
       ? `<img class="art" src="${NB_ART.train}" alt="">`
