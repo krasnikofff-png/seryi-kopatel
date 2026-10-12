@@ -855,7 +855,7 @@ const PLACES = {};
     offset: 1,
     probs: [0.12, 0.22, 0.26, 0.22, 0.18],
     eraW: [0.03, 0.05, 0.1, 0.27, 0.55],
-    n: 30,
+    n: 40,
     need: g => g.det >= 4 && g.region >= 2,
     needTxt: g =>
       g.region < 2

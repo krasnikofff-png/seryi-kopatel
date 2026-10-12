@@ -275,6 +275,10 @@ function newTrip(map, region) {
       if (!i.story && !i.leg) i.depth = Math.max(3, Math.round(i.depth * 0.55));
     });
   if (worldKind === "hillfort") {
+    // культурный слой городища распахан и размыт: часть древних вещей поднялась ближе к поверхности
+    t.items.forEach(i => {
+      if (!i.story && !i.leg && i.era >= 3 && i.depth > 100 && R() < 0.5) i.depth = 60 + Math.floor(R() * 40);
+    });
     const nB = t.wx === "rain" || season().id === "spring" ? 7 : 4;
     let k = 0; // река подмывает обрыв
     for (let a = 0; a < 600 && k < nB; a++) {
