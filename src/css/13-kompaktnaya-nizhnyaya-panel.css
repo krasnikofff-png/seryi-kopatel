@@ -352,34 +352,6 @@
   border-color: #6b5420;
   color: #8a7030;
 }
-.alb-sel {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-top: 10px;
-  padding: 8px;
-  border-radius: 8px;
-  background: #1d170e;
-}
-.alb-sel img,
-.alb-sel i {
-  width: 44px;
-  height: 44px;
-  flex: none;
-  image-rendering: pixelated;
-}
-.alb-sel span {
-  display: flex;
-  flex-direction: column;
-  font-size: 15px;
-}
-.alb-sel b {
-  color: var(--ink);
-}
-.alb-sel small {
-  color: var(--ink-dim);
-  font-size: 13.5px;
-}
 .legs {
   margin: 0 0 12px;
   border: 1px solid #6b5420;
@@ -583,4 +555,42 @@ html.noscroll body {
 }
 .sc-btns .sc-done:disabled {
   opacity: 0.45;
+}
+
+.alb-win {
+  text-align: center;
+}
+.alb-win .alb-big {
+  width: 112px;
+  height: 112px;
+  margin: 4px auto 10px;
+  display: block;
+  image-rendering: pixelated;
+}
+.alb-win .alb-big.no {
+  display: grid;
+  place-items: center;
+  border: 2px dashed #6b5420;
+  border-radius: 12px;
+  background: #1d170e;
+  color: #8a7030;
+  font-size: 44px;
+  font-family: var(--font-n);
+}
+.alb-win h2 {
+  margin: 0 0 8px;
+}
+.alb-win .alb-tags {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.alb-win .alb-got {
+  color: #8fae55;
+  font-weight: 700;
+}
+.alb-win .btn {
+  width: 100%;
+  margin-top: 6px;
 }

@@ -639,12 +639,8 @@ window.SK = {
   albToggle: o => {
     albOpen = o;
   },
-  albPick: (e, k) => {
-    const x = ALB[e][k];
-    albSel = albSel && albSel.name === x.name ? null : Object.assign({ era: e }, x);
-    albOpen = true;
-    renderBase();
-  },
+  albPick: (e, k) => albWin(Object.assign({ era: e }, ALB[e][k])),
+  albClose: () => ($("albOver").hidden = true),
   scrubDone,
   scrubCancel,
   buyGo,

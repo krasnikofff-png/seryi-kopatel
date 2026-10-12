@@ -1,6 +1,5 @@
 // ===== АЛЬБОМ НАХОДОК: всё, что бывает в земле; не найденное — тёмным «?» =====
-let albOpen = false,
-  albSel = null;
+let albOpen = false;
 const ALB = (() => {
   const seen = new Set(),
     by = [[], [], [], [], []];
@@ -35,17 +34,21 @@ function albumShelf() {
   const d = G.dex,
     tot = ALB.reduce((a, b) => a + b.length, 0),
     got = ALB.reduce((a, b) => a + b.filter(x => d[x.name]).length, 0);
-  const sel =
-    albSel && d[albSel.name]
-      ? `<div class="alb-sel"><img src="${FIND_IMG[albSel.name] || ""}" alt=""><span><b>${albSel.name}</b><small>${CLASSES[albSel.c].name} · ${ERAS[albSel.era].name}</small></span></div>`
-      : albSel
-        ? `<div class="alb-sel"><i>?</i><span><b>${CLASSES[albSel.c].name} — пока не найдено</b><small>${ERAS[albSel.era].name[0].toUpperCase() + ERAS[albSel.era].name.slice(1)}. Ищите ${ALB_TIP[albSel.era]}.</small></span></div>`
-        : "";
   return `<details class="legs alb" ${albOpen ? "open" : ""} ontoggle="SK.albToggle(this.open)"><summary><b>Альбом находок · ${got}/${tot}</b><span class="alb-bar"><i style="width:${Math.round((got / tot) * 100)}%"></i></span></summary>
-    ${sel}${ALB.map((a, e) => {
+    ${ALB.map((a, e) => {
       const g = a.filter(x => d[x.name]).length;
       return `<div class="alb-era"><div class="alb-h"><span>${ERAS[e].name[0].toUpperCase() + ERAS[e].name.slice(1)}</span><b>${g}/${a.length}</b></div><div class="alb-g">${a.map((x, k) => (d[x.name] ? `<button class="k${x.c}" onclick="SK.albPick(${e},${k})"><img src="${FIND_IMG[x.name] || ""}" alt="${x.name}"></button>` : `<button class="no k${x.c}" onclick="SK.albPick(${e},${k})">?</button>`)).join("")}</div></div>`;
     }).join("")}</details>`;
+}
+// окошко с карточкой вещи из альбома (найденной — с картинкой и описанием, не найденной — с подсказкой, где искать)
+function albWin(x) {
+  const o = $("albOver"),
+    got = G.dex && G.dex[x.name],
+    era = ERAS[x.era].name[0].toUpperCase() + ERAS[x.era].name.slice(1);
+  $("albSheet").innerHTML = got
+    ? `<img class="alb-big" src="${FIND_IMG[x.name] || ""}" alt=""><h2>${x.name}</h2><p class="alb-tags"><span class="fchip k${x.c}">${CLASSES[x.c].name}</span> ${era}</p>${FIND_DESC[x.name] ? `<p>${FIND_DESC[x.name]}</p>` : ""}<p class="alb-got">✓ Есть в альбоме</p><button class="btn" onclick="SK.albClose()">Закрыть</button>`
+    : `<div class="alb-big no">?</div><h2>Пока не найдено</h2><p class="alb-tags"><span class="fchip k${x.c}">${CLASSES[x.c].name}</span> ${era}</p><p>Ищите ${ALB_TIP[x.era]}.</p><button class="btn" onclick="SK.albClose()">Закрыть</button>`;
+  o.hidden = false;
 }
 function legShelf() {
   const got = Object.keys(LEGENDS).filter(k => G.leg && G.leg[k]).length;
