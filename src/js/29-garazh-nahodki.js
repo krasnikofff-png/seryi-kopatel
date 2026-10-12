@@ -136,9 +136,9 @@ function renderFinds() {
     bulk += `<div class="fbulk"><span>Не очищено: ${dirty.length}</span><button ${G.money < dirty.length * CLEAN_FEE ? "disabled" : ""} onclick="SK.cleanAll(false)">Всё мастеру · ${rub(dirty.length * CLEAN_FEE)}</button></div>`;
   if (junk.length > 1 && findFilter !== "dirty")
     bulk += `<div class="fbulk"><span>Мусор: ${junk.length}</span><button onclick="SK.sellJunk()">Всё в металлолом</button></div>`;
-  const sellable = clean.filter(i => !i.story && !i.leg);
+  const sellable = clean.filter(i => !i.story && !i.leg && i.c !== 0); // мусор — отдельно, в металлолом
   if (sellable.length > 1 && findFilter !== "dirty") {
-    const sum = sellable.reduce((a, i) => a + (i.c === 0 ? 12 : sellPrice(i, CHANNELS[0])), 0);
+    const sum = sellable.reduce((a, i) => a + sellPrice(i, CHANNELS[0]), 0);
     bulk += `<div class="fbulk"><span>Опознано: ${sellable.length}</span><button onclick="SK.sellAllBuy()">Сдать всё скупщику · ~${rub(sum)}</button></div>`;
   }
   const antInfo = CHANNELS[1].open()

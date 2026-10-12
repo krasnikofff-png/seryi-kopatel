@@ -348,24 +348,18 @@ function rumorTry() {
 function sellAllBuy() {
   SFX.coins(9);
   let sum = 0,
-    n = 0,
-    j = 0;
+    n = 0;
   for (let i = G.inv.length - 1; i >= 0; i--) {
     const it = G.inv[i];
-    if (!it.clean || it.story || it.leg) continue;
-    if (it.c === 0) {
-      sum += Math.round(5 + Math.random() * 15);
-      j++;
-    } else {
-      sum += sellPrice(it, CHANNELS[0]);
-      n++;
-    }
+    if (!it.clean || it.story || it.leg || it.c === 0) continue; // мусор скупщик не берёт — только металлолом
+    sum += sellPrice(it, CHANNELS[0]);
+    n++;
     G.inv.splice(i, 1);
   }
-  if (!n && !j) return;
+  if (!n) return;
   G.money += sum;
   msg(
-    `Скупщик забрал всё оптом: ${n} ${plural(n, "вещь", "вещи", "вещей")}${j ? ` и ${j} шт. мусора` : ""} за ${rub(sum)}.`
+    `Скупщик забрал всё оптом: ${n} ${plural(n, "вещь", "вещи", "вещей")} за ${rub(sum)}.`
   );
   rumorTry();
   save();
