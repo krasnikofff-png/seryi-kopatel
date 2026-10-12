@@ -342,11 +342,22 @@
   font-size: 14px;
   font-family: var(--font-n);
 }
+/* найденные вещи в альбоме — в цветах класса, как плашка в карточке находки */
+.alb-g button.k1:not(.no) {
+  background: #334222;
+  border-color: #6f8a38;
+}
+.alb-g button.k2:not(.no) {
+  background: #4a3218;
+  border-color: #b07a3a;
+}
 .alb-g button.k3:not(.no) {
-  border-color: #8aa04a;
+  background: #4a2218;
+  border-color: #c0583a;
 }
 .alb-g button.k4:not(.no) {
-  border-color: #f2d36a;
+  background: #4a3b12;
+  border-color: #e9c54a;
 }
 .alb-g button.k4.no {
   border-color: #6b5420;
