@@ -82,7 +82,26 @@
   padding: 8px 12px;
   font-size: 15px;
   text-align: center;
-  pointer-events: none;
+  pointer-events: auto;
+  padding-right: 34px;
+}
+.toast .tx,
+.card .x {
+  position: absolute;
+  right: 2px;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+  color: inherit;
+  opacity: 0.75;
+  cursor: pointer;
 }
 .card {
   position: absolute;
@@ -125,13 +144,7 @@
   color: #5a3e1c;
   margin-bottom: 2px;
 }
-.card .x {
-  position: absolute;
-  right: 8px;
-  top: 4px;
-  font-size: 16px;
-  color: #7a5a36;
-}
+
 
 .over {
   position: fixed;

@@ -1,26 +1,26 @@
 // ================= ДЕЙСТВИЯ В ПОЛЕ =================
 const toastEl = $("toast"),
   cardEl = $("card");
-let toastT = 0,
-  cardT = 0;
+// подсказки и карточки находок висят, пока игрок сам не закроет их крестиком (или не придёт новая)
 function toast(t) {
-  toastEl.innerHTML = t;
+  toastEl.innerHTML = `<button class="tx" aria-label="Закрыть">×</button>${t}`;
   toastEl.hidden = false;
-  toastT = 3.2;
   cardEl.hidden = true;
 }
+toastEl.addEventListener("pointerdown", e => {
+  e.stopPropagation();
+  if (e.target.closest(".tx")) toastEl.hidden = true;
+});
 function card(it, hurt, up, more) {
   cardEl.classList.toggle("leg", !!it.leg);
   if (it.leg) {
     cardEl.innerHTML = `<span class="x">×</span><div class="k">★ ЛЕГЕНДА · ${it.depth} см · ${ERAS[it.era].name}</div><img class="cpic" src="${FIND_IMG[it.name] || ""}" alt=""><h2>${it.name}</h2><p>Такое находят раз в жизни. Руки дрожат. Почистите дома — ей ничего не грозит.${up ? "<br><b>Новый уровень! Очко навыка ждёт дома.</b>" : ""}</p>`;
     cardEl.hidden = false;
-    cardT = 8;
     toastEl.hidden = true;
     return;
   }
   cardEl.innerHTML = `<span class="x">×</span><div class="k">${it.cache ? "Тайник с карты! · " : "Находка · "}${it.depth} см · ${ERAS[it.era].name}${it.vdi ? " · ВДИ " + it.vdi : ""}</div>${it.story ? "" : `<img class="cpic" src="${FIND_IMG[it.name] || ""}" alt="">`}<h2>${shownName(it)}</h2><p>${hurt ? "Кажется, задели лопатой — сохранность может пострадать. " : ""}${it.story ? "Что это — станет ясно после чистки." : it.c === 0 ? "Мусор. Только в металлолом." : `<span class="crange">${CLASSES[it.c].name} · ${rangeCh().id === "ant" ? "антиквар" : "скупщик"} даст ${rub(priceRange(it)[0])} – ${rub(priceRange(it)[1])}</span>Цену решит сохранность — узнаете после чистки. Бывают и редкие разновидности ×${rareM(it)} — их видно, только если чистить самому.`}${it.story ? `<br><b>★ Сердце ёкнуло: кажется, это то, что вы искали. Почистите дома.</b>` : ""}${more ? `<br><b>Детектор над ямой не умолкает — глубже лежит что-то ещё.</b>` : ""}${up ? "<br><b>Новый уровень! Очко навыка ждёт дома.</b>" : ""}</p>`;
   cardEl.hidden = false;
-  cardT = 5;
   toastEl.hidden = true;
 }
 cardEl.addEventListener("pointerdown", e => {
@@ -197,7 +197,6 @@ function finishDig() {
       toast(m);
       if (!G.pinTip2) {
         G.pinTip2 = 1;
-        toastT = 8;
       }
       save();
       return;
@@ -282,7 +281,6 @@ $("bagOver").addEventListener("pointerdown", e => {
 
 function endTrip(text) {
   cardEl.hidden = true;
-  cardT = 0;
   toastEl.hidden = true;
   const n = T ? T.found : 0,
     dirty = G.inv.filter(i => !i.clean).length;

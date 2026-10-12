@@ -21,14 +21,6 @@ function update(dt) {
     if (p.life <= 0) parts.splice(i, 1);
   }
   updateBirds(dt);
-  if (toastT > 0) {
-    toastT -= dt;
-    if (toastT <= 0) toastEl.hidden = true;
-  }
-  if (cardT > 0) {
-    cardT -= dt;
-    if (cardT <= 0) cardEl.hidden = true;
-  }
   if (paused || !T) {
     P.moving = false;
     return;

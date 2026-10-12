@@ -898,7 +898,6 @@ function loadTrip(t) {
   ensureWorld(LOC(t.region, t.map));
   try {
     cardEl.hidden = true;
-    cardT = 0;
     toastEl.hidden = true;
   } catch (e) {} // старая карточка находки не переезжает в новую поездку
   ZC = t.zc ? { x: t.zc.x, y: t.zc.y } : { x: ZONE.x, y: ZONE.y };

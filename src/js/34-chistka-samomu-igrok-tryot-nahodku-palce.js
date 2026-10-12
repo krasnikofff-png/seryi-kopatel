@@ -544,7 +544,6 @@ function go(id) {
   if (T && T.zHint) {
     const pr = toastEl.hidden ? "" : toastEl.innerHTML + "<br><br>";
     toast(pr + T.zHint);
-    toastT = pr ? 11 : 7;
   }
   if (worldKind === "swamp" && !G.swampSeen) {
     G.swampSeen = true;
