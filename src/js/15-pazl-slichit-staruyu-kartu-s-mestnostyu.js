@@ -592,7 +592,6 @@ function drawOldMap(g, pz) {
     g.fillText("200 саж.", sx + 34, sy - 2);
   }
   // потёртые края и уголки
-  const ed = g.createLinearGradient(0, 0, 0, H);
   g.strokeStyle = "rgba(90,60,30,.5)";
   g.lineWidth = 3;
   g.strokeRect(1.5, 1.5, W - 3, H - 3);

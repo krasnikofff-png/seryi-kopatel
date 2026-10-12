@@ -367,7 +367,6 @@ function updateSound(sig) {
   if (!gain) return;
   const live = soundOn && screen === "field" && !paused && sig.s > 0.08;
   // как у настоящего детектора: прерывистый писк, чем сильнее сигнал — тем чаще и выше
-  const iron = DET[G.det].disc && sig.it && sig.it.iron;
   const f =
       DET[G.det].disc && sig.it
         ? sig.it.iron

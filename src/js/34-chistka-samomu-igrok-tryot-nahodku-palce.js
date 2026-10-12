@@ -536,35 +536,7 @@ function go(id) {
     );
   }
 }
-function chanBtns(it, i) {
-  const list = CHANNELS.filter(c => c.cls.includes(it.c) && c.open());
-  const b = list
-    .map(c =>
-      c.id === "mus"
-        ? `<button onclick="SK.sell(${i},'mus')">В дар музею: +${giftRep(it)} совести${museumPay(it) ? ` и ${rub(museumPay(it))}` : ""}</button>`
-        : c.id === "blk"
-          ? `<button onclick="SK.sell(${i},'blk')">${c.name}: ${rub(sellPrice(it, c))} · ${blackRep(it)} совести</button>`
-          : `<button onclick="SK.sell(${i},'${c.id}')">${c.name}: ${rub(sellPrice(it, c))}</button>`
-    )
-    .join("");
-  const lock =
-    G.lvl < ANT_LVL
-      ? `<p class="locked">Антиквар дал бы ${rub(sellPrice(it, CHANNELS[1]))} — откроется на ${ANT_LVL}-м уровне.</p>`
-      : "";
-  return `<div class="brow">${b}</div>${lock}`;
-}
-function revealCard(it, i) {
-  const n = it._new,
-    C = CLASSES[it.c],
-    real = it.c !== 0;
-  return `<div class="bc reveal c${it.c}"><p class="was">${n.was} — ${n.self ? "почистили сами" : "после мастера"}:</p>
-    ${findImg(it, "fimg")}<h3>${it.name}</h3><p class="big"><span class="tag">${C.name}</span> ${grTxt(it)}${real ? ` · скупщик даст ${rub(sellPrice(it, CHANNELS[0]))}` : ""}</p>
-    <p class="meta">${it.depth} см · ${ERAS[it.era].name}</p>
-    ${n.note ? `<p class="warn">${n.note}</p>` : ""}
-    ${real ? chanBtns(it, i) : `<div class="brow"><button onclick="SK.sellOneJunk(${i})">В металлолом</button></div>`}</div>`;
-}
 function renderBase() {
-  const R0 = rank();
   $("bMoney").textContent = rub(G.money);
   $("bRep").textContent = `Совесть ${G.rep > 0 ? "+" : ""}${G.rep}`;
   $("bHeat").textContent = `Полиция ${G.heat}`;
@@ -783,7 +755,7 @@ window.SK = {
       el.classList.add("snap");
       el.style.transform = "translateY(100%)";
       setTimeout(() => {
-        SK.closeFind();
+        window.SK.closeFind();
       }, 200);
     } else if (dy > 0) {
       el.classList.add("snap");

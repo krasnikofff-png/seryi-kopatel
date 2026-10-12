@@ -713,43 +713,6 @@ const CLUES = [
     text: "Записка: «Серов Андрей Михайлович, 1912…». Дед нашёлся."
   }
 ];
-function cluePic(id) {
-  const k = "clue_" + id;
-  if (PANEL_IMG[k]) return PANEL_IMG[k];
-  const c = document.createElement("canvas");
-  c.width = c.height = 24;
-  const g = c.getContext("2d");
-  if (id === "letter") {
-    fillPoly(
-      g,
-      [
-        [2, 6],
-        [22, 6],
-        [12, 20]
-      ],
-      "#e8dcc0"
-    );
-    pline(g, 2, 6, 12, 13, "#b8a888");
-    pline(g, 22, 6, 12, 13, "#b8a888");
-    pline(g, 12, 13, 12, 20, "#b8a888");
-    pline(g, 6, 8, 17, 8, "#5a5a9a");
-    pline(g, 8, 10, 15, 10, "#5a5a9a");
-  } else if (id === "pp") {
-    disc(g, 12, 12, 10, 10, "#8a6aa8");
-    disc(g, 12, 12, 8, 8, "#e6dcc2");
-    disc(g, 12, 12, 6, 6, "#8a6aa8");
-    disc(g, 12, 12, 4, 4, "#e6dcc2");
-    rect(g, 6, 11, 13, 2, "#8a6aa8");
-  } else {
-    rect(g, 3, 3, 18, 18, "#3a3124");
-    rect(g, 4, 4, 16, 16, "#2a2218");
-    rect(g, 9, 6, 6, 2, "#7a6a52");
-    rect(g, 13, 8, 2, 4, "#7a6a52");
-    rect(g, 11, 12, 2, 3, "#7a6a52");
-    rect(g, 11, 17, 2, 2, "#7a6a52");
-  }
-  return (PANEL_IMG[k] = c.toDataURL());
-}
 function dedPhoto() {
   const W = 48,
     H = 60,

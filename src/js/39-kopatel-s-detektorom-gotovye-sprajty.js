@@ -52,7 +52,6 @@ function drawHeroDet(x, y, sig) {
   return true;
 }
 function drawShovel(cx, cy) {
-  const f = FACE[P.dir];
   let x = P.x + OFF.x + (P.dir === "left" ? -4 : 4) - cx,
     y = P.y + OFF.y - 8 - cy;
   if (digT > 0) {

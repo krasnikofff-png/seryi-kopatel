@@ -693,8 +693,6 @@ Object.assign(FIND_DESC, {
     "Жестяная брошка-ласточка с синей эмалью. На обороте нацарапано: «Нюра С. 1939». Сестра деда жила в этой деревне, пока её не затопили."
 });
 
-const findImg = (it, cls) =>
-  FIND_IMG[it.name] ? `<img class="${cls}" src="${FIND_IMG[it.name]}" alt="">` : "";
 const SHOVEL = [
   null,
   { name: "Сапёрная лопатка", depth: 30, step: 10, price: 0 },

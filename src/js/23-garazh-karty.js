@@ -1,24 +1,4 @@
 // ================= ГАРАЖ: КАРТЫ
-const MAP_TXT = {
-  1: {
-    short: "Говорят, здесь стоял хутор.",
-    acc: "низкая",
-    what: "Монеты и бытовые вещи · неглубоко",
-    note: "Ценные находки редки."
-  },
-  2: {
-    short: "Довоенная схема деревни.",
-    acc: "выше",
-    what: "Монеты и военное · война и империя",
-    note: "Зона поиска меньше. Часто есть тайник."
-  },
-  3: {
-    short: "Копия штабной карты из архива.",
-    acc: "высокая",
-    what: "Военное и редкое · глубоко",
-    note: "Зона маленькая. Тайник — всегда."
-  }
-};
 const REG_SHORT_NAME = [null, "Пригород", "Область", "Глушь"];
 const REG_IN = [null, "В пригороде", "В области", "В глуши"];
 const MAP_ART = {
@@ -28,8 +8,7 @@ const MAP_ART = {
   3: "@art(map-art/3.png)"
 };
 Object.assign(MAP_ART, { 4: "@art(map-art/4.png)", 5: "@art(map-art/5.png)" });
-const fieldPic = () => MAP_ART.f,
-  mapPic = m => MAP_ART[m.id];
+const mapPic = m => MAP_ART[m.id];
 const LOCK_SVG =
   '<svg class="lk" viewBox="0 0 10 12" aria-hidden="true"><path fill="currentColor" d="M2 5V3a3 3 0 0 1 6 0v2h1v7H1V5zm2 0h2V3a1 1 0 0 0-2 0z"/></svg>';
 const NB_ART = {

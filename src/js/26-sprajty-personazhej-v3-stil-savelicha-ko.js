@@ -621,7 +621,7 @@ const F_SOLD = {
 function borzyBust() {
   if (SPR.bBust) return SPR.bBust;
   const k = kit(48, 58),
-    { g, R, E, P, L, px } = k,
+    { R, E, P, L, px } = k,
     O = SO,
     sk = "#d8a07a",
     sh = "#b98660",
@@ -786,7 +786,7 @@ function borzyBust() {
 function nyuraBust() {
   if (SPR.nBust) return SPR.nBust;
   const k = kit(48, 58),
-    { g, R, E, P, L, px } = k,
+    { R, E, P, L, px } = k,
     O = SO,
     sk = "#e4b494",
     SC = "#3a5a9a",

@@ -38,29 +38,6 @@ function speck(g, r, x, y, w, h, n, cols) {
     g.fillRect(Math.floor(x + r() * w), Math.floor(y + r() * h), 1, 1);
   }
 }
-function vign(g, str) {
-  for (let y = 0; y < PH; y++)
-    for (let x = 0; x < PW; x++) {
-      const v = Math.hypot((x - 80) / 80, (y - 100) / 100);
-      if (v > 0.75 && (v - 0.75) * str * 16 > BAYER[y & 3][x & 3]) {
-        g.fillStyle = "#0e0a07";
-        g.fillRect(x, y, 1, 1);
-      }
-    }
-}
-function sepia2(g) {
-  const d = g.getImageData(0, 0, PW, PH),
-    p = d.data;
-  for (let i = 0; i < p.length; i += 4) {
-    const l = (p[i] * 0.3 + p[i + 1] * 0.59 + p[i + 2] * 0.11) / 255,
-      q = Math.round(l * 6) / 6;
-    p[i] = 34 + q * 196;
-    p[i + 1] = 26 + q * 168;
-    p[i + 2] = 16 + q * 116;
-  }
-  g.putImageData(d, 0, 0);
-  vign(g, 1.6);
-}
 // ---- голова крупно ----
 function head(g, cx, cy, s, o) {
   const sk = o.skin || "#e2a97e",
@@ -275,113 +252,6 @@ function head(g, cx, cy, s, o) {
   }
 }
 // ---- фигура в полный рост (≈ 46*s px) ----
-function body(g, x, y, s, o) {
-  const c = o.coat || "#5d7d38",
-    c2 = o.coatHi || "#7a9a4a",
-    lg = o.legs || "#3c5070",
-    bt = "#2a1e14",
-    ln = "#1a120c";
-  rect(
-    g,
-    x - Math.round(5 * s) - 1,
-    y - Math.round(16 * s) - 1,
-    Math.round(10 * s) + 2,
-    Math.round(16 * s) + 2,
-    ln
-  );
-  rect(g, x - Math.round(5 * s), y - Math.round(16 * s), Math.round(4 * s), Math.round(14 * s), lg);
-  rect(g, x + Math.round(1 * s), y - Math.round(16 * s), Math.round(4 * s), Math.round(14 * s), lg);
-  rect(g, x - Math.round(6 * s), y - Math.round(3 * s), Math.round(5 * s), Math.round(3 * s), bt);
-  rect(g, x + Math.round(1 * s), y - Math.round(3 * s), Math.round(5 * s), Math.round(3 * s), bt);
-  rect(
-    g,
-    x - Math.round(7 * s) - 1,
-    y - Math.round(32 * s) - 1,
-    Math.round(14 * s) + 2,
-    Math.round(17 * s) + 2,
-    ln
-  );
-  rect(g, x - Math.round(7 * s), y - Math.round(32 * s), Math.round(14 * s), Math.round(17 * s), c);
-  rect(g, x - Math.round(7 * s), y - Math.round(32 * s), Math.round(4 * s), Math.round(17 * s), c2);
-  if (o.belt)
-    rect(g, x - Math.round(7 * s), y - Math.round(18 * s), Math.round(14 * s), Math.round(2 * s), "#4a3020");
-  if (o.camo)
-    for (let k = 0; k < Math.round(14 * s); k++)
-      rect(
-        g,
-        x - Math.round(7 * s) + Math.floor(_PR() * 12 * s),
-        y - Math.round(31 * s) + Math.floor(_PR() * 15 * s),
-        Math.round(3 * s),
-        Math.round(2 * s),
-        k % 2 ? "#3a4428" : "#7a6a3a"
-      );
-  if (o.pack)
-    rect(g, x + Math.round(6 * s), y - Math.round(30 * s), Math.round(4 * s), Math.round(12 * s), "#8e5e33");
-  const arm = (sx, up) => {
-    rect(g, x + sx - 1, y - Math.round(31 * s), Math.round(3 * s) + 2, Math.round(13 * s) + 1, ln);
-    rect(g, x + sx, y - Math.round(31 * s), Math.round(3 * s), Math.round(12 * s), c);
-    rect(g, x + sx, y - Math.round(19 * s), Math.round(3 * s), Math.round(2 * s), o.skin || "#e2a97e");
-  };
-  if (!o.noL) arm(-Math.round(10 * s));
-  arm(Math.round(7 * s));
-  head(g, x, y - Math.round(38 * s), s * 0.42, o.head || {});
-}
-function sprucePix(g, x, y, h, dark, mid, light) {
-  const tiers = 5;
-  for (let t = 0; t < tiers; t++) {
-    const top = y - h + ((t * h) / tiers) * 0.78,
-      hh = (h / tiers) * 1.35,
-      w = ((t + 1.2) * h) / 11;
-    fillPoly(
-      g,
-      [
-        [x, top - 1],
-        [x + w + 1, top + hh + 1],
-        [x - w - 1, top + hh + 1]
-      ],
-      "#0e1e10"
-    );
-    fillPoly(
-      g,
-      [
-        [x, top],
-        [x + w, top + hh],
-        [x - w, top + hh]
-      ],
-      mid
-    );
-    fillPoly(
-      g,
-      [
-        [x, top],
-        [x - w, top + hh],
-        [x - w * 0.3, top + hh]
-      ],
-      light || mid
-    );
-    fillPoly(
-      g,
-      [
-        [x, top],
-        [x + w, top + hh],
-        [x + w * 0.4, top + hh]
-      ],
-      dark
-    );
-  }
-  rect(g, x - 1, y, 3, 4, "#3a2a1a");
-}
-function birchPix(g, x, y, h, bare) {
-  rect(g, x - 1, y - h, 5, h, "#1a1610");
-  rect(g, x, y - h, 3, h, "#ece8dc");
-  rect(g, x + 2, y - h, 1, h, "#b8b4a8");
-  for (let j = y - h + 3; j < y; j += 4 + ((j * 7) % 3)) rect(g, x, j, 2, 1, "#2a2620");
-  if (bare) {
-    pline(g, x + 1, y - h + 10, x - 8, y - h + 2, "#7a746a");
-    pline(g, x + 2, y - h + 18, x + 10, y - h + 9, "#7a746a");
-    pline(g, x + 1, y - h + 26, x - 6, y - h + 20, "#7a746a");
-  }
-}
 function boardFloor(g, y0, c1, c2, c3) {
   rect(g, 0, y0, PW, PH - y0, c1);
   for (let y = y0 + 3; y < PH; y += 6) rect(g, 0, y, PW, 1, c2);
@@ -389,13 +259,6 @@ function boardFloor(g, y0, c1, c2, c3) {
     for (let x = (y * 7) % 23; x < PW; x += 31) rect(g, x, y, 1, 6, c2);
   }
   if (c3) for (let k = 0; k < 40; k++) rect(g, (k * 53) % PW, y0 + ((k * 31) % (PH - y0)), 3, 1, c3);
-}
-function capsule2(g, x, y, len) {
-  rect(g, x - 1, y - 1, 12, len + 2, "#0a0806");
-  rect(g, x, y, 10, len, "#22201c");
-  rect(g, x + 2, y, 2, len, "#55524c");
-  rect(g, x + 7, y, 2, len, "#141210");
-  for (let j = y + 5; j < y + len; j += 5) rect(g, x, j, 10, 1, "#2e2c28");
 }
 // ---------- кадры ----------
 function P_box(g, r) {

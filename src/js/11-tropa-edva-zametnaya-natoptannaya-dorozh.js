@@ -54,11 +54,9 @@ function buildTrail(t) {
     pts = o;
   }
   const seg = [];
-  let tot = 0;
   for (let i = 0; i < pts.length - 1; i++) {
     const d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
     seg.push(d);
-    tot += d;
   }
   const c = document.createElement("canvas");
   c.width = WW;
