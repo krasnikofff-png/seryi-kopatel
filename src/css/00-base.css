@@ -1,0 +1,233 @@
+/* Два экрана: поле во весь экран (пиксели, вид 3/4 сверху, плашки по краям) и гараж — прокручиваемая колонка карточек */
+:root {
+  --ground: #3f5a2b;
+  --ink: #f4ead0;
+  --ink-dim: #cbbd95;
+  --panel: rgba(40, 32, 22, 0.9);
+  --panel-solid: #2a2117;
+  --edge: #b8955a;
+  --gold: #e9c54a;
+  --lcd: #1c2615;
+  --lcd-on: #c2dc6c;
+  --lcd-off: #3a4a26;
+  --paper: #efe2c1;
+  --paper-ink: #3a2e1e;
+  --red: #c4553a;
+  --base-bg: #211a12;
+  --card-bg: #30261a;
+  --card-edge: #5a4630;
+  --olive: #66773a;
+  --font: "PT Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-n: "PT Sans Narrow", "PT Sans", sans-serif;
+  --font-px: "Press Start 2P", "PT Sans", monospace;
+  color-scheme: dark;
+}
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--ground);
+  color: var(--ink);
+}
+body {
+  margin: 0;
+  font-family: var(--font);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#cv {
+  position: fixed;
+  left: 0;
+  top: 0;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+}
+#touch {
+  position: fixed;
+  inset: 0;
+  touch-action: none;
+}
+#hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  padding: calc(env(safe-area-inset-top, 0px) + 10px) 12px calc(env(safe-area-inset-bottom, 0px) + 10px);
+}
+#hud > .card,
+#hud > .actions {
+  pointer-events: auto;
+}
+.plate {
+  background: var(--panel);
+  border: 2px solid var(--edge);
+  border-radius: 6px;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+  color: var(--ink);
+}
+button {
+  font-family: var(--font);
+  color: var(--ink);
+  cursor: pointer;
+}
+button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.chip small {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-dim);
+}
+.trow {
+  display: flex;
+  gap: 5px;
+  align-items: stretch;
+  justify-content: space-between;
+}
+.chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 4px 7px;
+  min-height: 34px;
+  min-width: 0;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid #6b5636;
+  border-radius: 5px;
+  font-family: var(--font-n);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.05;
+  color: var(--ink);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+.trow button.chip {
+  color: var(--ink-dim);
+}
+@media (max-width: 350px) {
+  .chip.clock small {
+    display: none;
+  }
+}
+.trow button.chip.on {
+  color: var(--gold);
+}
+.trow2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+}
+.trow2 .chip.zone {
+  flex: none;
+  min-height: 30px;
+  font-size: 15px;
+  color: var(--ink-dim);
+}
+#mapBtn.on {
+  border: 2px solid var(--gold);
+  background: rgba(233, 197, 74, 0.12);
+  color: var(--gold);
+}
+.place {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 4px 0;
+  font-family: var(--font-n);
+  font-size: 15px;
+  color: var(--ink-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* компактная верхняя панель: одна строка */
+.top .trow {
+  gap: 4px;
+  align-items: center;
+}
+.top .chip {
+  min-height: 38px;
+  padding: 2px 6px;
+  gap: 5px;
+}
+.top .chip.clock,
+.top .chip.money {
+  flex: none;
+}
+.top .cl2 {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  align-items: flex-start;
+}
+.top .cl2 small {
+  font-size: 11px;
+}
+.top .chip.snd {
+  flex: none;
+  width: 38px;
+  padding: 0;
+}
+.top .place {
+  flex: 0 1 auto;
+  padding: 0 6px 0 2px;
+  gap: 4px;
+  font-size: 13px;
+  line-height: 1.15;
+}
+.top {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 8px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  background: linear-gradient(#3a2d1e, #2a2016);
+  border: 2px solid var(--edge);
+  border-radius: 7px;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4);
+  padding: 4px;
+  gap: 0;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 16px);
+}
+#placeF {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+#placeF b,
+#placeF small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#placeF b {
+  font-weight: 600;
+  color: var(--ink);
+}
+#placeF small {
+  font-size: 12px;
+}
+.ic {
+  display: inline-block;
+  flex: none;
+  image-rendering: pixelated;
+}
+.ic svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

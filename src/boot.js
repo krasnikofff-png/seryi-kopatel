@@ -1,0 +1,3 @@
+
+if(!Array.prototype.at){Array.prototype.at=function(n){n=Math.trunc(n)||0;if(n<0)n+=this.length;return this[n]}}window.__bootErr=null;window.addEventListener("error",function(e){if(!window.__bootErr)window.__bootErr=(e.message||"ошибка")+(e.lineno?" (строка "+e.lineno+")":"")});
+setTimeout(function(){var b=document.getElementById("boot");if(!b||window.__gameOk)return;document.getElementById("bootMsg").innerHTML="Игра не запустилась.<br><br>Откройте файл в браузере <b>Safari</b> или <b>Chrome</b>, а не во встроенном просмотре Телеграма или «Файлов». Если не поможет — обновите браузер."+(window.__bootErr?"<br><br><small style=\"opacity:.6\">"+window.__bootErr+"</small>":"")},3000);
