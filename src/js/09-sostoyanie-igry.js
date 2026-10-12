@@ -105,7 +105,7 @@ function antWhy(it) {
     return it.gr != null
       ? `Сохранность «${GRADES[it.gr].n.toLowerCase()}» — берёт от «хорошей»`
       : `Состояние ${Math.round(it.cond * 100)}% — ниже 70% не берёт`;
-  if ((G.antLeft ?? ANT_LIMIT) <= 0) return "Больше не берёт — приходите после поездки";
+  if ((G.antLeft ?? ANT_LIMIT) <= 0) return "Больше не берёт — приходите после следующей поездки";
   return "";
 }
 function sellPrice(it, ch) {

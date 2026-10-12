@@ -142,7 +142,7 @@ function renderFinds() {
     bulk += `<div class="fbulk"><span>Опознано: ${sellable.length}</span><button onclick="SK.sellAllBuy()">Сдать всё скупщику · ~${rub(sum)}</button></div>`;
   }
   const antInfo = CHANNELS[1].open()
-    ? `<div class="antinfo"><b>Антиквар сейчас ищет:</b> ${(G.antWant || []).map(w => w.t).join(", ")}. Возьмёт ещё ${G.antLeft} ${plural(G.antLeft, "вещь", "вещи", "вещей")}.${G.antDue ? ` На комиссии: ${rub(G.antDue)}.` : ""}</div>`
+    ? `<div class="antinfo"><b>Антиквар сейчас ищет:</b> ${(G.antWant || []).map(w => w.t).join(", ")}. Возьмёт ещё ${G.antLeft} ${plural(G.antLeft, "вещь", "вещи", "вещей")}.${G.antDue ? ` На комиссии: ${rub(G.antDue)} — придут после следующей поездки.` : ""}</div>`
     : "";
   bulk = antInfo + bulk;
   const rows = list
@@ -267,7 +267,7 @@ function legSheet(it, i, opt, meta) {
           "gold",
           FI.star,
           "Продать антиквару",
-          "Через аукцион · деньги после поездки",
+          "Через аукцион · деньги после следующей поездки",
           rub(L.price),
           `SK.sellLeg(${i},'ant')`
         )
