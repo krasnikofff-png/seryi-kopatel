@@ -11,7 +11,7 @@
       <div class="chip money"><span class="ic" data-ic="coin" style="width:16px;height:16px"></span><span id="moneyF">5 000 ₽</span></div>
       <button class="chip snd" id="snd" aria-pressed="false" title="Писк детектора" aria-label="Писк детектора"><span class="ic" id="sndIco" data-ic="sndOff" style="width:20px;height:18px"></span><span hidden><span id="sndTxt">выкл.</span></span></button>
     </div>
-    <div class="trow2"><button class="chip pzb" id="pzBtn" hidden onclick="SK.openPz()"></button>
+    <div class="trow2"><button class="chip pzb" id="pzBtn" hidden onclick="SK.openPz()"></button><button class="chip pzb mgb" id="magBtn" hidden onclick="SK.openMag()"></button>
     <label class="chip dvol" id="dvol" hidden><span>Писк</span><input type="range" id="dvolR" min="0" max="100" step="5" aria-label="Громкость детектора"><b id="dvolV"></b></label></div>
   </div>
 
@@ -53,6 +53,7 @@
 
 <div class="over" id="evt" hidden></div>
 <div class="over" id="pzOver" hidden></div>
+<div class="over" id="magOver" hidden><div class="sheet mg" id="magSheet"></div></div>
 <div id="comic" hidden></div>
 
 <div class="over" id="bagOver" hidden>

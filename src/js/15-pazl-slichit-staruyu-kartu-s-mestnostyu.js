@@ -925,6 +925,7 @@ function loadTrip(t) {
   updateHud();
   digLabels();
   pzBtn();
+  magBtn();
   if (T.pz && !T.pz.told) {
     T.pz.told = 1;
     setTimeout(

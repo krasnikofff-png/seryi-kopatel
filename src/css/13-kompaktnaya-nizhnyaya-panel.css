@@ -711,3 +711,67 @@ html.noscroll body {
 .track .sk-title {
   margin: 14px 0 14px;
 }
+
+/* поисковый магнит */
+#hud .mgb svg {
+  flex: none;
+}
+.sheet.mg {
+  width: min(380px, 100%);
+  max-height: 94vh;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.sheet.mg h2 {
+  margin-bottom: 0;
+  font-size: 20px;
+}
+.mg-place {
+  margin: 0 0 8px !important;
+  font-size: 14px !important;
+}
+#magCv {
+  display: block;
+  width: 100%;
+  aspect-ratio: 240 / 136;
+  image-rendering: pixelated;
+  border: 2px solid var(--edge);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  touch-action: none;
+  background: #24404f;
+}
+.mg-note {
+  font-size: 14px !important;
+  margin: 0 0 8px !important;
+}
+.mg-warn {
+  font-size: 13.5px !important;
+  color: #e2ae44 !important;
+  margin: 0 0 8px !important;
+}
+.mg-res {
+  margin: 0 0 4px !important;
+}
+.btn.mg-act {
+  min-height: 52px;
+  font-size: 19px;
+  touch-action: none;
+  -webkit-touch-callout: none;
+}
+.btn.mg-act:disabled {
+  opacity: 0.5;
+}
+.mg-got {
+  margin: 0 0 8px !important;
+}
+.mg-got li {
+  justify-content: flex-start !important;
+  gap: 10px !important;
+}
+.mg-got img {
+  width: 40px;
+  height: 40px;
+  image-rendering: pixelated;
+  flex: none;
+}

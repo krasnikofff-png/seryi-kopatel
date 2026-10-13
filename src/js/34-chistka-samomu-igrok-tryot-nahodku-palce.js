@@ -634,6 +634,9 @@ window.SK = {
     albOpen = o;
   },
   albPick: (e, k) => albWin(Object.assign({ era: e }, ALB[e][k])),
+  openMag,
+  magClose: closeMag,
+  magAgain,
   sellOrder,
   albClose: () => ($("albOver").hidden = true),
   scrubDone,

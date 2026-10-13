@@ -81,6 +81,7 @@ function update(dt) {
       path.shift();
       T.minutes += T.region === 3 ? 2 : 1;
       pzSee();
+      magBtn();
       SFX.step((P._st = !P._st));
       noise = (R() - 0.5) * 0.25 * (R() < 0.15 ? 2.5 : 1);
       updateHud();
