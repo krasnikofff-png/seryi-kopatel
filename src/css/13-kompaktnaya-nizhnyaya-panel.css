@@ -1207,3 +1207,24 @@ html.noscroll body {
 .wd-o.lock img {
   filter: grayscale(1);
 }
+
+/* снаряжение и транспорт — мелкий пиксель 64×64, масштаб целыми */
+.upg-cols img {
+  width: 128px;
+  max-width: 128px;
+  height: 128px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.glist img,
+.nb-tr .spr {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+@media (max-width: 400px) {
+  .upg-cols img {
+    width: 128px;
+    max-width: 40vw;
+    height: auto;
+  }
+}
