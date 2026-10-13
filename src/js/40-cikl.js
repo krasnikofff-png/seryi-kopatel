@@ -25,6 +25,11 @@ function update(dt) {
     P.moving = false;
     return;
   }
+  sletTick();
+  if (T.minutes >= dayEnd() && T.slet) {
+    sletEnd();
+    return;
+  }
   if (T.minutes >= dayEnd() && perk("night") && !T.night && !T.nightAsk) {
     T.nightAsk = 1;
     T.event = "nightfall";

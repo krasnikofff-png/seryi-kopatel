@@ -310,6 +310,7 @@ function draw() {
       if (P.dir !== "up") digT > 0 ? drawShovel(camX, camY) : drawDetector(camX, camY, sig);
     }
   });
+  sletEnts(ents, camX, camY);
   ents.sort((a, b) => a.y - b.y).forEach(e => e.f());
   if (worldKind === "swamp") {
     ctx.globalAlpha = 0.09;
@@ -352,6 +353,7 @@ function draw() {
   drawNight(camX, camY);
   // глубины рядом с игроком
   holes.forEach((h, k) => {
+    if (T.slet && T.slet.rh && T.slet.rh[k]) return; // ямы соперников без подписи
     const [tx, ty] = k.split(",").map(Number),
       x = tx * TS + 8 - camX,
       y = ty * TS + 15 - camY;

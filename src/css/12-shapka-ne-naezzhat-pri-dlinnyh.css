@@ -644,7 +644,7 @@ body:has(#fsheet:not([hidden])) #base {
   min-width: 28px;
   font-size: 12px;
 }
-#hud .trow2:has(> #pzBtn[hidden]):has(> #magBtn[hidden]) {
+#hud .trow2:has(> #pzBtn[hidden]):has(> #magBtn[hidden]):has(> #sletBtn[hidden]) {
   height: 0;
   min-height: 0;
   margin-top: -5px;

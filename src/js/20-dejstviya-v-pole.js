@@ -88,6 +88,12 @@ function finishDig() {
     }
     got.found = true;
     T.found++;
+    if (T.slet) sletFound(got);
+    if (got.token) {
+      updateHud();
+      save();
+      return;
+    }
     const cond = digFast ? (own("pin") ? rnd(0.7, 0.98) : rnd(0.4, 0.95)) : rnd(0.8, 1);
     const it = {
       wet: T.wx === "rain" ? 1 : 0,
@@ -314,6 +320,10 @@ function endTrip(text) {
   showBase();
 }
 $("home").onclick = () => {
+  if (T && T.slet && !paused && digT <= 0) {
+    sletEnd();
+    return;
+  }
   if (T && !paused && digT <= 0) endTrip("Вы вернулись домой.");
 };
 // окно «День окончен»: чтобы переход в гараж не выглядел как вылет игры

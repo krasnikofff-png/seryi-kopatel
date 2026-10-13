@@ -644,6 +644,8 @@ window.SK = {
   buyLot,
   goLead,
   goHouse,
+  goSlet,
+  sletInfo,
   hsSelect,
   hsSearch,
   hsListen,

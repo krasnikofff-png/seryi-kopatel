@@ -182,5 +182,5 @@ function renderMaps() {
     return `<div class="nbc${ok ? "" : " off"}"><div class="nbc-pic${m.id === 3 ? " raw" : ""}"><img src="${pic}" alt=""></div><div class="nbc-b">${t.hand ? `<span class="nbc-hand">${t.hand}</span>` : ""}<h3>${{ 3: "Архив", 4: "Городище", 5: "Деревня" }[m.id] || m.name}</h3>
       <p>${t.d}</p>${li(t.li)}${btn}</div></div>`;
   }).join("");
-  return `<div class="nbw"><div class="nb">${head}${seg}${trc}${free}${cards}${houseNb()}${fleaNb()}<div class="nb-note">${NBI.zone}Основные находки — внутри отмеченной зоны.</div></div></div>`;
+  return `<div class="nbw"><div class="nb">${head}${seg}${trc}${free}${cards}${sletNb()}${houseNb()}${fleaNb()}<div class="nb-note">${NBI.zone}Основные находки — внутри отмеченной зоны.</div></div></div>`;
 }
