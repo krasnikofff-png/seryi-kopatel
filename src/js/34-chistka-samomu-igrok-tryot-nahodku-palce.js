@@ -635,6 +635,14 @@ window.SK = {
   },
   albPick: (e, k) => albWin(Object.assign({ era: e }, ALB[e][k])),
   openMag,
+  openFlea,
+  fleaClose: closeFlea,
+  fleaBack: () => {
+    fleaOpen = null;
+    renderFlea();
+  },
+  buyLot,
+  goLead,
   magClose: closeMag,
   magAgain,
   sellOrder,

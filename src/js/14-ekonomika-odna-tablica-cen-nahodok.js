@@ -126,8 +126,9 @@ function newTrip(map, region) {
     G.lastZ[worldKind] = p.dir;
     const lm = ZLM[worldKind],
       where = p.dir < 0 ? `прямо на месте ${lm}` : `${ZDIR[p.dir]} от ${lm}`;
-    t.zHint =
-      map.id === 1
+    t.zHint = map.hint
+      ? map.hint(where)
+      : map.id === 1
         ? `Местные говорят: искать ${where}. Жёлтая стрелка у края экрана покажет, куда идти.`
         : map.id === 2
           ? `На схеме крестик — ${where}. Стрелка у края экрана покажет направление.`
