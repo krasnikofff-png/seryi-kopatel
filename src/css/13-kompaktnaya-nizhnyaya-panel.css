@@ -708,3 +708,6 @@ html.noscroll body {
   background: #4a3b12;
   color: #f2d36a;
 }
+.track .sk-title {
+  margin: 14px 0 14px;
+}
