@@ -48,7 +48,7 @@ function albWin(x) {
     era = ERAS[x.era].name[0].toUpperCase() + ERAS[x.era].name.slice(1);
   $("albSheet").innerHTML = got
     ? `<img class="alb-big" src="${FIND_IMG[x.name] || ""}" alt=""><h2>${x.name}</h2><p class="alb-tags"><span class="fchip k${x.c}">${CLASSES[x.c].name}</span> ${era}</p>${FIND_DESC[x.name] ? `<p>${FIND_DESC[x.name]}</p>` : ""}<p class="alb-got">✓ Есть в альбоме</p><button class="btn" onclick="SK.albClose()">Закрыть</button>`
-    : `${perk("book") ? `<img class="alb-big sil" src="${FIND_IMG[x.name] || ""}" alt="">` : `<div class="alb-big no">?</div>`}<h2>Пока не найдено</h2><p class="alb-tags"><span class="fchip k${x.c}">${CLASSES[x.c].name}</span> ${era}</p><p>Ищите ${x.night ? "в ночную смену (9-й уровень): светится в темноте" : x.mag ? "поисковым магнитом с берега (6-й уровень): река у Городища, затопленная деревня, болото, пруд усадьбы" : ALB_TIP[x.era]}.</p><button class="btn" onclick="SK.albClose()">Закрыть</button>`;
+    : `${perk("book") ? `<img class="alb-big sil" src="${FIND_IMG[x.name] || ""}" alt="">` : `<div class="alb-big no">?</div>`}<h2>Пока не найдено</h2><p class="alb-tags"><span class="fchip k${x.c}">${CLASSES[x.c].name}</span> ${era}</p><p>Ищите ${x.night ? "в ночную смену (9-й уровень): светится в темноте" : x.house ? "в старом доме под снос (11-й уровень): чердак, печь, стены, подпол" : x.mag ? "поисковым магнитом с берега (6-й уровень): река у Городища, затопленная деревня, болото, пруд усадьбы" : ALB_TIP[x.era]}.</p><button class="btn" onclick="SK.albClose()">Закрыть</button>`;
   o.hidden = false;
 }
 function legShelf() {

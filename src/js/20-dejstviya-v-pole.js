@@ -299,7 +299,7 @@ function endTrip(text) {
   const exc = vitIncome();
   G.money += exc;
   G.msgBad = false;
-  const dtxt = debtTick() + orderTick();
+  const dtxt = debtTick() + orderTick() + houseTick();
   G.msg = `${text}${due ? ` Антиквар продал вещи с комиссии: <b>+${rub(due)}</b>.` : ""}${exc ? ` Экскурсии по витрине: +${rub(exc)}.` : ""}${dtxt} Находок за поездку: ${n}.${dirty ? ` Неочищенных вещей: ${dirty} — почистите, чтобы узнать, что это.` : ""}${sNew}${rumorLine()}`;
   G.msgBad = dtxt.includes("коллектор");
   if (wasManor) {
@@ -403,7 +403,7 @@ function dayOverPopup(n, end, se, wt) {
     box.innerHTML = `<div class="sheet dayover"><img class="do-pic" src="${duskPic()}" alt=""><h2>День окончен</h2>
       <p>${end} — стемнело. ${S.name}, ${WEATHER[wt || "clear"].name}. Вы сложили лопату и поехали домой.</p>
       <ul><li><span>Находок за поездку</span><b>${n}</b></li>${dirty ? `<li><span>Ждут чистки</span><b>${dirty}</b></li>` : ""}<li><span>Деньги</span><b>${rub(G.money)}</b></li></ul>
-      <p class="dim">Фонарь в мастерской даёт ещё 2 часа светлого времени.</p>
+      <p class="dim">Налобный фонарь в магазине даёт ещё час копки.</p>
       <button class="btn" onclick="$('evt').hidden=true">В гараж</button></div>`;
     if (own("lamp")) box.querySelector(".dim").remove();
     box.hidden = false;
