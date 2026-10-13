@@ -89,6 +89,13 @@ function finishDig() {
     got.found = true;
     T.found++;
     if (T.slet) sletFound(got);
+    if (got.grave) {
+      T.found--;
+      updateHud();
+      kurganGrave();
+      save();
+      return;
+    }
     if (got.token) {
       updateHud();
       save();

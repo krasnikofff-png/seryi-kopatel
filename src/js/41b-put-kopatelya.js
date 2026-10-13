@@ -33,7 +33,7 @@ const TRACK = [
   { l: 11, id: "house", n: "Дом под снос", d: "Новое место: подпол, чердак, печь — ищете руками" },
   { l: 12, id: "slet", n: "Слёт копателей", d: "Раз в сезон — соревнование на общем поле" },
   { l: 13, id: "forum", n: "Имя на форуме", d: "Скупщик платит на 10% больше, слухи приходят чаще" },
-  { l: 15, id: "kurgan", n: "Курган", d: "Новое особое место для опытных", soon: 1 }
+  { l: 15, id: "kurgan", n: "Курган", d: "Новое особое место: скифский курган в степи и погребение в центре" }
 ];
 function perk(id) {
   const t = TRACK.find(x => x.id === id);
@@ -120,7 +120,7 @@ function spawnNight() {
     if (p) items.push(nightItem(pick(pool), p.tx, p.ty, { glow: 1 }));
   }
   let msg = "Стемнело. В траве кое-где теплятся зеленоватые огоньки — так светится фосфор.";
-  if (worldKind === "swamp" || worldKind === "hillfort") {
+  if (worldKind === "swamp" || worldKind === "hillfort" || worldKind === "kurgan") {
     const z = T.real || { x: P.x, y: P.y, r: 8 * TS },
       p = freeTileNear(z.x, z.y, 0, z.r);
     if (p) {

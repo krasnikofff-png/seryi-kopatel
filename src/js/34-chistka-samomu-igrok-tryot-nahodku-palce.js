@@ -483,11 +483,11 @@ function go(id) {
   const r = G.region;
   let m;
   let reg = r;
-  if (id === 4 || id === 5) {
+  if (id === 4 || id === 5 || id === 9) {
     m = PLACES[id];
     reg = m.reg;
     if (id === 4 && (!G.hfOwn || G.det < 4)) return;
-    if (id === 5 && !m.need(G)) return;
+    if ((id === 5 || id === 9) && !m.need(G)) return;
   } else if (id === 0) m = FREE_MAP;
   else {
     m = MAPS.find(x => x.id === id);
@@ -528,6 +528,7 @@ function go(id) {
       );
     } else save();
   }
+  if (worldKind === "kurgan") kurganStart();
   if (worldKind === "flooded" && !G.fldSeen) {
     G.fldSeen = true;
     save();

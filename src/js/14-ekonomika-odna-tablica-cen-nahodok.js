@@ -395,6 +395,7 @@ function newTrip(map, region) {
     !G.inv.some(i => i.story === "medal")
   )
     t.event = season().id === "winter" ? "ice" : "gat";
+  if (worldKind === "kurgan") kurganItems(t, used, mult);
   eyeSpots(t, used, mult);
   return t;
 }

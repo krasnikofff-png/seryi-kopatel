@@ -1218,7 +1218,9 @@ function buildManor() {
 }
 let worldKind = null;
 const LOC = (r, map) =>
-  map === 4
+  map === 9
+    ? "kurgan"
+    : map === 4
     ? "hillfort"
     : map === 5
       ? "flooded"
@@ -1826,6 +1828,7 @@ function ensureWorld(kind) {
       manor: buildManor,
       hillfort: buildHillfort,
       flooded: buildFlooded,
+      kurgan: buildKurgan,
       plough: () => buildField(true)
     })[kind] || (() => buildField(false))
   )();

@@ -920,7 +920,7 @@ function loadTrip(t) {
   birds.length = 0;
   for (let i = 0; i < 4; i++) spawnBird();
   $("placeF").innerHTML =
-    `<b>${T.map === 4 ? "Городище · древность" : T.map === 5 ? "Затопленная деревня" : REGIONS[T.region].name + " · " + (T.lead ? T.lead.name : T.map === 3 ? "усадьба" : REG_INFO[T.region].layer)}</b><small>${SEASONS.find(x => x.id === T.season)?.name || season().name}, ${WEATHER[T.wx || "clear"].name} · ${T.map === 4 ? "отчёт экспедиции 1954 г." : T.map === 5 ? "вода отступила" : T.lead ? T.lead.note : T.slet ? "слёт копателей" : T.map ? "карта «" + (MAPS.find(m => m.id === T.map) || { name: "?" }).name + "»" : "поиск наугад"}</small>`;
+    `<b>${T.map === 9 ? "Курган · древность" : T.map === 4 ? "Городище · древность" : T.map === 5 ? "Затопленная деревня" : REGIONS[T.region].name + " · " + (T.lead ? T.lead.name : T.map === 3 ? "усадьба" : REG_INFO[T.region].layer)}</b><small>${SEASONS.find(x => x.id === T.season)?.name || season().name}, ${WEATHER[T.wx || "clear"].name} · ${T.map === 9 ? "памятник археологии" : T.map === 4 ? "отчёт экспедиции 1954 г." : T.map === 5 ? "вода отступила" : T.lead ? T.lead.note : T.slet ? "слёт копателей" : T.map ? "карта «" + (MAPS.find(m => m.id === T.map) || { name: "?" }).name + "»" : "поиск наугад"}</small>`;
   buildBars();
   updateHud();
   digLabels();

@@ -86,12 +86,14 @@ function placeOpen(id) {
   return PLACES[id].need(G);
 }
 function placeLockTxt(id) {
+  if (id === 9) return PLACES[9].needTxt;
   if (id === 5) return "Деревня сейчас под водой. Дно покажется летом и осенью.";
   if (TRANSPORT[G.transport].region < 2) return "Городище — в Области. Нужен мопед или машина.";
   return "Городище откроется с профессиональным детектором (4-й уровень).";
 }
 const multTxt = x => "×" + String(x).replace(".", ",");
 function placeCard(id) {
+  if (id === 9) return kurganCard();
   const P = PLACES[id],
     t = NB_TXT[id],
     li = a => `<ul>${a.map(([ic, x]) => `<li>${NBI[ic]}<span>${x}</span></li>`).join("")}</ul>`;
@@ -144,6 +146,7 @@ function renderMaps() {
         [4, "Городище"],
         [5, "Деревня"]
       ]
+        .concat(perk("kurgan") ? [[9, "Курган"]] : [])
         .map(([id, n]) =>
           placeOpen(id)
             ? `<button class="pl" aria-pressed="${pl === id}" onclick="SK.setPlace(${id})">${n}</button>`
