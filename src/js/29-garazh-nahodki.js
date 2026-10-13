@@ -144,7 +144,10 @@ function renderFinds() {
   const antInfo = CHANNELS[1].open()
     ? `<div class="antinfo"><b>Антиквар сейчас ищет:</b> ${(G.antWant || []).map(w => w.t).join(", ")}. Возьмёт ещё ${G.antLeft} ${plural(G.antLeft, "вещь", "вещи", "вещей")}.${G.antDue ? ` На комиссии: ${rub(G.antDue)} — придут после следующей поездки.` : ""}</div>`
     : "";
-  bulk = antInfo + bulk;
+  const ordInfo = G.order
+    ? `<div class="antinfo ord"><b>Заказ коллекционера:</b> «${G.order.name}» — заплатит вдвое против антиквара. Осталось ${G.order.left} ${plural(G.order.left, "поездка", "поездки", "поездок")}.</div>`
+    : "";
+  bulk = ordInfo + antInfo + bulk;
   const rows = list
     .map(([it, i]) => {
       const meta = `${eraCap(it.era)} · ${it.depth} см${it.cache ? " · тайник" : ""}`;

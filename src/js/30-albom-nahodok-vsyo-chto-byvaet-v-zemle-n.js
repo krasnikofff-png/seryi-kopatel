@@ -37,7 +37,7 @@ function albumShelf() {
   return `<details class="legs alb" ${albOpen ? "open" : ""} ontoggle="SK.albToggle(this.open)"><summary><b>Альбом находок · ${got}/${tot}</b><span class="alb-bar"><i style="width:${Math.round((got / tot) * 100)}%"></i></span></summary>
     ${ALB.map((a, e) => {
       const g = a.filter(x => d[x.name]).length;
-      return `<div class="alb-era"><div class="alb-h"><span>${ERAS[e].name[0].toUpperCase() + ERAS[e].name.slice(1)}</span><b>${g}/${a.length}</b></div><div class="alb-g">${a.map((x, k) => (d[x.name] ? `<button class="k${x.c}" onclick="SK.albPick(${e},${k})"><img src="${FIND_IMG[x.name] || ""}" alt="${x.name}"></button>` : `<button class="no k${x.c}" onclick="SK.albPick(${e},${k})">?</button>`)).join("")}</div></div>`;
+      return `<div class="alb-era"><div class="alb-h"><span>${e < 5 ? ERAS[e].name[0].toUpperCase() + ERAS[e].name.slice(1) : "Ночные находки"}</span><b>${g}/${a.length}</b></div><div class="alb-g">${a.map((x, k) => (d[x.name] ? `<button class="k${x.c}" onclick="SK.albPick(${e},${k})"><img src="${FIND_IMG[x.name] || ""}" alt="${x.name}"></button>` : `<button class="no k${x.c}" onclick="SK.albPick(${e},${k})">${perk("book") ? `<img class="sil" src="${FIND_IMG[x.name] || ""}" alt="">` : "?"}</button>`)).join("")}</div></div>`;
     }).join("")}</details>`;
 }
 // окошко с карточкой вещи из альбома (найденной — с картинкой и описанием, не найденной — с подсказкой, где искать)
@@ -47,7 +47,7 @@ function albWin(x) {
     era = ERAS[x.era].name[0].toUpperCase() + ERAS[x.era].name.slice(1);
   $("albSheet").innerHTML = got
     ? `<img class="alb-big" src="${FIND_IMG[x.name] || ""}" alt=""><h2>${x.name}</h2><p class="alb-tags"><span class="fchip k${x.c}">${CLASSES[x.c].name}</span> ${era}</p>${FIND_DESC[x.name] ? `<p>${FIND_DESC[x.name]}</p>` : ""}<p class="alb-got">✓ Есть в альбоме</p><button class="btn" onclick="SK.albClose()">Закрыть</button>`
-    : `<div class="alb-big no">?</div><h2>Пока не найдено</h2><p class="alb-tags"><span class="fchip k${x.c}">${CLASSES[x.c].name}</span> ${era}</p><p>Ищите ${ALB_TIP[x.era]}.</p><button class="btn" onclick="SK.albClose()">Закрыть</button>`;
+    : `${perk("book") ? `<img class="alb-big sil" src="${FIND_IMG[x.name] || ""}" alt="">` : `<div class="alb-big no">?</div>`}<h2>Пока не найдено</h2><p class="alb-tags"><span class="fchip k${x.c}">${CLASSES[x.c].name}</span> ${era}</p><p>Ищите ${x.night ? "в ночную смену (9-й уровень): светится в темноте" : ALB_TIP[x.era]}.</p><button class="btn" onclick="SK.albClose()">Закрыть</button>`;
   o.hidden = false;
 }
 function legShelf() {
@@ -126,6 +126,8 @@ function renderFindSheet() {
         `SK.sellOneJunk(${i})`
       );
     else {
+      if (G.order && G.order.name === it.name)
+        opts += opt("gold", FI.star, "Отдать коллекционеру", "По заказу · платит вдвое против антиквара", rub(orderPrice(it)), `SK.sellOrder(${i})`);
       opts += opt(
         "amber",
         FI.coins,

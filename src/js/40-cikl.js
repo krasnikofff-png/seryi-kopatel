@@ -25,12 +25,18 @@ function update(dt) {
     P.moving = false;
     return;
   }
+  if (T.minutes >= dayEnd() && perk("night") && !T.night && !T.nightAsk) {
+    T.nightAsk = 1;
+    T.event = "nightfall";
+    showEvent();
+    return;
+  }
   if (T.minutes >= dayEnd()) {
     const n = T.found,
       end = hhmmAbs(480 + dayEnd()),
       wt = T.wx,
       se = T.season;
-    endTrip("Стемнело, пора домой.");
+    endTrip(T.night ? "Ночь на исходе — пора домой." : "Стемнело, пора домой.");
     dayOverPopup(n, end, se, wt);
     return;
   }

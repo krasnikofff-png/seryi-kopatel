@@ -300,7 +300,7 @@ function sell(idx, chId) {
 }
 // слухи о том, чего игрок ещё не видел: особые места, легенды, древность, пустые страницы альбома
 function rumorLine() {
-  if (Math.random() > 0.4) return "";
+  if (Math.random() > (perk("forum") ? 0.6 : 0.4)) return "";
   const R = [],
     seen = G.rumSeen || [],
     d = G.dex || {};
@@ -327,7 +327,7 @@ function rumorLine() {
   });
   ALB.forEach((a, e) => {
     const n = a.filter(x => !d[x.name]).length;
-    if (n >= 5)
+    if (e < 5 && n >= 5)
       R.push([
         "alb" + e + "_" + Math.floor(n / 10),
         "В альбоме пусто",
@@ -634,6 +634,7 @@ window.SK = {
     albOpen = o;
   },
   albPick: (e, k) => albWin(Object.assign({ era: e }, ALB[e][k])),
+  sellOrder,
   albClose: () => ($("albOver").hidden = true),
   scrubDone,
   scrubCancel,

@@ -66,6 +66,7 @@ const mapPrice = (m, r) =>
       Math.pow(MAP_GROWTH, r - 1) *
       (m.id === 3 && G.rep >= 40 ? 0.5 : 1) *
       (m.id === 3 && (G.arch || 0) >= 3 ? 0.7 : 1) *
+      (m.id === 3 && G.lvl >= 8 ? 0.7 : 1) *
       (G.rumor ? 0.7 : 1)) /
       10
   ) * 10;
@@ -113,7 +114,8 @@ function sellPrice(it, ch) {
   const m = grM(it),
     cond = ch.id === "ant" ? (it.gr != null ? m * (it.gr >= 3 ? 1.15 : 1) : m * m) : m,
     dem = ch.id === "ant" ? antDem(it) * (isWinter() ? 1.15 : 1) : 1;
-  return Math.round(it.base * cond * ch.mult * blk * dem * (1 + sk("torg") * 0.02));
+  const forum = ch.id === "buy" && perk("forum") ? 1.1 : 1;
+  return Math.round(it.base * cond * ch.mult * blk * dem * forum * (1 + sk("torg") * 0.02));
 }
 const museumPay = it => (G.rep >= 15 ? Math.round(sellPrice(it, CHANNELS[1]) * 0.25) : 0);
 const GRADES = [

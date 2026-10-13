@@ -176,6 +176,7 @@ function draw() {
       ctx.restore();
     }
   }
+  drawSunk(camX, camY);
   // ямы
   holes.forEach((h, k) => {
     const [tx, ty] = k.split(",").map(Number),
@@ -348,6 +349,7 @@ function draw() {
       ctx.globalAlpha = 1;
     }
   }
+  drawNight(camX, camY);
   // глубины рядом с игроком
   holes.forEach((h, k) => {
     const [tx, ty] = k.split(",").map(Number),

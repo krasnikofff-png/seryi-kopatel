@@ -164,5 +164,5 @@ function renderSkills() {
     <p class="rk-p">${R0.perk[0].toUpperCase() + R0.perk.slice(1)}.</p><p class="rk-p">${up ? `До «${up.name}» — ${up.min - G.rep} ${plural(up.min - G.rep, "очко", "очка", "очков")} совести.` : "Это высшее звание."}</p>
     <details><summary>Все звания</summary><ul class="rk-list">${RANKS.map(r => `<li class="${r === R0 ? "cur" : ""}"><span>${r.range}</span><b>${r.name}</b><small>${r.perk}</small></li>`).join("")}</ul></details>
     <details><summary>Как меняется совесть? <span class="q">?</span></summary><div class="rk-how"><p>Дар музею: +1 за бытовое и монеты, +2 за военное из слоя империи и старины и за редкое, +3 за редкое из старины.</p><p>Чёрный рынок: −1 совести за любую вещь, плюс растёт внимание полиции.</p><p>Скупщик и антиквар совесть не меняют.</p></div></details></section>`;
-  return lvl + `<div class="sk-title"><h2>Навыки</h2><span></span></div>` + cards + rankBox;
+  return lvl + trackBox() + `<div class="sk-title"><h2>Навыки</h2><span></span></div>` + cards + rankBox;
 }

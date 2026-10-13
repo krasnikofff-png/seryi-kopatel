@@ -14,12 +14,12 @@ toastEl.addEventListener("pointerdown", e => {
 function card(it, hurt, up, more) {
   cardEl.classList.toggle("leg", !!it.leg);
   if (it.leg) {
-    cardEl.innerHTML = `<span class="x">×</span><div class="k">★ ЛЕГЕНДА · ${it.depth} см · ${ERAS[it.era].name}</div><img class="cpic" src="${FIND_IMG[it.name] || ""}" alt=""><h2>${it.name}</h2><p>Такое находят раз в жизни. Руки дрожат. Почистите дома — ей ничего не грозит.${up ? "<br><b>Новый уровень! Очко навыка ждёт дома.</b>" : ""}</p>`;
+    cardEl.innerHTML = `<span class="x">×</span><div class="k">★ ЛЕГЕНДА · ${it.depth} см · ${ERAS[it.era].name}</div><img class="cpic" src="${FIND_IMG[it.name] || ""}" alt=""><h2>${it.name}</h2><p>Такое находят раз в жизни. Руки дрожат. Почистите дома — ей ничего не грозит.${up ? lvlUpTxt() : ""}</p>`;
     cardEl.hidden = false;
     toastEl.hidden = true;
     return;
   }
-  cardEl.innerHTML = `<span class="x">×</span><div class="k">${it.cache ? "Тайник с карты! · " : "Находка · "}${it.depth} см · ${ERAS[it.era].name}${it.vdi ? " · ВДИ " + it.vdi : ""}</div>${it.story ? "" : `<img class="cpic" src="${FIND_IMG[it.name] || ""}" alt="">`}<h2>${shownName(it)}</h2><p>${hurt ? "Кажется, задели лопатой — сохранность может пострадать. " : ""}${it.story ? "Что это — станет ясно после чистки." : it.c === 0 ? "Мусор. Только в металлолом." : `<span class="crange">${CLASSES[it.c].name} · ${rangeCh().id === "ant" ? "антиквар" : "скупщик"} даст ${rub(priceRange(it)[0])} – ${rub(priceRange(it)[1])}</span>Цену решит сохранность — узнаете после чистки. Бывают и редкие разновидности ×${rareM(it)} — их видно, только если чистить самому.`}${it.story ? `<br><b>★ Сердце ёкнуло: кажется, это то, что вы искали. Почистите дома.</b>` : ""}${more ? `<br><b>Детектор над ямой не умолкает — глубже лежит что-то ещё.</b>` : ""}${up ? "<br><b>Новый уровень! Очко навыка ждёт дома.</b>" : ""}</p>`;
+  cardEl.innerHTML = `<span class="x">×</span><div class="k">${it.cache ? "Тайник с карты! · " : "Находка · "}${it.depth} см · ${ERAS[it.era].name}${it.vdi ? " · ВДИ " + it.vdi : ""}</div>${it.story ? "" : `<img class="cpic" src="${FIND_IMG[it.name] || ""}" alt="">`}<h2>${shownName(it)}</h2><p>${hurt ? "Кажется, задели лопатой — сохранность может пострадать. " : ""}${it.story ? "Что это — станет ясно после чистки." : it.c === 0 ? "Мусор. Только в металлолом." : `<span class="crange">${CLASSES[it.c].name} · ${rangeCh().id === "ant" ? "антиквар" : "скупщик"} даст ${rub(priceRange(it)[0])} – ${rub(priceRange(it)[1])}</span>Цену решит сохранность — узнаете после чистки. Бывают и редкие разновидности ×${rareM(it)} — их видно, только если чистить самому.`}${it.story ? `<br><b>★ Сердце ёкнуло: кажется, это то, что вы искали. Почистите дома.</b>` : ""}${more ? `<br><b>Детектор над ямой не умолкает — глубже лежит что-то ещё.</b>` : ""}${up ? lvlUpTxt() : ""}</p>`;
   cardEl.hidden = false;
   toastEl.hidden = true;
 }
@@ -299,7 +299,7 @@ function endTrip(text) {
   const exc = vitIncome();
   G.money += exc;
   G.msgBad = false;
-  const dtxt = debtTick();
+  const dtxt = debtTick() + orderTick();
   G.msg = `${text}${due ? ` Антиквар продал вещи с комиссии: <b>+${rub(due)}</b>.` : ""}${exc ? ` Экскурсии по витрине: +${rub(exc)}.` : ""}${dtxt} Находок за поездку: ${n}.${dirty ? ` Неочищенных вещей: ${dirty} — почистите, чтобы узнать, что это.` : ""}${sNew}${rumorLine()}`;
   G.msgBad = dtxt.includes("коллектор");
   if (wasManor) {

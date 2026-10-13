@@ -394,5 +394,6 @@ function newTrip(map, region) {
     !G.inv.some(i => i.story === "medal")
   )
     t.event = season().id === "winter" ? "ice" : "gat";
+  eyeSpots(t, used, mult);
   return t;
 }

@@ -56,7 +56,8 @@ function rollWx() {
   }
   return (G.wx = "clear");
 }
-const dayEnd = () => Math.min(780, season().end + (own("lamp") ? 120 : 0));
+const dayEnd = () =>
+  Math.min(780, season().end + (own("lamp") ? 60 : 0) + (perk("thermos") ? 60 : 0)) + (T && T.night ? 180 : 0);
 const hhmmAbs = m => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
 function seasonStrip() {
   const S = season(),

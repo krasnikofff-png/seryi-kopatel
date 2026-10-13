@@ -605,3 +605,106 @@ html.noscroll body {
   width: 100%;
   margin-top: 6px;
 }
+
+/* Путь копателя */
+.track ol {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.track li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #2a2117;
+  border: 1px solid #4a3c2a;
+  font-family: var(--font-n);
+}
+.track li div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.track li b {
+  font-size: 16px;
+  color: var(--ink);
+}
+.track li small {
+  font-size: 13.5px;
+  color: var(--ink-dim);
+  line-height: 1.3;
+}
+.track .tr-l {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #3a3020;
+  color: var(--ink-dim);
+  font-weight: 700;
+}
+.track .tr-s {
+  font-size: 13px;
+  color: #8fae55;
+  white-space: nowrap;
+}
+.track li.done {
+  border-color: #556227;
+  background: #232a17;
+}
+.track li.done .tr-l {
+  background: #5d7d38;
+  color: #fffbe8;
+}
+.track li.next {
+  border-color: #e9c54a;
+}
+.track li.next .tr-l {
+  background: #e9c54a;
+  color: #2a2117;
+}
+.track li.next .tr-s {
+  color: #f2d36a;
+}
+.track li.lock {
+  opacity: 0.7;
+}
+.tr-soon {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 400;
+  color: #c9a85a;
+  border: 1px solid #6b5420;
+  border-radius: 6px;
+  padding: 0 5px;
+  margin-left: 4px;
+}
+.alb-g button.no img.sil,
+.alb-win img.sil {
+  filter: brightness(0) invert(0.75);
+  opacity: 0.32;
+}
+.track .tr-s {
+  text-align: right;
+}
+.track li.soon .tr-s {
+  color: #c9a85a;
+}
+.antinfo.ord {
+  border-left-color: #e9c54a;
+}
+.track li.soon {
+  border-style: dashed;
+  border-color: #6b5420;
+}
+.track li.soon .tr-l {
+  background: #4a3b12;
+  color: #f2d36a;
+}
