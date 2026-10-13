@@ -3,7 +3,7 @@
 const SLET_IMG = { cup: "@art(slet/cup.png)", token: "@art(slet/token.png)" };
 const SLET_PTS = [0, 1, 3, 5, 10],
   SLET_TOKEN = 10,
-  SLET_PRIZE = [30000, 12000, 5000, 0],
+  SLET_PRIZE = [30000, 10000, 0, 0],
   SLET_START = 120, // 10:00
   SLET_END = 300; // свисток в 13:00
 const SLET_RIVALS = [
@@ -23,7 +23,7 @@ const sletKey = () => Math.floor((G.trips || 0) / 4);
 const sletOpen = () => perk("slet") && G.sletDone !== sletKey();
 function sletNb() {
   if (!sletOpen()) return "";
-  return `<div class="nbc slet"><div class="nbc-pic spr"><img src="${SLET_IMG.cup}" alt=""></div><div class="nbc-b"><span class="nbc-hand">${season().name.toLowerCase()}</span><h3>Слёт копателей</h3><p>Раз в сезон копатели собираются на общем поле. Организаторы закопали 12 жетонов. Три часа, свисток в 13:00 — у кого больше очков, тот и победил.</p><ul><li>${NBI.bars}<span>Очки: жетон ${SLET_TOKEN}, редкое 10, военное 5, монета 3, бытовое 1</span></li><li>${NBI.box}<span>Призы: ${rub(SLET_PRIZE[0])} и кубок · ${rub(SLET_PRIZE[1])} · ${rub(SLET_PRIZE[2])}</span></li><li>${NBI.acc}<span>Соперники: ${SLET_RIVALS.map(r => r.n).join(", ")}</span></li></ul><button class="nb-btn" onclick="SK.goSlet()">Ехать на слёт</button></div></div>`;
+  return `<div class="nbc slet"><div class="nbc-pic spr"><img src="${SLET_IMG.cup}" alt=""></div><div class="nbc-b"><span class="nbc-hand">${season().name.toLowerCase()}</span><h3>Слёт копателей</h3><p>Раз в сезон копатели собираются на общем поле. Организаторы закопали 12 жетонов. Три часа, свисток в 13:00 — у кого больше очков, тот и победил.</p><ul><li>${NBI.bars}<span>Очки: жетон ${SLET_TOKEN}, редкое 10, военное 5, монета 3, бытовое 1</span></li><li>${NBI.box}<span>Призы: 1-е — ${rub(SLET_PRIZE[0])} и кубок, 2-е — ${rub(SLET_PRIZE[1])}</span></li><li>${NBI.acc}<span>Соперники: ${SLET_RIVALS.map(r => r.n).join(", ")}</span></li></ul><button class="nb-btn" onclick="SK.goSlet()">Ехать на слёт</button></div></div>`;
 }
 function goSlet() {
   if (!sletOpen()) return;
@@ -105,7 +105,7 @@ function sletChip() {
 }
 function sletInfo() {
   toast(
-    `Очки: жетон слёта ${SLET_TOKEN}, редкое 10, военное 5, монета 3, бытовое 1, мусор 0. Призы: 1-е — ${rub(SLET_PRIZE[0])} и кубок, 2-е — ${rub(SLET_PRIZE[1])}, 3-е — ${rub(SLET_PRIZE[2])}. Соперники копают то же поле — что выкопали они, вам уже не достанется.`
+    `Очки: жетон слёта ${SLET_TOKEN}, редкое 10, военное 5, монета 3, бытовое 1, мусор 0. Призы: 1-е — ${rub(SLET_PRIZE[0])} и кубок, 2-е — ${rub(SLET_PRIZE[1])}, за 3-е и 4-е — ничего. Соперники копают то же поле — что выкопали они, вам уже не достанется.`
   );
 }
 // очки игрока: вызывается из копки
