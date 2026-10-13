@@ -468,7 +468,7 @@ function magDraw() {
   for (const b of MG.bub) g.fillRect(Math.round(b.x), Math.round(b.y), 2, 2);
   // копатель
   const im = heroImg(G.det) || HERO_DET[1];
-  if (im && im.complete && im.naturalWidth) g.drawImage(im, 0, 2 * 42, 24, 42, 8, 21, 24, 42);
+  if (im && im.complete !== false && im.naturalWidth !== 0) g.drawImage(im, 0, 2 * 42, 24, 42, 8, 21, 24, 42);
   // прицел
   if (MG.ph === "aim") {
     const ax = M_T0 + MG.p * M_TR;

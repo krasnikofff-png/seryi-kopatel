@@ -1140,3 +1140,70 @@ html.noscroll body {
   vertical-align: -4px;
   margin-right: 4px;
 }
+
+/* гардероб */
+.wd-prev {
+  display: flex;
+  justify-content: center;
+  background: #9aaa6a;
+  border: 2px solid #5a4a33;
+  border-radius: 6px;
+  margin: 6px 0 10px;
+  padding: 4px 0;
+}
+.wd-prev img {
+  width: 240px;
+  max-width: 100%;
+  image-rendering: pixelated;
+}
+.wd-slot h3 {
+  margin: 8px 0 6px;
+  font-size: 15px;
+  color: var(--ink-dim);
+}
+.wd-opts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.wd-o {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #2a2117;
+  border: 2px solid #5a4a33;
+  color: var(--ink);
+  text-align: left;
+  font-family: var(--font-n);
+  font-size: 14px;
+}
+.wd-o img {
+  width: 40px;
+  height: 40px;
+  image-rendering: pixelated;
+  flex: none;
+}
+.wd-o span {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+.wd-o small {
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+.wd-o.on {
+  border-color: var(--gold);
+  background: #3a2e1c;
+}
+.wd-o.on small {
+  color: var(--gold);
+}
+.wd-o.lock {
+  opacity: 0.5;
+}
+.wd-o.lock img {
+  filter: grayscale(1);
+}

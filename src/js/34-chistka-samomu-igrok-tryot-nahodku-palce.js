@@ -646,6 +646,7 @@ window.SK = {
   goLead,
   goHouse,
   goSlet,
+  wearPick,
   sletInfo,
   hsSelect,
   hsSearch,

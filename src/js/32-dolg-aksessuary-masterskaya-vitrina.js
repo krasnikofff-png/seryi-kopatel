@@ -267,7 +267,7 @@ function renderEcon() {
   }
   return { debt, acc, ws, vit };
 }
-const SHOP_TABS = { acc: "Аксессуары", ws: "Мастерская" };
+const SHOP_TABS = { acc: "Аксессуары", ws: "Мастерская", wd: "Гардероб" };
 function renderGear(GEAR) {
   if (!GEAR[gearTab] && !SHOP_TABS[gearTab]) gearTab = "shovel";
   const E = renderEcon(),
@@ -276,7 +276,7 @@ function renderGear(GEAR) {
   const shopRow = `<div class="subtabs shop" role="tablist">${Object.keys(SHOP_TABS)
     .map(
       t =>
-        `<button role="tab" aria-selected="${t === gearTab}" onclick="SK.gearTab('${t}')">${SHOP_TABS[t]}<small>${items(t).filter(x => own(x.id)).length}/${items(t).length}</small>${canBuy(t) ? `<i class="sdot" aria-label="можно купить"></i>` : ""}</button>`
+        `<button role="tab" aria-selected="${t === gearTab}" onclick="SK.gearTab('${t}')">${SHOP_TABS[t]}<small>${t === "wd" ? wdCount() : `${items(t).filter(x => own(x.id)).length}/${items(t).length}`}</small>${t !== "wd" && canBuy(t) ? `<i class="sdot" aria-label="можно купить"></i>` : ""}</button>`
     )
     .join("")}</div>`;
   const gearRow = `<div class="subtabs" role="tablist">${Object.keys(GEAR)
@@ -285,7 +285,8 @@ function renderGear(GEAR) {
         `<button role="tab" aria-selected="${t === gearTab}" onclick="SK.gearTab('${t}')">${GEAR[t].label}<small>ур. ${G[t]}/${GEAR[t].tbl.length - 1}</small></button>`
     )
     .join("")}</div>`;
-  if (SHOP_TABS[gearTab]) return E.debt + gearRow + shopRow + (gearTab === "acc" ? E.acc : E.ws + E.vit);
+  if (SHOP_TABS[gearTab])
+    return E.debt + gearRow + shopRow + (gearTab === "acc" ? E.acc : gearTab === "wd" ? wardrobeBox() : E.ws + E.vit);
   const k = gearTab,
     g = GEAR[k],
     T = g.tbl,

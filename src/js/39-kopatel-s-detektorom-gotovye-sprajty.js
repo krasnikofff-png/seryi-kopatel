@@ -14,49 +14,72 @@ const HERO_DET = [
   im.src = u;
   return im;
 });
-// одежда копателя: надевается сама с уровнем. Новую одежду добавлять сюда — свой набор из шести листов (по детекторам)
-const loadSheets = urls =>
-  urls.map(u => {
-    if (!u) return null;
-    const im = new Image();
-    im.src = u;
-    return im;
-  });
-const OUTFITS = [
-  { id: "cap", l: 1, n: "Кепка", sheets: HERO_DET },
-  {
-    id: "ushanka",
-    l: 3,
-    n: "Ушанка",
-    sheets: loadSheets([
-      null,
-      "@art(hero-det/u1.png)",
-      "@art(hero-det/u2.png)",
-      "@art(hero-det/u3.png)",
-      "@art(hero-det/u4.png)",
-      "@art(hero-det/u5.png)",
-      "@art(hero-det/u6.png)"
-    ])
-  },
-  {
-    id: "gorka",
-    l: 9,
-    n: "Ушанка и розовая «горка»",
-    sheets: loadSheets([
-      null,
-      "@art(hero-det/ug1.png)",
-      "@art(hero-det/ug2.png)",
-      "@art(hero-det/ug3.png)",
-      "@art(hero-det/ug4.png)",
-      "@art(hero-det/ug5.png)",
-      "@art(hero-det/ug6.png)"
-    ])
-  }
+// ===== ОДЕЖДА: слои поверх листа копателя (штаны, куртка, шапка). Новая одежда — строка в WEAR и свой слой =====
+const WEAR_SLOTS = [
+  ["hat", "Шапка"],
+  ["jacket", "Куртка"],
+  ["pants", "Штаны"]
 ];
-const outfit = () => OUTFITS.filter(o => (G.lvl || 1) >= o.l).pop();
+const WEAR = {
+  hat: [
+    { id: "cap", n: "Кепка", l: 1, ic: "@art(ui/cap.png)" },
+    { id: "ushanka", n: "Ушанка", l: 3, ic: "@art(ui/ushanka.png)", ov: "@art(hero-det/ov-ushanka.png)" }
+  ],
+  jacket: [
+    { id: "green", n: "Зелёная куртка", l: 1, ic: "@art(ui/jacket.png)" },
+    { id: "gorka", n: "Розовая «горка»", l: 9, ic: "@art(ui/gorka.png)", ov: "@art(hero-det/ov-gorka.png)" }
+  ],
+  pants: [
+    { id: "jeans", n: "Джинсы", l: 1, ic: "@art(ui/jeans.png)" },
+    { id: "gorka", n: "Штаны «горка»", l: 9, ic: "@art(ui/gorka-pants.png)", ov: "@art(hero-det/ov-gorka-pants.png)" }
+  ]
+};
+Object.values(WEAR).forEach(a =>
+  a.forEach(w => {
+    if (!w.ov) return;
+    const im = new Image();
+    im.src = w.ov;
+    w.img = im;
+  })
+);
+// новая одежда надевается сама, как только открылась; потом её можно сменить в гардеробе
+function wearSync() {
+  G.wear = G.wear || {};
+  G.wearSeen = G.wearSeen || [];
+  WEAR_SLOTS.forEach(([s]) =>
+    WEAR[s].forEach(w => {
+      const k = s + ":" + w.id;
+      if ((G.lvl || 1) >= w.l && !G.wearSeen.includes(k)) {
+        G.wearSeen.push(k);
+        G.wear[s] = w.id;
+      }
+    })
+  );
+}
+const wearOn = s => WEAR[s].find(w => w.id === (G.wear && G.wear[s])) || WEAR[s][0];
+const heroCache = {};
+let wearLvl = -1;
 function heroImg(d) {
-  const im = outfit().sheets[d];
-  return im && im.complete && im.naturalWidth ? im : HERO_DET[d];
+  if (wearLvl !== G.lvl) {
+    wearLvl = G.lvl;
+    wearSync();
+  }
+  const base = HERO_DET[d];
+  if (!base || !base.complete || !base.naturalWidth) return base;
+  const lay = ["pants", "jacket", "hat"].map(wearOn).filter(w => w.img);
+  if (!lay.length) return base;
+  if (lay.some(w => !w.img.complete || !w.img.naturalWidth)) return base;
+  const key = d + ":" + lay.map(w => w.id).join(",");
+  if (!heroCache[key]) {
+    const c = document.createElement("canvas");
+    c.width = base.naturalWidth;
+    c.height = base.naturalHeight;
+    const g = c.getContext("2d");
+    g.drawImage(base, 0, 0);
+    lay.forEach(w => g.drawImage(w.img, 0, 0));
+    heroCache[key] = c;
+  }
+  return heroCache[key];
 }
 const HD_ROW = { down: 0, left: 1, right: 2, up: 3 },
   HD_SWAY = [0, -2, 2];
@@ -73,7 +96,7 @@ function heroCoil(x, y, fr) {
 }
 function drawHeroDet(x, y, sig) {
   const im = heroImg(G.det);
-  if (!im || !im.complete || !im.naturalWidth) return false;
+  if (!im || (im.complete === false) || im.naturalWidth === 0) return false;
   const fr = P.moving ? [0, 1, 0, 2][((Math.floor(P.walk * 8) % 4) + 4) % 4] : 0;
   x = Math.round(x);
   y = Math.round(y);
