@@ -906,3 +906,13 @@ html.noscroll body {
   line-height: 1.15 !important;
   padding-right: 34px;
 }
+.fl-luck {
+  margin: 0 0 6px !important;
+  padding: 6px 10px;
+  border: 2px solid #e9c54a;
+  border-radius: 6px;
+  background: #4a3b12;
+  color: #fbe58a !important;
+  font-weight: 700;
+  font-size: 14.5px !important;
+}

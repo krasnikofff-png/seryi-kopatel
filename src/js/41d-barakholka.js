@@ -143,6 +143,8 @@ const LEADS = [
   }
 ];
 const LEAD_MAX = 4;
+const FLEA_LUCK = 0.25, // шанс, что лот окажется удачным
+  FLEA_X = 4; // удачный лот: вещи внутри стоят вчетверо дороже (по цене антиквара)
 const rndInt = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 function newLead() {
   G.leads = G.leads || [];
@@ -224,6 +226,23 @@ function buyLot(j) {
     G.inv.push(it);
     got.push(it);
   }
+  let luck = false;
+  if (Math.random() < FLEA_LUCK) {
+    luck = true;
+    let good = got.filter(i => i.c > 0);
+    if (!good.length) {
+      // в мешке одного лома или в пачке писем — между бумаг нашлась ценная вещь
+      const it = fleaItem(Math.random() < 0.3 ? 4 : 3, L.era || [0.2, 0.45, 0.3, 0.05, 0], L.iron);
+      it.gr = Math.max(2, it.gr);
+      dexAdd(it.name);
+      G.inv.push(it);
+      got.push(it);
+      good = [it];
+    }
+    const val = good.reduce((a, i) => a + sellPrice(i, CHANNELS[1]), 0),
+      k = Math.max(1, (lot.p * FLEA_X) / Math.max(1, val));
+    good.forEach(i => (i.base = Math.max(10, Math.round((i.base * k) / 10) * 10)));
+  }
   if (Math.random() < L.lead) {
     const ld = newLead();
     if (ld) leads.push(ld);
@@ -232,8 +251,8 @@ function buyLot(j) {
       if (l2) leads.push(l2);
     }
   }
-  fleaOpen = { lot, got, leads };
-  SFX.coins(2);
+  fleaOpen = { lot, got, leads, luck };
+  SFX.coins(luck ? 6 : 2);
   if (leads.length) setTimeout(() => SFX.paper(), 300);
   save();
   renderFlea();
@@ -247,10 +266,10 @@ function renderFlea() {
   const s = $("fleaSheet"),
     st = fleaStall();
   if (fleaOpen) {
-    const { lot, got, leads } = fleaOpen,
+    const { lot, got, leads, luck } = fleaOpen,
       L = LOTS[lot.k];
     const val = got.reduce((a, it) => a + (it.c === 0 ? 0 : sellPrice(it, CHANNELS[1])), 0);
-    s.innerHTML = `<h2>${L.n}</h2><p class="fl-sub">Заплатили ${rub(lot.p)}.${got.some(i => i.c > 0) ? ` Антиквар дал бы за всё ~${rub(val)}.` : ""}</p>${got.length ? `<ul class="mg-got fl-got">${got.map(it => `<li><img src="${FIND_IMG[it.name] || ""}" alt=""><span>${it.name}<small class="k${it.c}">${fleaTag(it)}</small></span></li>`).join("")}</ul>` : ""}${leads.map(l => leadCard(l)).join("")}${!got.length && !leads.length ? `<p>Пусто: только газеты и пыль.</p>` : ""}${lot.k === "pack" && !leads.length ? `<p>Письма как письма — про погоду и урожай. Наводок нет.</p>` : ""}<div class="row"><button class="btn" onclick="SK.fleaBack()">К рядам</button></div>`;
+    s.innerHTML = `<h2>${L.n}</h2>${luck ? `<p class="fl-luck">Повезло! Продавец не знал, что продаёт: вещи стоят вчетверо дороже лота.</p>` : ""}<p class="fl-sub">Заплатили ${rub(lot.p)}.${got.some(i => i.c > 0) ? ` Антиквар дал бы за всё ~${rub(val)}.` : ""}</p>${got.length ? `<ul class="mg-got fl-got">${got.map(it => `<li><img src="${FIND_IMG[it.name] || ""}" alt=""><span>${it.name}<small class="k${it.c}">${fleaTag(it)}</small></span></li>`).join("")}</ul>` : ""}${leads.map(l => leadCard(l)).join("")}${!got.length && !leads.length ? `<p>Пусто: только газеты и пыль.</p>` : ""}${lot.k === "pack" && !leads.length ? `<p>Письма как письма — про погоду и урожай. Наводок нет.</p>` : ""}<div class="row"><button class="btn" onclick="SK.fleaBack()">К рядам</button></div>`;
     return;
   }
   const leadsN = (G.leads || []).length;
@@ -262,7 +281,7 @@ function renderFlea() {
     })
     .join(
       ""
-    )}</div><p class="fl-note">Что внутри — видно только после покупки. Вещи уже чистые: их сразу можно продать. Новые лоты — после следующей поездки.${leadsN ? ` Наводок в блокноте: ${leadsN}.` : ""}</p><button class="btn ghost" onclick="SK.fleaClose()">Уйти</button>`;
+    )}</div><p class="fl-note">Что внутри — видно только после покупки. Примерно каждый четвёртый лот — удачный: вещи в нём стоят вчетверо дороже. Вещи уже чистые: их сразу можно продать. Новые лоты — после следующей поездки.${leadsN ? ` Наводок в блокноте: ${leadsN}.` : ""}</p><button class="btn ghost" onclick="SK.fleaClose()">Уйти</button>`;
 }
 // блокнот: барахолка и наводки
 function fleaNb() {
