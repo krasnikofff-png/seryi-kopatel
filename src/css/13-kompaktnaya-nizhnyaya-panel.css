@@ -1132,3 +1132,11 @@ html.noscroll body {
   text-align: right;
   color: var(--ink-dim);
 }
+
+.track .tr-ic {
+  width: 20px;
+  height: 20px;
+  image-rendering: pixelated;
+  vertical-align: -4px;
+  margin-right: 4px;
+}

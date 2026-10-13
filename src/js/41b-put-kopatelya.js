@@ -2,7 +2,7 @@
 // Каждый уровень открывает конкретную вещь. «soon» — появится в следующем обновлении.
 const TRACK = [
   { l: 2, id: "book", n: "Записная книжка", d: "В альбоме вместо «?» видны силуэты ещё не найденных вещей" },
-  { l: 3, id: "thermos", n: "Термос", d: "День в поле на час длиннее" },
+  { l: 3, id: "thermos", n: "Термос и ушанка", d: "День в поле на час длиннее, а Серый — в ушанке", ic: "@art(ui/ushanka.png)" },
   { l: 4, id: "ant", n: "Антиквар", d: "Новый покупатель: платит больше скупщика за то, что ищет" },
   { l: 5, id: "eye", n: "Наметанный глаз", d: "На поле видна осевшая земля — под ней старый тайник" },
   {
@@ -21,8 +21,9 @@ const TRACK = [
   {
     l: 9,
     id: "night",
-    n: "Ночная смена",
-    d: "Можно остаться в поле на ночь: светящиеся находки и клады-огоньки. Полиция +1"
+    n: "Ночная смена и «горка»",
+    d: "Можно остаться в поле на ночь: светящиеся находки и клады-огоньки, полиция +1. Серый — в розовой «горке»",
+    ic: "@art(ui/gorka.png)"
   },
   {
     l: 10,
@@ -48,7 +49,7 @@ function trackBox() {
   return `<section class="track"><div class="sk-title"><h2>Путь копателя</h2><span></span></div><ol>${TRACK.map(
     t => {
       const st = G.lvl >= t.l ? (t.soon ? "soon" : "done") : t === nx ? "next" : "lock";
-      return `<li class="${st}"><span class="tr-l">${t.l}</span><div><b>${t.n}${t.soon ? ` <em class="tr-soon">скоро</em>` : ""}</b><small>${t.d}</small></div><span class="tr-s">${st === "done" ? "✓" : st === "soon" ? "ждёт обновления" : st === "next" ? "следующий" : ""}</span></li>`;
+      return `<li class="${st}"><span class="tr-l">${t.l}</span><div><b>${t.ic ? `<img class="tr-ic" src="${t.ic}" alt="">` : ""}${t.n}${t.soon ? ` <em class="tr-soon">скоро</em>` : ""}</b><small>${t.d}</small></div><span class="tr-s">${st === "done" ? "✓" : st === "soon" ? "ждёт обновления" : st === "next" ? "следующий" : ""}</span></li>`;
     }
   ).join("")}</ol></section>`;
 }

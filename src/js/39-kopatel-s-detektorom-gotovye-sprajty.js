@@ -14,6 +14,50 @@ const HERO_DET = [
   im.src = u;
   return im;
 });
+// одежда копателя: надевается сама с уровнем. Новую одежду добавлять сюда — свой набор из шести листов (по детекторам)
+const loadSheets = urls =>
+  urls.map(u => {
+    if (!u) return null;
+    const im = new Image();
+    im.src = u;
+    return im;
+  });
+const OUTFITS = [
+  { id: "cap", l: 1, n: "Кепка", sheets: HERO_DET },
+  {
+    id: "ushanka",
+    l: 3,
+    n: "Ушанка",
+    sheets: loadSheets([
+      null,
+      "@art(hero-det/u1.png)",
+      "@art(hero-det/u2.png)",
+      "@art(hero-det/u3.png)",
+      "@art(hero-det/u4.png)",
+      "@art(hero-det/u5.png)",
+      "@art(hero-det/u6.png)"
+    ])
+  },
+  {
+    id: "gorka",
+    l: 9,
+    n: "Ушанка и розовая «горка»",
+    sheets: loadSheets([
+      null,
+      "@art(hero-det/ug1.png)",
+      "@art(hero-det/ug2.png)",
+      "@art(hero-det/ug3.png)",
+      "@art(hero-det/ug4.png)",
+      "@art(hero-det/ug5.png)",
+      "@art(hero-det/ug6.png)"
+    ])
+  }
+];
+const outfit = () => OUTFITS.filter(o => (G.lvl || 1) >= o.l).pop();
+function heroImg(d) {
+  const im = outfit().sheets[d];
+  return im && im.complete && im.naturalWidth ? im : HERO_DET[d];
+}
 const HD_ROW = { down: 0, left: 1, right: 2, up: 3 },
   HD_SWAY = [0, -2, 2];
 function heroCoil(x, y, fr) {
@@ -28,7 +72,7 @@ function heroCoil(x, y, fr) {
         : { x: x - 13, y: y - 1 + h };
 }
 function drawHeroDet(x, y, sig) {
-  const im = HERO_DET[G.det];
+  const im = heroImg(G.det);
   if (!im || !im.complete || !im.naturalWidth) return false;
   const fr = P.moving ? [0, 1, 0, 2][((Math.floor(P.walk * 8) % 4) + 4) % 4] : 0;
   x = Math.round(x);
