@@ -28,12 +28,21 @@ function pline(g, x0, y0, x1, y1, col) {
 }
 const PANELS = {}; // кадры комикса — см. раздел «КАДРЫ (перерисованы)»
 const PANEL_IMG = {
-  // пролог — готовые кадры (нарисованы отдельно, 560×700)
+  // готовые рисованные кадры (560×700); остальные рисуются кодом
   attic: "@art(comic/attic.webp)",
   box: "@art(comic/box.webp)",
   letter: "@art(comic/letter.webp)",
   room: "@art(comic/room.webp)",
-  loan: "@art(comic/loan.webp)"
+  loan: "@art(comic/loan.webp)",
+  // главы 1, 2, 5, 6
+  museum: "@art(comic/museum.webp)",
+  savelich: "@art(comic/savelich.webp)",
+  forestdig: "@art(comic/forestdig.webp)",
+  dugout42: "@art(comic/dugout42.webp)",
+  borzy: "@art(comic/borzy.webp)",
+  train: "@art(comic/train.webp)",
+  nyura: "@art(comic/nyura.webp)",
+  medal: "@art(comic/medal.webp)"
 };
 function panelPic(id) {
   if (PANEL_IMG[id]) return PANEL_IMG[id];
