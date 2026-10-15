@@ -27,7 +27,14 @@ function pline(g, x0, y0, x1, y1, col) {
     g.fillRect(Math.round(x0 + ((x1 - x0) * i) / n), Math.round(y0 + ((y1 - y0) * i) / n), 1, 1);
 }
 const PANELS = {}; // кадры комикса — см. раздел «КАДРЫ (перерисованы)»
-const PANEL_IMG = {};
+const PANEL_IMG = {
+  // пролог — готовые кадры (нарисованы отдельно, 560×700)
+  attic: "@art(comic/attic.webp)",
+  box: "@art(comic/box.webp)",
+  letter: "@art(comic/letter.webp)",
+  room: "@art(comic/room.webp)",
+  loan: "@art(comic/loan.webp)"
+};
 function panelPic(id) {
   if (PANEL_IMG[id]) return PANEL_IMG[id];
   const c = document.createElement("canvas");

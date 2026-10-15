@@ -367,3 +367,7 @@
     transform: none;
   }
 }
+/* готовые рисованные кадры (webp) — плавное масштабирование, а не пиксельное */
+.cm-frame img[src^="data:image/webp"] {
+  image-rendering: auto;
+}
