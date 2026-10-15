@@ -43,9 +43,7 @@ function openScrub(idx) {
     mg.drawImage(img, 0, 0, 32, 32);
     const md = mg.getImageData(0, 0, 32, 32).data;
     const r = rng(idx * 131 + it.depth * 7 + (it.base | 0)),
-      col = it.iron
-        ? ["#6a4426", "#8a5a32", "#5a3a20", "#7a4a2a"]
-        : ["#5e5038", "#6e5e40", "#4e4430", "#7a6a48"];
+      col = it.iron ? ["#6a4426", "#8a5a32", "#5a3a20", "#7a4a2a"] : ["#5e5038", "#6e5e40", "#4e4430", "#7a6a48"];
     for (let y = 0; y < 32; y++)
       for (let x = 0; x < 32; x++) {
         let on = false;
@@ -163,8 +161,7 @@ function drawScrub() {
   const p = Math.round(st.pct * 100);
   $("scBar").style.width = p + "%";
   $("scPct").textContent = `Очищено: ${p}%`;
-  $("scScr").textContent =
-    scrF > 0 ? `Царапины: ${scrF < 0.2 ? "мелкие" : scrF < 0.5 ? "заметные" : "глубокие"}` : "";
+  $("scScr").textContent = scrF > 0 ? `Царапины: ${scrF < 0.2 ? "мелкие" : scrF < 0.5 ? "заметные" : "глубокие"}` : "";
   const warn = performance.now() - st.warnT < 700;
   $("scHint").textContent = warn
     ? "Осторожно! Слишком сильно — царапаете находку."
@@ -358,9 +355,7 @@ function sellAllBuy() {
   }
   if (!n) return;
   G.money += sum;
-  msg(
-    `Скупщик забрал всё оптом: ${n} ${plural(n, "вещь", "вещи", "вещей")} за ${rub(sum)}.`
-  );
+  msg(`Скупщик забрал всё оптом: ${n} ${plural(n, "вещь", "вещи", "вещей")} за ${rub(sum)}.`);
   rumorTry();
   save();
   renderBase();
@@ -553,9 +548,7 @@ function renderBase() {
   $("bRep").textContent = `Совесть ${G.rep > 0 ? "+" : ""}${G.rep}`;
   $("bHeat").textContent = `Полиция ${G.heat}`;
   $("bLvl").innerHTML = `Ур. ${G.lvl}${G.sp ? ` <i class="sp">+${G.sp}</i>` : ""}`;
-  document
-    .querySelectorAll("#tabs button")
-    .forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
+  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
   {
     const sb = document.querySelector('#tabs button[data-tab="skills"]');
     if (sb) sb.classList.toggle("alert", (G.sp || 0) > 0);
@@ -683,6 +676,10 @@ window.SK = {
   },
   gearTab: k => {
     gearTab = k;
+    renderBase();
+  },
+  skTab: k => {
+    skTab = k;
     renderBase();
   },
   gearPick: (k, n) => {

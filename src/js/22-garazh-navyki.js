@@ -113,17 +113,24 @@ function kartoPic(lv) {
   };
   return `<svg class="karto" viewBox="0 0 340 100" role="img" aria-label="Кольцо на карте до и после улучшения">${panel(0, lv, "Сейчас")}<text x="170" y="56" text-anchor="middle" font-size="22" fill="#e9c54a">→</text>${panel(190, Math.min(SKMAX, lv + 1), lv >= SKMAX ? "Максимум" : "После", lv >= SKMAX ? null : lv)}</svg>`;
 }
+let skTab = "sk";
+// ближайшая награда пути — видна в карточке уровня, ведёт на вкладку «Путь копателя»
+function nextReward() {
+  const nx = TRACK.find(t => t.l > G.lvl);
+  if (!nx) return `<p class="lv-next-t">Весь путь копателя пройден.</p>`;
+  return `<button class="lv-next" onclick="SK.skTab('tr')"><span class="lv-next-l">${nx.l}</span><span class="lv-next-b"><small>Следующая награда</small><b>${nx.ic ? `<img class="tr-ic" src="${nx.ic}" alt="">` : ""}${nx.n}</b></span><em aria-hidden="true">›</em></button>`;
+}
 function renderSkills() {
   const need = xpNeed(G.lvl),
     R0 = rank(),
     up = RANKS.filter(r => r.min > G.rep).slice(-1)[0];
   const spBox =
     G.sp > 0
-      ? `<div class="sp-box on"><span class="sp-num">${G.sp}</span><span>${plural(G.sp, "свободное очко", "свободных очка", "свободных очков")} навыка — вложите в навык ниже ↓</span></div>`
+      ? `<div class="sp-box on"><span class="sp-num">${G.sp}</span><span>${plural(G.sp, "свободное очко", "свободных очка", "свободных очков")} навыка${skTab === "sk" ? " — выберите навык ниже ↓" : ""}</span>${skTab === "sk" ? "" : `<button class="sp-go" onclick="SK.skTab('sk')">Вложить</button>`}</div>`
       : `<div class="sp-box">Очков навыка нет — следующее на ${G.lvl + 1}-м уровне</div>`;
   const lvl = `<section class="lvbox"><div class="lv-h"><h2>Уровень ${G.lvl}</h2><span>${G.xp} / ${need} опыта</span></div>
     <div class="lv-bar"><i style="width:${Math.min(100, Math.round((G.xp / need) * 100))}%"></i></div>${spBox}
-    <p>Опыт дают найденные вещи: чем ценнее, тем больше.${G.lvl < ANT_LVL ? ` На ${ANT_LVL}-м уровне откроется антиквар.` : ""}</p></section>`;
+    <p>Опыт дают найденные вещи: чем ценнее, тем больше.</p>${nextReward()}</section>`;
   const eff = {
     torg: l => [["Цена продажи", pct(l * 2)]],
     master: l => [
@@ -164,5 +171,7 @@ function renderSkills() {
     <p class="rk-p">${R0.perk[0].toUpperCase() + R0.perk.slice(1)}.</p><p class="rk-p">${up ? `До «${up.name}» — ${up.min - G.rep} ${plural(up.min - G.rep, "очко", "очка", "очков")} совести.` : "Это высшее звание."}</p>
     <details><summary>Все звания</summary><ul class="rk-list">${RANKS.map(r => `<li class="${r === R0 ? "cur" : ""}"><span>${r.range}</span><b>${r.name}</b><small>${r.perk}</small></li>`).join("")}</ul></details>
     <details><summary>Как меняется совесть? <span class="q">?</span></summary><div class="rk-how"><p>Дар музею: +1 за бытовое и монеты, +2 за военное из слоя империи и старины и за редкое, +3 за редкое из старины.</p><p>Чёрный рынок: −1 совести за любую вещь, плюс растёт внимание полиции.</p><p>Скупщик и антиквар совесть не меняют.</p></div></details></section>`;
-  return lvl + trackBox() + `<div class="sk-title"><h2>Навыки</h2><span></span></div>` + cards + rankBox;
+  const done = TRACK.filter(t => G.lvl >= t.l).length;
+  const tabs = `<div class="subtabs sk-tabs" role="tablist"><button role="tab" aria-selected="${skTab === "sk"}" onclick="SK.skTab('sk')">Навыки${G.sp > 0 ? `<i class="sk-badge">${G.sp}</i>` : ""}</button><button role="tab" aria-selected="${skTab === "tr"}" onclick="SK.skTab('tr')">Путь копателя<i class="sk-cnt">${done}/${TRACK.length}</i></button></div>`;
+  return lvl + tabs + (skTab === "tr" ? trackBox() : cards + rankBox);
 }

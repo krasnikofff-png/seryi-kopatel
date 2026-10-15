@@ -2,7 +2,13 @@
 // Каждый уровень открывает конкретную вещь. «soon» — появится в следующем обновлении.
 const TRACK = [
   { l: 2, id: "book", n: "Записная книжка", d: "В альбоме вместо «?» видны силуэты ещё не найденных вещей" },
-  { l: 3, id: "thermos", n: "Термос и ушанка", d: "День в поле на час длиннее, а Серый — в ушанке", ic: "@art(ui/ushanka.png)" },
+  {
+    l: 3,
+    id: "thermos",
+    n: "Термос и ушанка",
+    d: "День в поле на час длиннее, а Серый — в ушанке",
+    ic: "@art(ui/ushanka.png)"
+  },
   { l: 4, id: "ant", n: "Антиквар", d: "Новый покупатель: платит больше скупщика за то, что ищет" },
   { l: 5, id: "eye", n: "Наметанный глаз", d: "На поле видна осевшая земля — под ней старый тайник" },
   {
@@ -46,12 +52,10 @@ function lvlUpTxt() {
 }
 function trackBox() {
   const nx = TRACK.find(t => t.l > G.lvl);
-  return `<section class="track"><div class="sk-title"><h2>Путь копателя</h2><span></span></div><ol>${TRACK.map(
-    t => {
-      const st = G.lvl >= t.l ? (t.soon ? "soon" : "done") : t === nx ? "next" : "lock";
-      return `<li class="${st}"><span class="tr-l">${t.l}</span><div><b>${t.ic ? `<img class="tr-ic" src="${t.ic}" alt="">` : ""}${t.n}${t.soon ? ` <em class="tr-soon">скоро</em>` : ""}</b><small>${t.d}</small></div><span class="tr-s">${st === "done" ? "✓" : st === "soon" ? "ждёт обновления" : st === "next" ? "следующий" : ""}</span></li>`;
-    }
-  ).join("")}</ol></section>`;
+  return `<section class="track"><ol>${TRACK.map(t => {
+    const st = G.lvl >= t.l ? (t.soon ? "soon" : "done") : t === nx ? "next" : "lock";
+    return `<li class="${st}"><span class="tr-l">${t.l}</span><div><b>${t.ic ? `<img class="tr-ic" src="${t.ic}" alt="">` : ""}${t.n}${t.soon ? ` <em class="tr-soon">скоро</em>` : ""}</b><small>${t.d}</small></div><span class="tr-s">${st === "done" ? "✓" : st === "soon" ? "ждёт обновления" : st === "next" ? "следующий" : ""}</span></li>`;
+  }).join("")}</ol></section>`;
 }
 
 // ===== НОЧНЫЕ НАХОДКИ: только в ночную смену =====
@@ -77,8 +81,7 @@ Object.assign(FIND_DESC, {
   "Компас Адрианова": "Красноармейский компас со светящимися метками — по ним шли ночью без фонаря.",
   "Часы «Кировские»": "Наручные часы со светящимися стрелками. Остановились в 4:12 — может, на рассвете боя.",
   "Фосфорная мушка": "Мушка от винтовочного прицела с каплей светящейся краски — для стрельбы в сумерках.",
-  "Циферблат авиаприбора":
-    "Светящийся циферблат высотомера с самолёта. Где-то над этим лесом его потерял лётчик.",
+  "Циферблат авиаприбора": "Светящийся циферблат высотомера с самолёта. Где-то над этим лесом его потерял лётчик.",
   "Купальский клад": "Горшок, который «горел» в ночь на Ивана Купалу. Внутри — серебро. Бабки не врали."
 });
 ALB.push(NIGHT.map(q => ({ c: q[0], era: q[1], name: q[2], night: 1 })));
@@ -127,9 +130,7 @@ function spawnNight() {
     if (p) {
       const m = makeItem(pickW([0, 0, 0.6, 0, 0.4]), [0, 0, 0.5, 0.5, 0], REGIONS[T.region].mult);
       m.depth = 25 + Math.floor(Math.random() * 20);
-      items.push(
-        Object.assign({ tx: p.tx, ty: p.ty, x: p.tx * TS + 8, y: p.ty * TS + 8, wisp: 1, cache: true }, m)
-      );
+      items.push(Object.assign({ tx: p.tx, ty: p.ty, x: p.tx * TS + 8, y: p.ty * TS + 8, wisp: 1, cache: true }, m));
       msg += " Над болотом мелькнул блуждающий огонёк — говорят, так «горит» клад.";
     }
   }
