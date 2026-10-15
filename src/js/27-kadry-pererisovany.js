@@ -11,8 +11,7 @@ function P_attic(g, r) {
     "#1e1610"
   );
   for (let y = 10; y < 120; y += 7) rect(g, 0, y, PW, 1, "#17110c");
-  for (let y = 10; y < 120; y += 14)
-    for (let x = (y * 5) % 37; x < PW; x += 37) rect(g, x, y, 1, 7, "#17110c");
+  for (let y = 10; y < 120; y += 14) for (let x = (y * 5) % 37; x < PW; x += 37) rect(g, x, y, 1, 7, "#17110c");
   fillPoly(
     g,
     [
@@ -185,8 +184,7 @@ function P_forestdig(g, r) {
   ell(g, 104, 172, 22, 8, "#5e4a30", "#2a2014");
   ell(g, 104, 171, 17, 5, "#3a2c1c");
   ell(g, 104, 172, 13, 3, "#2a2014");
-  for (let k = 0; k < 24; k++)
-    rect(g, 82 + r() * 44, 162 + r() * 18, 2, 1, r() < 0.5 ? "#6a5234" : "#4a3a24");
+  for (let k = 0; k < 24; k++) rect(g, 82 + r() * 44, 162 + r() * 18, 2, 1, r() < 0.5 ? "#6a5234" : "#4a3a24");
   ell(g, 107, 171, 5, 2, "#9aa0a4", "#3a3a3a");
   rect(g, 105, 170, 4, 1, "#e8ecee");
   rect(g, 108, 172, 2, 1, "#5a5a60");
@@ -340,12 +338,7 @@ function P_hq(g, r) {
   rect(g, 86, 100, 4, 16, "#f0e8d0");
   rect(g, 87, 96, 2, 4, "#ffd070");
   disc(g, 88, 94, 2, 3, "#fff0a0");
-  drawFig(
-    g,
-    fig(Object.assign({}, F_SOLD, { id: "hqsold", hat: null, hair: "short", mustache: 1, seed: 5 })),
-    44,
-    190
-  );
+  drawFig(g, fig(Object.assign({}, F_SOLD, { id: "hqsold", hat: null, hair: "short", mustache: 1, seed: 5 })), 44, 190);
   sepia3(g);
   glow(g, 88, 96, 10, "#f0c070", 0.6);
 }
@@ -635,7 +628,7 @@ function showComic(id, done) {
   const render = () => {
     const p = C.pages[i];
     el.innerHTML = `<div class="cm"><div class="cm-top"><span>${C.title}</span><button class="cm-skip" onclick="SK.comicEnd()">Пропустить</button></div>
-      <div class="cm-frame" onclick="SK.comicNext()"><img src="${panelPic(p.p)}" alt=""><div class="cm-cap${p.say ? " say" : ""}">${p.cap}</div></div>
+      <div class="cm-frame" onclick="SK.comicNext()"><img src="${panelPic(p.p)}" style="${panelFy(p.p)}" alt=""><div class="cm-cap${p.say ? " say" : ""}">${p.cap}</div></div>
       <div class="cm-nav"><span class="cm-dots">${C.pages.map((_, k) => `<i class="${k === i ? "on" : ""}"></i>`).join("")}</span><button class="cm-next" onclick="SK.comicNext()">${i < C.pages.length - 1 ? "Дальше ›" : "Закрыть"}</button></div></div>`;
   };
   comicQ = {
@@ -1046,8 +1039,7 @@ function storyGoal() {
     };
   }
   if (st === 5) {
-    if (has("medal"))
-      return { t: "Почистить находку с острова", d: "Чёрный цилиндрик ждёт во вкладке «Находки»." };
+    if (has("medal")) return { t: "Почистить находку с острова", d: "Чёрный цилиндрик ждёт во вкладке «Находки»." };
     if (G.debt > 0)
       return {
         t: "Рассчитаться с долгом",
@@ -1061,10 +1053,7 @@ function storyGoal() {
       : { t: "Добраться до болот", d: "Глушь открывает «Нива» во вкладке «Снаряжение»." };
   }
   const E = {
-    good: [
-      "Финал «Вернулся»",
-      "Деда похоронили в селе, у братской могилы. История окончена — но копать можно дальше."
-    ],
+    good: ["Финал «Вернулся»", "Деда похоронили в селе, у братской могилы. История окончена — но копать можно дальше."],
     grey: [
       "Финал «Серый»",
       "Медальон у Нюры. Дед так и остался на острове. История окончена — но копать можно дальше."
@@ -1446,7 +1435,7 @@ let choiceQ = null;
 function storyChoice(title, pic, text, opts) {
   const el = $("comic");
   choiceQ = opts;
-  el.innerHTML = `<div class="cm choice"><div class="cm-top"><span>${title}</span></div><div class="cm-frame"><img src="${panelPic(pic)}" alt=""><div class="cm-cap say">${text}</div></div>
+  el.innerHTML = `<div class="cm choice"><div class="cm-top"><span>${title}</span></div><div class="cm-frame"><img src="${panelPic(pic)}" style="${panelFy(pic)}" alt=""><div class="cm-cap say">${text}</div></div>
     <div class="cm-ch">${opts.map((o, k) => `<button class="cm-opt ${o.cls || ""}" ${o.off ? "disabled" : ""} onclick="SK.choose(${k})"><b>${o.label}</b><small>${o.sub}</small></button>`).join("")}</div></div>`;
   el.hidden = false;
 }

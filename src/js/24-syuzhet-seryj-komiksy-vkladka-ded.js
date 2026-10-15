@@ -44,6 +44,10 @@ const PANEL_IMG = {
   nyura: "@art(comic/nyura.webp)",
   medal: "@art(comic/medal.webp)"
 };
+// если кадр ниже по высоте, чем 4:5 (низкий экран, экран выбора) — картинка заполняет всю ширину
+// и обрезается сверху/снизу; здесь — какую часть по высоте оставить (0% — верх, 100% — низ)
+const PANEL_FY = { borzy: 28, savelich: 30, nyura: 35, museum: 35, train: 55, forestdig: 55, dugout42: 50, medal: 35 };
+const panelFy = id => `--fy:${PANEL_FY[id] ?? 40}%`;
 function panelPic(id) {
   if (PANEL_IMG[id]) return PANEL_IMG[id];
   const c = document.createElement("canvas");

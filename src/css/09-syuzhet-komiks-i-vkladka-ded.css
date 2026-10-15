@@ -65,7 +65,8 @@
   flex: 0 1 auto;
   aspect-ratio: 160/200;
   max-height: 52vh;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: 50% var(--fy, 40%);
   background: #000;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
