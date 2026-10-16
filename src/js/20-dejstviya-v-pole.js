@@ -3,7 +3,7 @@ const toastEl = $("toast"),
   cardEl = $("card");
 // подсказки и карточки находок висят, пока игрок сам не закроет их крестиком (или не придёт новая)
 function toast(t) {
-  toastEl.innerHTML = `<button class="tx" aria-label="Закрыть">×</button>${t}`;
+  toastEl.innerHTML = `${pxi("pin", 20)}<p>${t}</p><button class="tx" aria-label="Закрыть">${pxi("x", 12)}</button>`;
   toastEl.hidden = false;
   cardEl.hidden = true;
 }
@@ -14,12 +14,12 @@ toastEl.addEventListener("pointerdown", e => {
 function card(it, hurt, up, more) {
   cardEl.classList.toggle("leg", !!it.leg);
   if (it.leg) {
-    cardEl.innerHTML = `<span class="x">×</span><div class="k">★ ЛЕГЕНДА · ${it.depth} см · ${ERAS[it.era].name}</div><img class="cpic" src="${FIND_IMG[it.name] || ""}" alt=""><h2>${it.name}</h2><p>Такое находят раз в жизни. Руки дрожат. Почистите дома — ей ничего не грозит.${up ? lvlUpTxt() : ""}</p>`;
+    cardEl.innerHTML = `<span class="x">${pxi("x", 12)}</span><div class="k">Легенда, ${it.depth} см, ${ERAS[it.era].name}</div><span class="slot star cpic"><img src="${FIND_IMG[it.name] || ""}" alt=""></span><h2>${it.name}</h2><p>Такое находят раз в жизни. Руки дрожат. Почистите дома — ей ничего не грозит.${up ? lvlUpTxt() : ""}</p>`;
     cardEl.hidden = false;
     toastEl.hidden = true;
     return;
   }
-  cardEl.innerHTML = `<span class="x">×</span><div class="k">${it.cache ? "Тайник с карты! · " : "Находка · "}${it.depth} см · ${ERAS[it.era].name}${it.vdi ? " · ВДИ " + it.vdi : ""}</div>${it.story ? "" : `<img class="cpic" src="${FIND_IMG[it.name] || ""}" alt="">`}<h2>${shownName(it)}</h2><p>${hurt ? "Кажется, задели лопатой — сохранность может пострадать. " : ""}${it.story ? "Что это — станет ясно после чистки." : it.c === 0 ? "Мусор. Только в металлолом." : `<span class="crange">${CLASSES[it.c].name} · ${rangeCh().id === "ant" ? "антиквар" : "скупщик"} даст ${rub(priceRange(it)[0])} – ${rub(priceRange(it)[1])}</span>Цену решит сохранность — узнаете после чистки. Бывают и редкие разновидности ×${rareM(it)} — их видно, только если чистить самому.`}${it.story ? `<br><b>★ Сердце ёкнуло: кажется, это то, что вы искали. Почистите дома.</b>` : ""}${more ? `<br><b>Детектор над ямой не умолкает — глубже лежит что-то ещё.</b>` : ""}${up ? lvlUpTxt() : ""}</p>`;
+  cardEl.innerHTML = `<span class="x">${pxi("x", 12)}</span><div class="k">${it.cache ? "Тайник с карты, " : "Находка, "}${it.depth} см, ${ERAS[it.era].name}${it.vdi ? ", ВДИ " + it.vdi : ""}</div>${it.story ? "" : `<span class="slot mud cpic"><img src="${FIND_IMG[it.name] || ""}" alt=""></span>`}<h2>${shownName(it)}</h2><p>${hurt ? "Кажется, задели лопатой — сохранность может пострадать. " : ""}${it.story ? "Что это — станет ясно после чистки." : it.c === 0 ? "Мусор. Только в металлолом." : `<span class="crange">${CLASSES[it.c].name}: ${rangeCh().id === "ant" ? "антиквар" : "скупщик"} даст ${rub(priceRange(it)[0])} – ${rub(priceRange(it)[1])}</span>Цену решит сохранность — узнаете после чистки. Бывают и редкие разновидности ×${rareM(it)} — их видно, только если чистить самому.`}${it.story ? `<br><b>★ Сердце ёкнуло: кажется, это то, что вы искали. Почистите дома.</b>` : ""}${more ? `<br><b>Детектор над ямой не умолкает — глубже лежит что-то ещё.</b>` : ""}${up ? lvlUpTxt() : ""}</p>`;
   cardEl.hidden = false;
   toastEl.hidden = true;
 }
@@ -233,8 +233,7 @@ function updateHud() {
     const ce = $("clockEnd");
     if (ce) ce.textContent = "до " + hhmmAbs(480 + dayEnd());
   }
-  $("clock").textContent =
-    String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+  $("clock").textContent = String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
   $("moneyF").textContent = rub(G.money);
   $("bagTxt").textContent = `${kg(bagW())} / ${bagCap()} кг`;
 }
@@ -258,17 +257,25 @@ function openBag() {
   $("bagOver").hidden = false;
 }
 function renderBag() {
-  $("bagTitle").textContent = `Сумка · ${kg(bagW())} из ${bagCap()} кг (с землёй)`;
   const list = tripBag(),
-    ul = $("bagList");
+    ul = $("bagList"),
+    w = bagW(),
+    cap = bagCap(),
+    heavy = w / cap > 0.7;
+  $("bagTitle").textContent = "Сумка";
+  $("bagSub").textContent = list.length
+    ? `${list.length} ${plural(list.length, "находка", "находки", "находок")} за поездку`
+    : "за эту поездку";
+  $("bagW").innerHTML =
+    `<div class="bag-wh"><span>${pxi("kg", 18)}Вес с землёй</span><b>${kg(w)} <i>из ${cap} кг</i></b></div><div class="xp"><i style="width:${Math.min(100, Math.round((w / cap) * 100))}%"></i></div>${heavy ? `<small class="warn">Тяжело — копать медленнее</small>` : ""}`;
   ul.innerHTML = list.length
     ? list
         .map(
           (it, i) =>
-            `<li><span>${shownName(it)}<small>${kg(soilW(it.w))} кг · ${it.depth} см · ${ERAS[it.era].name}</small></span><button data-i="${i}">Выкинуть</button></li>`
+            `<li class="fi bag-i"><span class="slot${it.clean ? "" : " mud"}"><img src="${findPic(it)}" alt=""></span><span class="fb"><span class="bag-r"><b>${shownName(it)}</b></span><span class="bag-r"><span class="frow"><span class="tag k${it.c}">${CLASSES[it.c].name}</span><small>${kg(soilW(it.w))} кг, ${it.depth} см</small></span><button class="mini" data-i="${i}" aria-label="Выбросить: ${shownName(it)}">${pxi("trash", 13)}Выбросить</button></span></span></li>`
         )
         .join("")
-    : "<li><span>За эту поездку пока пусто.</span></li>";
+    : `<li class="empty">Пока пусто. Копайте там, где шкала детектора выше.</li>`;
   ul.querySelectorAll("button").forEach(
     b =>
       (b.onclick = () => {
@@ -303,8 +310,7 @@ function endTrip(text) {
   G.trips++;
   G.heat = Math.max(0, G.heat - 1);
   rollWx();
-  const sNew =
-    seasonIdx() !== sBefore ? `<br><b>Наступила ${season().name.toLowerCase()}.</b> ${season().line}` : "";
+  const sNew = seasonIdx() !== sBefore ? `<br><b>Наступила ${season().name.toLowerCase()}.</b> ${season().line}` : "";
   const due = G.antDue || 0;
   G.money += due;
   G.antDue = 0;

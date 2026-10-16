@@ -68,10 +68,7 @@ function makePuzzle(t, map, used) {
     const an = R() * Math.PI * 2,
       d = 5 * TS + R() * 6 * TS;
     old.push(
-      Object.assign(
-        { id: "o" + old.length, k },
-        toOld(ZC.x + Math.cos(an) * d, ZC.y + Math.sin(an) * d * 0.75, 0)
-      )
+      Object.assign({ id: "o" + old.length, k }, toOld(ZC.x + Math.cos(an) * d, ZC.y + Math.sin(an) * d * 0.75, 0))
     );
   });
   old.sort(() => R() - 0.5);
@@ -209,7 +206,7 @@ function pzBtn() {
   const pz = T && T.pz;
   b.hidden = !pz;
   if (!pz) return;
-  b.innerHTML = `<span class="ic" data-ic="map" style="width:18px;height:14px"></span><span>${pz.done ? "Сверить заново" : "Сличить карту"}<small>${pz.seen.length} ${plural(pz.seen.length, "ориентир", "ориентира", "ориентиров")}</small></span>`;
+  b.innerHTML = `${pxi("pin", 18)}<span>${pz.done ? "Сверить заново" : "Сличить карту"}</span><b class="pz-n">${pz.seen.length}</b>`;
   b.querySelectorAll(".ic[data-ic]").forEach(el => setIcon(el, el.dataset.ic));
 }
 let pzSel = null,
@@ -505,7 +502,7 @@ function drawOldMap(g, pz) {
       g.lineTo(W, y);
       g.stroke();
     }
-    g.font = "9px 'PT Sans Narrow',sans-serif";
+    g.font = "700 9px 'Nunito',sans-serif";
     g.fillStyle = "rgba(60,60,90,.6)";
     for (let x = 0; x < W; x += 40) g.fillText(String(41 + x / 40), x + 2, 9);
     const c = pzOldXY(pz.cross);
@@ -562,7 +559,7 @@ function drawOldMap(g, pz) {
     g.lineTo(x + 3, y);
     g.lineTo(x - 3, y);
     g.stroke();
-    g.font = "bold 10px 'PT Sans Narrow',sans-serif";
+    g.font = "bold 10px 'Nunito',sans-serif";
     g.fillText("С", x - 3, y - 17);
   }
   // картуш и масштаб
@@ -587,7 +584,7 @@ function drawOldMap(g, pz) {
     pen(ink, 1);
     g.strokeRect(sx, sy, 60, 3);
     g.fillRect(sx + 40, sy, 20, 3);
-    g.font = "9px 'PT Sans Narrow',sans-serif";
+    g.font = "700 9px 'Nunito',sans-serif";
     g.fillText("0", sx - 2, sy - 2);
     g.fillText("200 саж.", sx + 34, sy - 2);
   }
@@ -617,7 +614,7 @@ function renderPz() {
   }, 0);
   const pairs = Object.entries(pz.pairs),
     need = pz.need;
-  box.innerHTML = `<div class="sheet pz"><h2>Сличить карту с местностью</h2>
+  box.innerHTML = `<div class="sheet pz"><div class="sh-h"><h2>Сличить карту</h2><span class="alb-tot">пар ${pairs.length} из ${need}</span></div>
     ${pzNote ? `<p class="pz-note">${pzNote}</p>` : ""}<p class="pz-hint">${pzSel ? `Теперь нажмите этот же ориентир на нижней схеме.` : pairs.length >= need ? `Пар достаточно (${pairs.length} из ${need}) — можно сверять. Новая пара заменит старую.` : `Нажмите ориентир на старой карте, потом — тот же на схеме местности. Пар: ${pairs.length} из ${need}.`} Часть того, что на старой карте, давно исчезла${pz.rotated ? ", а сама карта нарисована под углом" : ""}.</p>
     <div class="pz-cap">Старая карта</div><canvas id="pzOld" width="${PZW * 2}" height="${PZH * 2}"></canvas>
     <div class="pz-cap">Местность — что вы видели <small>${pz.seen.length ? "" : "пока ничего: походите по полю"}</small></div><canvas id="pzNow" width="${PZW * 2}" height="${PZH * 2}"></canvas>
@@ -625,10 +622,10 @@ function renderPz() {
       .map(([o, f]) => {
         const O = pz.old.find(x => x.id === o),
           F = pz.field.find(x => x.id === f);
-        return `<button onclick="SK.pzUnpair('${o}')">${LM[O.k].n} ↔ ${LM[F.k].f} ✕</button>`;
+        return `<button onclick="SK.pzUnpair('${o}')">${LM[O.k].n} = ${LM[F.k].f}${pxi("x", 9)}</button>`;
       })
       .join("")}</div>
-    <div class="row"><button class="btn" ${pairs.length === need ? "" : "disabled"} onclick="SK.pzCheck()">Сверить · ${PZ_COST} мин</button><button class="btn ghost" onclick="SK.pzClose()">Закрыть</button></div></div>`;
+    <div class="row pz-row"><button class="btn ghost" onclick="SK.pzClose()">Позже</button><button class="btn" ${pairs.length === need ? "" : "disabled"} onclick="SK.pzCheck()">${lblCost(`Сверить · ${PZ_COST} мин`)}</button></div></div>`;
   // старая карта — рисованный план с лесами, пашней, дорогой, болотом, рельефом и картушем
   const co = $("pzOld"),
     g = co.getContext("2d");
@@ -662,7 +659,7 @@ function renderPz() {
       g.stroke();
     }
     lmIcon(g, o.k, x, y, "#2a1c10");
-    g.font = "italic 600 13px 'Caveat','PT Sans Narrow',cursive";
+    g.font = "italic 600 13px 'Caveat','Nunito',cursive";
     const L = LM[o.k].n,
       tw = g.measureText(L).width,
       [tx, ty] = lblPos(boxO, x, y, tw, PZW);
@@ -731,7 +728,7 @@ function renderPz() {
       q.arc(x, y, 11, 0, 7);
       q.fill();
       lmIcon(q, m.k, x, y, "#1a1408");
-      q.font = "11px 'PT Sans Narrow',sans-serif";
+      q.font = "700 11px 'Nunito',sans-serif";
       const tw = q.measureText(LM[m.k].f).width,
         [tx, ty] = lblPos(boxN, x, y, tw, PZW);
       q.fillStyle = "#fff8e0";
@@ -803,10 +800,7 @@ function pzUnpair(o) {
 }
 function pzCheck() {
   const pz = T.pz,
-    P2 = Object.entries(pz.pairs).map(([o, f]) => [
-      pz.old.find(x => x.id === o),
-      pz.field.find(x => x.id === f)
-    ]);
+    P2 = Object.entries(pz.pairs).map(([o, f]) => [pz.old.find(x => x.id === o), pz.field.find(x => x.id === f)]);
   if (P2.length !== pz.need) return;
   let px,
     py,
@@ -862,8 +856,7 @@ function placeStory(t, used) {
   if (!S) return;
   for (const id in STORY_SPOT) {
     const p = STORY_SPOT[id];
-    if (p.world !== worldKind || S.st !== p.st || S.clues.includes(id) || G.inv.some(i => i.story === id))
-      continue;
+    if (p.world !== worldKind || S.st !== p.st || S.clues.includes(id) || G.inv.some(i => i.story === id)) continue;
     if (id === "medal" && G.debt > 0) continue; // остров — только без долгов
     const cx = Math.floor(p.x / TS),
       cy = Math.floor(p.y / TS);
@@ -919,8 +912,34 @@ function loadTrip(t) {
   }
   birds.length = 0;
   for (let i = 0; i < 4; i++) spawnBird();
-  $("placeF").innerHTML =
-    `<b>${T.map === 9 ? "Курган · древность" : T.map === 4 ? "Городище · древность" : T.map === 5 ? "Затопленная деревня" : REGIONS[T.region].name + " · " + (T.lead ? T.lead.name : T.map === 3 ? "усадьба" : REG_INFO[T.region].layer)}</b><small>${SEASONS.find(x => x.id === T.season)?.name || season().name}, ${WEATHER[T.wx || "clear"].name} · ${T.map === 9 ? "памятник археологии" : T.map === 4 ? "отчёт экспедиции 1954 г." : T.map === 5 ? "вода отступила" : T.lead ? T.lead.note : T.slet ? "слёт копателей" : T.map ? "карта «" + (MAPS.find(m => m.id === T.map) || { name: "?" }).name + "»" : "поиск наугад"}</small>`;
+  // место — коротко: название и источник с погодой (сезон виден в блокноте)
+  const plName =
+      T.map === 9
+        ? "Курган"
+        : T.map === 4
+          ? "Городище"
+          : T.map === 5
+            ? "Деревня"
+            : T.lead
+              ? T.lead.name
+              : T.map === 3
+                ? "Усадьба"
+                : REGIONS[T.region].name,
+    plSrc =
+      T.map === 9
+        ? "раскоп"
+        : T.map === 4
+          ? "отчёт 1954 г."
+          : T.map === 5
+            ? "вода ушла"
+            : T.lead
+              ? "по наводке"
+              : T.slet
+                ? "слёт"
+                : T.map
+                  ? "«" + (MAPS.find(m => m.id === T.map) || { name: "?" }).name + "»"
+                  : "наугад";
+  $("placeF").innerHTML = `<b>${plName}</b><small>${plSrc}, ${WEATHER[T.wx || "clear"].name}</small>`;
   buildBars();
   updateHud();
   digLabels();

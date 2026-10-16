@@ -104,7 +104,7 @@ function placeCard(id) {
       btn =
         G.det < 4
           ? `<button class="nb-btn" disabled>${LOCK_SVG} Закрыто</button>`
-          : `<button class="nb-btn" ${G.money < P.unlock ? "disabled" : ""} onclick="SK.buyPlace(4)">Купить отчёт · ${rub(P.unlock)}</button>`;
+          : `<button class="nb-btn" ${G.money < P.unlock ? "disabled" : ""} onclick="SK.buyPlace(4)">${lblCost(`Купить отчёт · ${rub(P.unlock)}`)}</button>`;
     else
       btn =
         G.det < 4
@@ -168,7 +168,7 @@ function renderMaps() {
         ["bars", "Находок: меньше"],
         ["road", "Места: любые поля и леса"]
       ])}
-      <button class="nb-btn" onclick="SK.go(0)">Ехать</button></div></div>`;
+      <button class="nb-btn" onclick="SK.go(0)"><span class="lbl">Ехать</span>${costPill("даром")}</button></div></div>`;
   const cards = MAPS.map(m => {
     const t = NB_TXT[m.id],
       p = mapPrice(m, r),
@@ -179,11 +179,24 @@ function renderMaps() {
     let btn;
     if (!ok)
       btn = `<button class="nb-btn" disabled>${LOCK_SVG} Закрыто</button><p class="nb-warn">${typeof m.needTxt === "function" ? m.needTxt(G) : m.needTxt}</p>`;
-    else if (have) btn = `<button class="nb-btn" onclick="SK.go(${m.id})">Ехать · карта уже есть</button>`;
+    else if (have)
+      btn = `<button class="nb-btn" onclick="SK.go(${m.id})"><span class="lbl">Ехать</span>${costPill("карта есть")}</button>`;
     else
-      btn = `<button class="nb-btn" ${money ? "" : "disabled"} onclick="SK.buyGo(${m.id})">Ехать · ${rub(p)}</button>${money ? "" : `<p class="nb-warn">Не хватает ${rub(p - G.money)}</p>`}`;
+      btn = `<button class="nb-btn" ${money ? "" : "disabled"} onclick="SK.buyGo(${m.id})">${lblCost(`Ехать · ${rub(p)}`)}</button>${money ? "" : `<p class="nb-warn">Не хватает ${rub(p - G.money)}</p>`}`;
     return `<div class="nbc${ok ? "" : " off"}"><div class="nbc-pic${m.id === 3 ? " raw" : ""}"><img src="${pic}" alt=""></div><div class="nbc-b">${t.hand ? `<span class="nbc-hand">${t.hand}</span>` : ""}<h3>${{ 3: "Архив", 4: "Городище", 5: "Деревня" }[m.id] || m.name}</h3>
       <p>${t.d}</p>${li(t.li)}${btn}</div></div>`;
   }).join("");
-  return `<div class="nbw"><div class="nb">${head}${seg}${trc}${free}${cards}${sletNb()}${houseNb()}${fleaNb()}<div class="nb-note">${NBI.zone}Основные находки — внутри отмеченной зоны.</div></div></div>`;
+  const sl = sletNb(),
+    hs = houseNb(),
+    fl = fleaNb(),
+    go = c => `document.querySelector('.nbc.${c}').scrollIntoView({behavior:'smooth',block:'center'})`;
+  const today = [
+    sl && [`<img src="${"@art(slet/cup.png)"}" alt="">Слёт`, "slet"],
+    hs && [`${pxi("pin", 16)}Старый дом`, "house"],
+    fl && [`<img src="${"@art(flea/box.png)"}" alt="">Барахолка`, "flea"]
+  ].filter(Boolean);
+  const todayRow = today.length
+    ? `<div class="nb-today"><span>Сегодня</span>${today.map(([t, c]) => `<button onclick="${go(c)}">${t}</button>`).join("")}</div>`
+    : "";
+  return `<div class="nbw"><div class="nb">${head}${seg}${todayRow}${trc}${free}${cards}${sl}${hs}${fl}<div class="nb-note">${NBI.zone}Основные находки — внутри отмеченной зоны.</div></div></div>`;
 }

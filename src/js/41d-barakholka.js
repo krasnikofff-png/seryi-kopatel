@@ -270,19 +270,19 @@ function renderFlea() {
       L = LOTS[lot.k];
     const val = got.reduce((a, it) => a + (it.c === 0 ? 0 : sellPrice(it, CHANNELS[0])), 0),
       antOk = got.some(it => ANT_CLS.includes(it.c) && it.gr >= 2);
-    s.innerHTML = `<h2>${L.n}</h2>${luck ? `<p class="fl-luck">Повезло! Продавец не знал, что продаёт: скупщик даст вчетверо больше, чем вы заплатили.</p>` : ""}<p class="fl-sub">Заплатили ${rub(lot.p)}.${got.some(i => i.c > 0) ? ` Скупщик даст за всё ~${rub(val)}.${antOk ? " Антиквар за монеты, военное и редкое заплатит вдвое больше." : ""}` : ""}</p>${got.length ? `<ul class="mg-got fl-got">${got.map(it => `<li><img src="${FIND_IMG[it.name] || ""}" alt=""><span>${it.name}<small class="k${it.c}">${fleaTag(it)}</small></span></li>`).join("")}</ul>` : ""}${leads.map(l => leadCard(l)).join("")}${!got.length && !leads.length ? `<p>Пусто: только газеты и пыль.</p>` : ""}${lot.k === "pack" && !leads.length ? `<p>Письма как письма — про погоду и урожай. Наводок нет.</p>` : ""}<div class="row"><button class="btn" onclick="SK.fleaBack()">К рядам</button></div>`;
+    s.innerHTML = `<span class="grab" aria-hidden="true"></span><h2>${L.n}</h2>${luck ? `<p class="fl-luck">Повезло! Продавец не знал, что продаёт: скупщик даст вчетверо больше, чем вы заплатили.</p>` : ""}<p class="fl-sub">Заплатили ${rub(lot.p)}.${got.some(i => i.c > 0) ? ` Скупщик даст за всё ~${rub(val)}.${antOk ? " Антиквар за монеты, военное и редкое заплатит вдвое больше." : ""}` : ""}</p>${got.length ? `<ul class="mg-got fl-got">${got.map(it => `<li><img src="${FIND_IMG[it.name] || ""}" alt=""><span>${it.name}<small class="k${it.c}">${fleaTag(it)}</small></span></li>`).join("")}</ul>` : ""}${leads.map(l => leadCard(l)).join("")}${!got.length && !leads.length ? `<p>Пусто: только газеты и пыль.</p>` : ""}${lot.k === "pack" && !leads.length ? `<p>Письма как письма — про погоду и урожай. Наводок нет.</p>` : ""}<div class="row"><button class="btn" onclick="SK.fleaBack()">К рядам</button></div>`;
     return;
   }
   const leadsN = (G.leads || []).length;
-  s.innerHTML = `<h2>Барахолка</h2><p class="fl-sub">${FLEA_SELLER[st.s]}</p><div class="fl-lots">${st.lots
+  s.innerHTML = `<span class="grab" aria-hidden="true"></span><button class="sx" onclick="SK.fleaClose()" aria-label="Закрыть">${pxi("x", 16)}</button><div class="fl-h"><img src="${FLEA_ART.box}" alt=""><div><h2>Барахолка</h2><span class="alb-tot">у вокзала, лотов: ${st.lots.filter(l => !l.sold).length}</span></div></div><p class="fl-sub">${FLEA_SELLER[st.s]}</p><div class="fl-lots">${st.lots
     .map((lot, j) => {
       const L = LOTS[lot.k],
         can = !lot.sold && G.money >= lot.p;
-      return `<div class="fl-lot${lot.sold ? " sold" : ""}"><img src="${FLEA_ART[lot.k]}" alt=""><div class="fl-b"><b>${L.n}</b><p>${L.d}</p>${lot.sold ? `<span class="fl-sold">Продано</span>` : `<button class="btn fl-buy" ${can ? "" : "disabled"} onclick="SK.buyLot(${j})">Купить · ${rub(lot.p)}</button>${can ? "" : `<small class="fl-warn">Не хватает ${rub(lot.p - G.money)}</small>`}`}</div></div>`;
+      return `<div class="fl-lot${lot.sold ? " sold" : ""}"><img src="${FLEA_ART[lot.k]}" alt=""><div class="fl-b"><b>${L.n}</b><p>${L.d}</p>${lot.sold ? `<span class="fl-sold">Продано</span>` : `<button class="btn fl-buy" ${can ? "" : "disabled"} onclick="SK.buyLot(${j})">${lblCost(`Купить · ${rub(lot.p)}`)}</button>${can ? "" : `<small class="fl-warn">Не хватает ${rub(lot.p - G.money)}</small>`}`}</div></div>`;
     })
     .join(
       ""
-    )}</div><p class="fl-note">Что внутри — видно только после покупки. Примерно каждый четвёртый лот — удачный: скупщик даст за него вчетверо больше цены. Вещи уже чистые: их сразу можно продать. Новые лоты — после следующей поездки.${leadsN ? ` Наводок в блокноте: ${leadsN}.` : ""}</p><button class="btn ghost" onclick="SK.fleaClose()">Уйти</button>`;
+    )}</div><div class="antinfo">${pxi("star", 18)}<span>Примерно каждый четвёртый лот удачный: скупщик даст вчетверо больше цены. Новые лоты — после поездки.${leadsN ? ` Наводок в блокноте: ${leadsN}.` : ""}</span></div><button class="btn ghost" onclick="SK.fleaClose()">Уйти</button>`;
 }
 // блокнот: барахолка и наводки
 function fleaNb() {

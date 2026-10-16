@@ -164,16 +164,36 @@ function payDebt(n) {
 function debtHelp() {
   const o = $("debtOver");
   if (!o) return;
-  const d = G.debt > 0;
-  $("debtSheet").innerHTML = `<h2>Долг за гараж</h2>
-  <p>Полтора года назад мы с приятелем открыли в гараже шиномонтаж и взяли займ — ${rub(DEBT0)} под залог гаража. Приятель уехал на север и не берёт трубку, шиномонтаж закрылся, а займ записан на меня. Не платить — заберут гараж со всем, что в нём.</p>
-  <ul class="dh">
-  <li>Раз в ${DEBT_EVERY} поездок списывается платёж${d ? ` — сейчас <b>${rub(debtMin())}</b>` : ""}. Каждый месяц он растёт на ${rub(DEBT_STEP)} (до ${rub(DEBT_CAP)}).</li>
-  <li>На остаток капает 3% в месяц${d ? ` — сейчас это ≈ <b>${rub(Math.round(G.debt * DEBT_RATE))}</b>` : ""}. Чем быстрее гасите, тем меньше переплата.</li>
-  <li>Можно внести заранее или больше минимума — всё идёт в счёт долга.</li>
-  <li>Не хватило денег — штраф ${rub(DEBT_FINE)}. Две просрочки подряд — коллектор приедет прямо на копку.</li></ul>
-  <button class="btn" onclick="document.getElementById('debtOver').hidden=true">Понятно</button>`;
+  const d = G.debt > 0,
+    left = Math.max(0, DEBT_EVERY - (G.trips - G.debtTrip)),
+    need = d ? Math.max(0, debtMin() - (G.debtPaid || 0)) : 0,
+    mn = d ? debtMin() : 0,
+    pay = Math.min(need || mn, G.debt),
+    when = left ? `через ${left} ${plural(left, "поездку", "поездки", "поездок")}` : "после этой поездки",
+    pct = Math.max(0, Math.min(100, Math.round((1 - G.debt / DEBT0) * 100))),
+    paid = G.debtOk && need === mn;
+  $("debtSheet").className = "sheet plank debt-win";
+  $("debtSheet").innerHTML = `<h2>${pxi("paper", 24)}Долг за гараж</h2>
+  <p class="dw-story">Брали на шиномонтаж под залог гаража — ${rub(DEBT0)}. Приятель уехал, платить мне. Не платить — заберут гараж.</p>
+  ${
+    d
+      ? `<div class="dw-sum"><b>${rub(G.debt)}</b><span>осталось из ${rub(DEBT0)}</span></div><div class="eco-bar dw-bar"><i style="--w:${pct}%"></i></div>
+  <ul class="dw-l">
+   <li>${pxi("clock", 22)}<span>${paid ? "Платёж за месяц внесён" : `Платёж ${rub(need || mn)}`}</span><em>${paid ? `следующий ${when}` : when}</em></li>
+   <li>${pxi("up", 22)}<span>Проценты 3% в месяц</span><em>≈ ${rub(Math.round(G.debt * DEBT_RATE))}</em></li>
+   <li class="bad">${pxi("shield", 22)}<span>Пропустил платёж — штраф ${rub(DEBT_FINE)}. Два пропуска подряд — коллектор приедет на копку.</span></li>
+  </ul>${(G.debtMiss || 0) >= 2 ? `<div class="debt-warn">Коллектор приедет на следующую копку</div>` : (G.debtMiss || 0) === 1 ? `<div class="debt-warn">Одна просрочка — ещё одна, и приедет коллектор</div>` : ""}
+  <div class="row">
+   <button class="btn" ${G.money < pay ? "disabled" : ""} onclick="SK.payDebt(${pay});SK.debtHelp()">${lblCost(`${paid ? "Внести заранее" : "Внести платёж"} · ${rub(pay)}`)}</button>
+   ${G.money >= G.debt ? `<button class="btn y" onclick="SK.payDebt(${G.debt});SK.debtHelp()">${lblCost(`Погасить весь долг · ${rub(G.debt)}`)}</button>` : ""}
+   <button class="btn ghost" onclick="document.getElementById('debtOver').hidden=true">Позже</button>
+  </div>`
+      : `<p class="dw-done">${pxi("check", 22)}Долг закрыт. Коллекторы больше не звонят.</p><div class="row"><button class="btn" onclick="document.getElementById('debtOver').hidden=true">Отлично</button></div>`
+  }`;
   o.hidden = false;
+  o.onclick = e => {
+    if (e.target === o) o.hidden = true;
+  };
 }
 function buyShop(id) {
   const x = SHOP.find(i => i.id === id);
@@ -194,9 +214,7 @@ function toVit(i) {
   G.vit.push(it);
   G.inv.splice(i, 1);
   openFind = null;
-  const done = VIT_SETS.filter(
-    x => x.test(G.vit) && !before.includes(x.id) && !(G.setsDone || []).includes(x.id)
-  );
+  const done = VIT_SETS.filter(x => x.test(G.vit) && !before.includes(x.id) && !(G.setsDone || []).includes(x.id));
   done.forEach(x => {
     G.setsDone = (G.setsDone || []).concat(x.id);
     G.rep += 3;
@@ -225,26 +243,34 @@ function renderEcon() {
       need = Math.max(0, debtMin() - (G.debtPaid || 0)),
       mn = debtMin(),
       pct = Math.round((1 - G.debt / DEBT0) * 100);
-    const when = left
-        ? `через ${left} ${plural(left, "поездку", "поездки", "поездок")}`
-        : "после этой поездки",
+    const when = left ? `через ${left} ${plural(left, "поездку", "поездки", "поездок")}` : "после этой поездки",
       pay = Math.min(need || mn, G.debt);
     debt = `<section class="eco debt mini"><div class="eco-h dq" onclick="SK.debtHelp()"><h2>Долг <span class="dq-i">?</span></h2><b>${rub(G.debt)}</b></div><div class="eco-bar"><i style="--w:${Math.max(0, Math.min(100, pct))}%"></i></div>
       <div class="debt-row"><div class="debt-pay">${G.debtOk && need === mn ? `<b class="debt-ok">✓ Внесено</b><small>следующий ${when}</small>` : need ? `<b>Платёж ${rub(need)}</b><small>${when}</small>` : `<b class="debt-ok">✓ Внесено</b><small>следующий ${when}</small>`}</div>
       ${G.money >= G.debt ? `<button onclick="SK.payDebt(${G.debt})">Погасить всё</button>` : `<button ${G.money < pay ? "disabled" : ""} onclick="SK.payDebt(${pay})">${G.debtOk && need === mn ? "Внести заранее" : "Внести"}</button>`}</div>${(G.debtMiss || 0) >= 2 ? `<div class="debt-warn">⚠ Коллектор приедет на следующую копку</div>` : (G.debtMiss || 0) === 1 ? `<div class="debt-warn">⚠ Одна просрочка — ещё одна, и приедет коллектор</div>` : ""}</section>`;
   } else
     debt = `<section class="eco debt done"><div class="eco-h"><h2>Долг</h2><b>закрыт</b></div><p>Коллекторы больше не звонят.</p></section>`;
+  const SHOP_IC = {
+    phones: "phones",
+    lamp: "lamp",
+    pin: "pinpointer",
+    coil: "coil",
+    bench: "bench",
+    bath: "bath",
+    vit: "case",
+    vit2: "case"
+  };
   const card = x => {
     const has = own(x.id),
       lock = x.need && !own(x.need);
-    return `<li class="eco-i${has ? " own" : ""}"><div><b>${x.name}</b><small>${x.d}</small></div>${has ? `<span class="eco-own">✓ есть</span>` : lock ? `<span class="eco-lock">Сначала: ${SHOP.find(i => i.id === x.need).name.toLowerCase()}</span>` : `<button ${G.money < x.price ? "disabled" : ""} onclick="SK.buyShop('${x.id}')">${rub(x.price)}</button>`}</li>`;
+    return `<li class="eco-i${has ? " own" : ""}${lock ? " lock" : ""}"><span class="eco-ic">${pxi(SHOP_IC[x.id] || "star", 32)}</span><div><b>${x.name}</b><small>${x.d}</small></div>${has ? `<span class="eco-own">${pxi("check", 16)}есть</span>` : lock ? `<span class="eco-lock">${pxi("lock", 12)}после: ${SHOP.find(i => i.id === x.need).name.toLowerCase()}</span>` : `<button ${G.money < x.price ? "disabled" : ""} onclick="SK.buyShop('${x.id}')"><img class="px" src="${COIN_IMG}" alt="" width="16" height="16">${num(x.price)}</button>`}</li>`;
   };
-  const acc = `<section class="eco"><div class="eco-h"><h2>Аксессуары к детектору</h2></div><p class="dim">Покупаются один раз и работают в каждой поездке.</p><ul class="eco-l">${SHOP.filter(
+  const acc = `<section class="eco"><div class="eco-h"><h2>К детектору</h2><b>${SHOP.filter(x => x.sec === "acc" && own(x.id)).length} из ${SHOP.filter(x => x.sec === "acc").length}</b></div><p class="dim">Покупаются один раз и работают в каждой поездке.</p><ul class="eco-l">${SHOP.filter(
     x => x.sec === "acc"
   )
     .map(card)
     .join("")}</ul></section>`;
-  const ws = `<section class="eco"><div class="eco-h"><h2>Мастерская</h2></div><p class="dim">Чистка находок дома и витрина для коллекции.</p><ul class="eco-l">${SHOP.filter(
+  const ws = `<section class="eco"><div class="eco-h"><h2>Мастерская</h2><b>${SHOP.filter(x => x.sec === "ws" && own(x.id)).length} из ${SHOP.filter(x => x.sec === "ws").length}</b></div><p class="dim">Чистка находок дома и витрина для коллекции.</p><ul class="eco-l">${SHOP.filter(
     x => x.sec === "ws"
   )
     .map(card)
@@ -253,7 +279,7 @@ function renderEcon() {
   if (vitCap()) {
     const v = G.vit || [],
       inc = vitIncome();
-    vit = `<section class="eco vit"><div class="eco-h"><h2>Витрина · ${v.length}/${vitCap()}</h2><b>${inc ? `+${rub(inc)} за поездку` : ""}</b></div>
+    vit = `<section class="eco vit"><div class="eco-h"><h2>Витрина</h2><b>${v.length} из ${vitCap()}</b></div>${inc ? `<p class="vit-inc">${pxi("up", 16)}+${rub(inc)} за поездку</p>` : ""}
       ${
         v.length
           ? `<ul class="vit-l">${v.map((it, k) => `<li><img src="${findPic(it)}" alt=""><span>${it.name}<small>${CLASSES[it.c].name} · ${grTxt(it)}</small></span><button onclick="SK.fromVit(${k})">Забрать</button></li>`).join("")}</ul>`
@@ -261,13 +287,13 @@ function renderEcon() {
       }
       <div class="vit-sets">${VIT_SETS.map(x => {
         const ok = x.test(v);
-        return `<span class="${ok ? "ok" : ""}">${ok ? "✓" : "○"} ${x.name}<small>${x.d}</small></span>`;
+        return `<span class="${ok ? "ok" : ""}">${ok ? pxi("check", 14) : pxi("lock", 12)}<b>${x.name}</b><small>${x.d}</small></span>`;
       }).join("")}</div>
       <p class="dim">Экскурсии: 5% стоимости выставленного за поездку, каждый собранный набор +20%.</p></section>`;
   }
   return { debt, acc, ws, vit };
 }
-const SHOP_TABS = { acc: "Аксессуары", ws: "Мастерская", wd: "Гардероб" };
+const SHOP_TABS = { acc: "Магазин", ws: "Мастерская", wd: "Одежда" };
 function renderGear(GEAR) {
   if (!GEAR[gearTab] && !SHOP_TABS[gearTab]) gearTab = "shovel";
   const E = renderEcon(),
@@ -276,17 +302,17 @@ function renderGear(GEAR) {
   const shopRow = `<div class="subtabs shop" role="tablist">${Object.keys(SHOP_TABS)
     .map(
       t =>
-        `<button role="tab" aria-selected="${t === gearTab}" onclick="SK.gearTab('${t}')">${SHOP_TABS[t]}<small>${t === "wd" ? wdCount() : `${items(t).filter(x => own(x.id)).length}/${items(t).length}`}</small>${t !== "wd" && canBuy(t) ? `<i class="sdot" aria-label="можно купить"></i>` : ""}</button>`
+        `<button role="tab" aria-selected="${t === gearTab}" onclick="SK.gearTab('${t}')">${SHOP_TABS[t]}${t !== "wd" && canBuy(t) ? `<i class="sdot" aria-label="можно купить"></i>` : ""}</button>`
     )
     .join("")}</div>`;
   const gearRow = `<div class="subtabs" role="tablist">${Object.keys(GEAR)
     .map(
       t =>
-        `<button role="tab" aria-selected="${t === gearTab}" onclick="SK.gearTab('${t}')">${GEAR[t].label}<small>ур. ${G[t]}/${GEAR[t].tbl.length - 1}</small></button>`
+        `<button role="tab" aria-selected="${t === gearTab}" onclick="SK.gearTab('${t}')" aria-label="${GEAR[t].label}, уровень ${G[t]} из ${GEAR[t].tbl.length - 1}">${GEAR[t].label}</button>`
     )
     .join("")}</div>`;
   if (SHOP_TABS[gearTab])
-    return E.debt + gearRow + shopRow + (gearTab === "acc" ? E.acc : gearTab === "wd" ? wardrobeBox() : E.ws + E.vit);
+    return gearRow + shopRow + (gearTab === "acc" ? E.acc : gearTab === "wd" ? wardrobeBox() : E.ws + E.vit);
   const k = gearTab,
     g = GEAR[k],
     T = g.tbl,
@@ -299,7 +325,7 @@ function renderGear(GEAR) {
   const sub = gearRow + shopRow;
   let card;
   if (lv >= MX) {
-    card = `<section class="upg"><div class="upg-h"><h2>${GWHAT[k][0][0].toUpperCase() + GWHAT[k][0].slice(1)} — максимум</h2><span>${MX} / ${MX}</span></div>
+    card = `<section class="upg"><div class="upg-h"><h2>${GWHAT[k][0][0].toUpperCase() + GWHAT[k][0].slice(1)} — максимум</h2><span>${MX} из ${MX}</span></div>
       <div class="upg-cols one"><figure><figcaption><b>${sh[MX]}</b><small>Сейчас · ур. ${MX}</small></figcaption><img src="${img[MX]}" alt="${T[MX].name}"></figure></div>
       <p class="upg-gain">Это лучшее, что есть</p></section>`;
   } else {
@@ -312,11 +338,11 @@ function renderGear(GEAR) {
     const btn = !next
       ? `<button class="buy" disabled>Сначала нужен: ${sh[lv + 1]}</button><p class="buy-note">Улучшать можно только по порядку</p>`
       : can
-        ? `<button class="buy" onclick="SK.buy('${k}')">Купить улучшение · ${rub(b.price)}</button><p class="buy-note">Останется ${rub(G.money - b.price)}</p>`
+        ? `<button class="buy" onclick="SK.buy('${k}')">${lblCost(`Купить · ${rub(b.price)}`)}</button><p class="buy-note">Останется ${rub(G.money - b.price)}</p>`
         : `<button class="buy" disabled>Не хватает ${rub(b.price - G.money)}</button><p class="buy-note">Нужно ${rub(b.price)}, у вас ${rub(G.money)}</p>`;
-    card = `<section class="upg"><div class="upg-h"><h2>Улучшить ${GWHAT[k][0]}</h2><span>${lv} → ${sel} / ${MX}</span></div>
+    card = `<section class="upg"><div class="upg-h"><h2>Улучшить ${GWHAT[k][0]}</h2><span>${sel} из ${MX}</span></div>
       <div class="upg-cols"><figure><figcaption><b>${sh[lv]}</b><small>Сейчас · ур. ${lv}</small></figcaption><img src="${img[lv]}" alt="${a.name}"></figure>
-        <span class="upg-arr" aria-hidden="true">→</span>
+        <span class="upg-arr" aria-hidden="true">${pxi("arrow", 26)}</span>
         <figure><figcaption><b>${sh[sel]}</b><small>Уровень ${sel}</small></figcaption><img src="${img[sel]}" alt="${b.name}"></figure></div>
       <p class="upg-gain">${gearGain(k, a, b)}</p>
       <table class="cmp"><thead><tr><th>Параметр</th><th>Сейчас</th><th>После</th></tr></thead><tbody>
@@ -325,7 +351,7 @@ function renderGear(GEAR) {
       <p class="upg-next">${after ? `Следующее улучшение: ${sh[sel + 1].toLowerCase().startsWith("«") ? sh[sel + 1] : sh[sel + 1].toLowerCase()}` : "Это последний уровень"}</p>
       ${btn}</section>`;
   }
-  const list = `<div class="glist-h"><h2>${GWHAT[k][1]}</h2><small>${{ shovel: SHOVEL, det: DET, transport: TRANSPORT }[k].length - 1} уровней снаряжения · нажмите, чтобы сравнить</small></div>
+  const list = `<div class="glist-h"><h2>${GWHAT[k][1]}</h2><small>Нажмите на уровень, чтобы сравнить</small></div>
     <ol class="glist">${T.slice(1)
       .map((x, i) => {
         const n = i + 1,
@@ -333,7 +359,7 @@ function renderGear(GEAR) {
           pick = n === sel && n > lv;
         const badge =
           n === lv
-            ? `<span class="gl-badge eq">✓ Экипирован</span>`
+            ? `<span class="gl-badge eq">${pxi("check", 12)}Есть</span>`
             : n === lv + 1
               ? `<span class="gl-badge nx">Следующий</span>`
               : "";
@@ -342,11 +368,11 @@ function renderGear(GEAR) {
             ? `<span class="gl-own">есть</span>`
             : n === lv
               ? ""
-              : `<span class="gl-price">${rub(x.price)}<b aria-hidden="true">›</b></span>`;
+              : `<span class="gl-price"><img class="px" src="${COIN_IMG}" alt="" width="16" height="16">${num(x.price)}</span>`;
         return `<li class="${st}${pick ? " pick" : ""}"${n > lv ? ` role="button" tabindex="0" onclick="SK.gearPick('${k}',${n})"` : ""}>
         <span class="gl-n">${n}</span><img src="${img[n]}" alt="">
         <span class="gl-b"><span class="gl-top"><b>${sh[n]}</b>${badge}</span><small>${GSUB[k][n]}</small><span class="gl-bot"><span class="gl-s">${gearStats(k, x)}</span>${price}</span></span></li>`;
       })
       .join("")}</ol>`;
-  return E.debt + sub + card + list;
+  return sub + card + list;
 }

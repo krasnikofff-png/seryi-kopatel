@@ -81,44 +81,12 @@ const plural = (n, a, b, c) => {
     h = n % 100;
   return m === 1 && h !== 11 ? a : m >= 2 && m <= 4 && (h < 10 || h >= 20) ? b : c;
 };
-const pct = n => (n > 0 ? "+" : "") + n + "%";
-function kartoPic(lv) {
-  // кольцо с карты «Слух»: радиус и сдвиг до и после
-  const sh = l => 9 * (1 - l * 0.07),
-    of = l => 4.5 * (1 - l * 0.09),
-    K = 4.2; // схема: разница между уровнями нарочно заметнее, точные числа — под картинкой
-  const panel = (x0, l, label, g) => {
-    const cx = x0 + 75,
-      cy = 50,
-      ox = of(l) * K,
-      gx = g != null ? of(g) * K : 0;
-    return `<g>
-    <rect x="${x0}" y="0" width="150" height="100" rx="6" fill="#2b3520"/>
-    <path d="M${x0 + 108} 0 C${x0 + 96} 30 ${x0 + 128} 55 ${x0 + 112} 100" stroke="#3d5866" stroke-width="7" fill="none"/>
-    ${[
-      [14, 18],
-      [30, 80],
-      [128, 22],
-      [136, 74],
-      [20, 52],
-      [60, 12],
-      [95, 88]
-    ]
-      .map(([x, y]) => `<path d="M${x0 + x} ${y - 6}l5 9h-10z" fill="#3c4a2a"/>`)
-      .join("")}
-    ${g != null ? `<circle cx="${cx + gx}" cy="${cy - gx * 0.6}" r="${sh(g) * K}" fill="none" stroke="#9a8a6a" stroke-width="1.5" stroke-dasharray="3 4" opacity=".7"/>` : ""}
-    <circle cx="${cx + ox}" cy="${cy - ox * 0.6}" r="${sh(l) * K}" fill="rgba(233,197,74,.08)" stroke="#e9c54a" stroke-width="2" stroke-dasharray="5 4"/>
-    <path d="M${cx - 5} ${cy - 5}l10 10M${cx + 5} ${cy - 5}l-10 10" stroke="#f4ead0" stroke-width="2.5" stroke-linecap="round"/>
-    <text x="${cx}" y="94" text-anchor="middle" font-size="12" font-weight="700" fill="#f4ead0" style="paint-order:stroke" stroke="#1d1710" stroke-width="3">${label}</text></g>`;
-  };
-  return `<svg class="karto" viewBox="0 0 340 100" role="img" aria-label="Кольцо на карте до и после улучшения">${panel(0, lv, "Сейчас")}<text x="170" y="56" text-anchor="middle" font-size="22" fill="#e9c54a">→</text>${panel(190, Math.min(SKMAX, lv + 1), lv >= SKMAX ? "Максимум" : "После", lv >= SKMAX ? null : lv)}</svg>`;
-}
 let skTab = "sk";
 // ближайшая награда пути — видна в карточке уровня, ведёт на вкладку «Путь копателя»
 function nextReward() {
   const nx = TRACK.find(t => t.l > G.lvl);
   if (!nx) return `<p class="lv-next-t">Весь путь копателя пройден.</p>`;
-  return `<button class="lv-next" onclick="SK.skTab('tr')"><span class="lv-next-l">${nx.l}</span><span class="lv-next-b"><small>Следующая награда</small><b>${nx.ic ? `<img class="tr-ic" src="${nx.ic}" alt="">` : ""}${nx.n}</b></span><em aria-hidden="true">›</em></button>`;
+  return `<button class="lv-next" onclick="SK.skTab('tr')"><span class="lv-next-l">${nx.l}</span><span class="lv-next-b"><small>Следующая награда</small><b>${nx.n}</b></span><em aria-hidden="true">${pxi("arrow", 16)}</em></button>`;
 }
 function renderSkills() {
   const need = xpNeed(G.lvl),
@@ -126,19 +94,21 @@ function renderSkills() {
     up = RANKS.filter(r => r.min > G.rep).slice(-1)[0];
   const spBox =
     G.sp > 0
-      ? `<div class="sp-box on"><span class="sp-num">${G.sp}</span><span>${plural(G.sp, "свободное очко", "свободных очка", "свободных очков")} навыка${skTab === "sk" ? " — выберите навык ниже ↓" : ""}</span>${skTab === "sk" ? "" : `<button class="sp-go" onclick="SK.skTab('sk')">Вложить</button>`}</div>`
+      ? `<div class="sp-box on"><span class="sp-num">${G.sp}</span><span>${plural(G.sp, "свободное очко", "свободных очка", "свободных очков")}${skTab === "sk" ? ": нажмите «+1» у навыка" : ""}</span>${skTab === "sk" ? "" : `<button class="sp-go" onclick="SK.skTab('sk')">Вложить</button>`}</div>`
       : `<div class="sp-box">Очков навыка нет — следующее на ${G.lvl + 1}-м уровне</div>`;
-  const lvl = `<section class="lvbox"><div class="lv-h"><h2>Уровень ${G.lvl}</h2><span>${G.xp} / ${need} опыта</span></div>
+  const lvl = `<section class="lvbox"><div class="lv-h"><h2>Уровень ${G.lvl}</h2><span>${G.xp} из ${need} опыта</span></div>
     <div class="lv-bar"><i style="width:${Math.min(100, Math.round((G.xp / need) * 100))}%"></i></div>${spBox}
     <p>Опыт дают найденные вещи: чем ценнее, тем больше.</p>${nextReward()}</section>`;
-  const eff = {
-    torg: l => [["Цена продажи", pct(l * 2)]],
-    master: l => [
-      ["Риск испортить", 35 - l * 3 + "%"],
-      ["Бонус к состоянию", pct(l * 2)]
-    ],
-    svyazi: l => [["Взятки и облавы", l ? "−" + l * 8 + "%" : "0%"]]
-  };
+  const pc = v => `+${String(Math.round(v * 10) / 10).replace(".", ",")}%`,
+    fx = (id, l) => {
+      const e = (l * 10) / SKMAX; // сила навыка на уровне l
+      return {
+        torg: ["Цена продажи", pc(e * 2)],
+        karto: ["Кольцо карты", `${String(+(11 - e * 0.25).toFixed(1)).replace(".", ",")} кл.`],
+        master: ["Риск испортить", `${Math.round(35 - e * 3)}%`],
+        svyazi: ["Взятки и облавы", e ? `−${Math.round(e * 8)}%` : "0%"]
+      }[id];
+    };
   const note = {
     torg: "При любой продаже.",
     karto: "Кольцо купленной карты ближе к хутору и уже.",
@@ -146,32 +116,20 @@ function renderSkills() {
     svyazi: "Дешевле договориться на посту ДПС, реже облавы на чёрном рынке."
   };
   const cards = SKILLS.map(S => {
-    const l = sk(S.id),
-      max = l >= SKMAX;
-    const boxes = [...Array(SKMAX).keys()].map(i => `<i class="${i < l ? "on" : ""}"></i>`).join("");
-    let body;
-    if (S.id === "karto")
-      body = `<p class="sk-d">Точнее обозначает область поиска.</p>${kartoPic(l)}<p class="sk-n">${l >= SKMAX ? `Кольцо: ${String(+(11 - l * 0.25).toFixed(2)).replace(".", ",")} клетки, сдвиг ${String(+(3 * (1 - l * 0.08)).toFixed(2)).replace(".", ",")} — точнее не бывает (для карты «Слух»).` : `Кольцо: ${String(+(11 - l * 0.25).toFixed(2)).replace(".", ",")} → ${String(+(11 - Math.min(SKMAX, l + 1) * 0.25).toFixed(2)).replace(".", ",")} клетки, сдвиг ${String(+(3 * (1 - l * 0.08)).toFixed(2)).replace(".", ",")} → ${String(+(3 * (1 - Math.min(SKMAX, l + 1) * 0.08)).toFixed(2)).replace(".", ",")} (для карты «Слух»).`}</p>`;
-    else
-      body =
-        eff[S.id](l)
-          .map(
-            ([n, v], k) =>
-              `<p class="sk-e"><span>${n}</span><b>${v}</b>${max ? "" : `<em>→</em><b class="up">${eff[S.id](l + 1)[k][1]}</b>`}</p>`
-          )
-          .join("") + `<p class="sk-n">${note[S.id]}</p>`;
+    const l = skl(S.id),
+      max = l >= SKMAX,
+      [n, v] = fx(S.id, l),
+      boxes = [...Array(SKMAX).keys()].map(i => `<i class="${i < l ? "on" : ""}"></i>`).join("");
     const btn = max
-      ? `<button class="buy" disabled>Максимум</button>`
-      : G.sp < 1
-        ? `<button class="buy" disabled>Нужно очко навыка</button>`
-        : `<button class="buy" onclick="SK.learn('${S.id}')">Улучшить · 1 очко</button>`;
-    return `<section class="skc"><div class="sk-top"><img src="${skillPic(S.id)}" alt=""><div class="sk-hd"><h3>${S.name}</h3><span class="sk-lv">${l}/${SKMAX}<span class="boxes">${boxes}</span></span></div></div>${body}${btn}</section>`;
+      ? `<span class="sk-max">${pxi("check", 18)}</span>`
+      : `<button class="sk-plus" ${G.sp < 1 ? "disabled" : ""} onclick="SK.learn('${S.id}')" aria-label="Улучшить: ${S.name}">+1</button>`;
+    return `<section class="skc"><div class="sk-top"><span class="sk-ic"><img src="${skillPic(S.id)}" alt=""></span><div class="sk-hd"><span class="sk-row"><h3>${S.name}</h3><span class="sk-lv">${l} из ${SKMAX}</span></span><span class="boxes" aria-hidden="true">${boxes}</span><p class="sk-e">${n} <b>${v}</b>${max ? "" : ` → <b class="up">${fx(S.id, l + 1)[1]}</b>`}</p></div>${btn}</div><p class="sk-n">${note[S.id]}</p></section>`;
   }).join("");
-  const rankBox = `<section class="rkbox"><div class="rk-top"><div><small>Звание</small><h3>${R0.name}</h3></div><span class="rk-chip">Совесть ${G.rep > 0 ? "+" : ""}${G.rep}</span></div>
+  const rankBox = `<section class="rkbox"><div class="rk-top"><div><small>Звание</small><h3>${R0.name}</h3></div><span class="rk-chip">${pxi("heart", 16)}${G.rep > 0 ? "+" : ""}${G.rep}</span></div>
     <p class="rk-p">${R0.perk[0].toUpperCase() + R0.perk.slice(1)}.</p><p class="rk-p">${up ? `До «${up.name}» — ${up.min - G.rep} ${plural(up.min - G.rep, "очко", "очка", "очков")} совести.` : "Это высшее звание."}</p>
     <details><summary>Все звания</summary><ul class="rk-list">${RANKS.map(r => `<li class="${r === R0 ? "cur" : ""}"><span>${r.range}</span><b>${r.name}</b><small>${r.perk}</small></li>`).join("")}</ul></details>
     <details><summary>Как меняется совесть? <span class="q">?</span></summary><div class="rk-how"><p>Дар музею: +1 за бытовое и монеты, +2 за военное из слоя империи и старины и за редкое, +3 за редкое из старины.</p><p>Чёрный рынок: −1 совести за любую вещь, плюс растёт внимание полиции.</p><p>Скупщик и антиквар совесть не меняют.</p></div></details></section>`;
   const done = TRACK.filter(t => G.lvl >= t.l).length;
-  const tabs = `<div class="subtabs sk-tabs" role="tablist"><button role="tab" aria-selected="${skTab === "sk"}" onclick="SK.skTab('sk')">Навыки${G.sp > 0 ? `<i class="sk-badge">${G.sp}</i>` : ""}</button><button role="tab" aria-selected="${skTab === "tr"}" onclick="SK.skTab('tr')">Путь копателя<i class="sk-cnt">${done}/${TRACK.length}</i></button></div>`;
+  const tabs = `<div class="subtabs sk-tabs" role="tablist"><button role="tab" aria-selected="${skTab === "sk"}" onclick="SK.skTab('sk')">Навыки${G.sp > 0 ? `<i class="sk-badge">${G.sp}</i>` : ""}</button><button role="tab" aria-selected="${skTab === "tr"}" onclick="SK.skTab('tr')">Путь копателя<i class="sk-cnt">${done} из ${TRACK.length}</i></button></div>`;
   return lvl + tabs + (skTab === "tr" ? trackBox() : cards + rankBox);
 }

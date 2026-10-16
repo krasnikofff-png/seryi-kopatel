@@ -629,7 +629,7 @@ function showComic(id, done) {
     const p = C.pages[i];
     el.innerHTML = `<div class="cm"><div class="cm-top"><span>${C.title}</span><button class="cm-skip" onclick="SK.comicEnd()">Пропустить</button></div>
       <div class="cm-frame" onclick="SK.comicNext()"><img src="${panelPic(p.p)}" style="${panelFy(p.p)}" alt=""><div class="cm-cap${p.say ? " say" : ""}">${p.cap}</div></div>
-      <div class="cm-nav"><span class="cm-dots">${C.pages.map((_, k) => `<i class="${k === i ? "on" : ""}"></i>`).join("")}</span><button class="cm-next" onclick="SK.comicNext()">${i < C.pages.length - 1 ? "Дальше ›" : "Закрыть"}</button></div></div>`;
+      <div class="cm-nav"><span class="cm-dots">${C.pages.map((_, k) => `<i class="${k === i ? "on" : ""}"></i>`).join("")}</span><button class="cm-next" onclick="SK.comicNext()">${i < C.pages.length - 1 ? "Дальше" : "Закрыть"}</button></div></div>`;
   };
   comicQ = {
     next: () => {
@@ -1065,25 +1065,33 @@ function storyGoal() {
 function renderDed() {
   const S = G.story,
     goal = storyGoal(),
-    found = id => S.clues.includes(id);
-  return `<section class="dd-card"><img src="${soldierPic()}" alt=""><div><small>Дед</small><h2>Андрей Михайлович Серов</h2><p>1912 г. р. · старший сержант</p><p class="dim">${S.end === "good" ? "Найден в 2026 · похоронен в селе" : S.end === "grey" ? "Найден на острове в 2026" : "Пропал без вести, 1942"}</p></div></section>
-  <section class="dd-goal"><small>Что дальше</small><b>${goal.t}</b>${goal.d ? `<p>${goal.d}</p>` : ""}</section>
-  <div class="sk-title"><h2>Улики</h2><span></span></div>
-  <ul class="dd-list">${CLUES.map(c =>
-    found(c.id)
-      ? `<li><img src="${storyItemPic(c.id)}" alt=""><div><small>${c.ch}</small><b>${c.name}</b><p>${c.id === "zheton" && S.sold ? "Продан Борзому за 100 000 ₽. Имя Савельич успел назвать: Фёдор Лыков." : c.id === "medal" && S.end === "bad" ? "Отдан Борзому. Записка: «Серов Андрей Михайлович, 1912…»." : c.text}</p></div></li>`
-      : `<li class="off"><img src="${storyItemPic("?")}" alt=""><div><small>${c.ch}</small><b>???</b></div></li>`
-  ).join("")}</ul>
-  <div class="dd-replay"><button onclick="SK.comic('prologue')">Пересмотреть пролог</button>${[
-    ["museum", 2, "музей"],
-    ["ch2", 3, "лес"],
-    ["ch3", 4, "усадьба"],
+    found = id => S.clues.includes(id),
+    got = CLUES.filter(c => found(c.id)),
+    left = CLUES.length - got.length;
+  const replays = [
+    ["prologue", 0, "Пролог"],
+    ["museum", 2, "Музей"],
+    ["ch2", 3, "Лес"],
+    ["ch3", 4, "Усадьба"],
     ["ch4", 5, "Нюра"],
-    ["ch5", 6, "остров"]
+    ["ch5", 6, "Остров"]
   ]
     .filter(([, m]) => S.st >= m)
-    .map(([id, , t]) => `<button onclick="SK.comic('${id}')">Пересмотреть: ${t}</button>`)
-    .join("")}${S.end ? `<button onclick="SK.comic('end_${S.end}')">Пересмотреть финал</button>` : ""}</div>`;
+    .concat(S.end ? [[`end_${S.end}`, 0, "Финал"]] : []);
+  return `<section class="dd-card"><span class="dd-photo"><img src="${soldierPic()}" alt="Фото деда"></span><div><h2>Андрей Михайлович Серов</h2><p class="dim">Старший сержант, 1912 г. р. ${S.end === "good" ? "Найден в 2026-м, похоронен в селе." : S.end === "grey" ? "Найден на острове в 2026-м." : "Пропал без вести в 1942-м."}</p></div></section>
+  <section class="dd-goal">${pxi("pin", 26)}<div><small>Что дальше</small><b>${goal.t}</b>${goal.d ? `<p>${goal.d}</p>` : ""}</div></section>
+  <section class="dd-box"><div class="eco-h"><h2>Улики</h2><b>${got.length} из ${CLUES.length}</b></div>
+  <ul class="dd-list">${got
+    .map(
+      c =>
+        `<li><span class="dd-ic"><img src="${storyItemPic(c.id)}" alt=""></span><div><small>${c.ch}</small><b>${c.name}</b><p>${c.id === "zheton" && S.sold ? "Продан Борзому за 100 000 ₽. Имя Савельич успел назвать: Фёдор Лыков." : c.id === "medal" && S.end === "bad" ? "Отдан Борзому. Записка: «Серов Андрей Михайлович, 1912…»." : c.text}</p></div></li>`
+    )
+    .join(
+      ""
+    )}${left ? `<li class="off"><span class="dd-ic">?</span><div><b>Ещё ${left} ${plural(left, "улика не найдена", "улики не найдены", "улик не найдено")}</b></div></li>` : ""}</ul></section>
+  <section class="dd-box"><div class="eco-h"><h2>Пересмотреть</h2></div><div class="dd-replay">${replays
+    .map(([id, , t]) => `<button onclick="SK.comic('${id}')">${pxi("arrow", 14)}${t}</button>`)
+    .join("")}</div></section>`;
 }
 const STORY_ITEMS = {
   zheton: {
@@ -1436,7 +1444,7 @@ function storyChoice(title, pic, text, opts) {
   const el = $("comic");
   choiceQ = opts;
   el.innerHTML = `<div class="cm choice"><div class="cm-top"><span>${title}</span></div><div class="cm-frame"><img src="${panelPic(pic)}" style="${panelFy(pic)}" alt=""><div class="cm-cap say">${text}</div></div>
-    <div class="cm-ch">${opts.map((o, k) => `<button class="cm-opt ${o.cls || ""}" ${o.off ? "disabled" : ""} onclick="SK.choose(${k})"><b>${o.label}</b><small>${o.sub}</small></button>`).join("")}</div></div>`;
+    <p class="cm-hint">Выбор изменит концовку</p><div class="cm-ch">${opts.map((o, k) => `<button class="cm-opt ${o.cls || ""}" ${o.off ? "disabled" : ""} onclick="SK.choose(${k})"><span class="cm-k">${k + 1}</span><span><b>${o.label}</b><small>${o.sub}</small></span></button>`).join("")}</div></div>`;
   el.hidden = false;
 }
 function addClue(id) {

@@ -54,10 +54,11 @@ function save() {
   } catch (e) {}
 }
 const $ = id => document.getElementById(id);
-const rub = n => Math.round(n).toLocaleString("ru-RU") + " ₽";
+const rub = n => Math.round(n).toLocaleString("ru-RU") + "\u00a0₽"; // неразрывный пробел: «₽» не уезжает на новую строку
 const rnd = (a, b) => a + Math.random() * (b - a);
 const kg = n => n.toFixed(1).replace(".", ",");
-const sk = id => G.skills[id] || 0;
+const skl = id => Math.min(SKMAX, (G.skills && G.skills[id]) || 0); // уровень навыка 0…6
+const sk = id => (skl(id) * 10) / SKMAX; // сила навыка в прежней шкале 0…10 — все формулы считают от неё
 const bagCap = () => TRANSPORT[G.transport].cap;
 const shovelMax = () => SHOVEL[G.shovel].depth - (isWinter() ? 10 : 0);
 const mapPrice = (m, r) =>
@@ -130,11 +131,7 @@ const GRADES = [
 const rareM = it => (it.base < 2000 ? 5 : it.base <= 10000 ? 3 : 2); // редкая разновидность: чем дороже вещь, тем меньше прибавка
 const grM = it => (it.leg ? 1 : it.gr != null ? (it.gr === 5 ? rareM(it) : GRADES[it.gr].m) : it.cond); // множитель цены: сохранность после чистки (старые сохранения — по проценту состояния)
 const grTxt = it =>
-  it.leg
-    ? "легенда"
-    : it.gr != null
-      ? GRADES[it.gr].n.toLowerCase()
-      : `состояние ${Math.round(it.cond * 100)}%`;
+  it.leg ? "легенда" : it.gr != null ? GRADES[it.gr].n.toLowerCase() : `состояние ${Math.round(it.cond * 100)}%`;
 const shownName = it => (it.story ? dirtyName(it) : it.name); // в поле сразу видно, что за вещь; сюжетные — загадка до чистки
 const rangeCh = () => (CHANNELS[1].open() ? CHANNELS[1] : CHANNELS[0]);
 const priceRange = it => {
@@ -152,17 +149,14 @@ function rollGrade(it, self, rm, careful) {
   if (g < 5 && R() < pd) g = Math.max(0, g - 1);
   if (self && !it.story) {
     const risk =
-      (own("bath")
-        ? 0
-        : Math.max(0, 35 - sk("master") * 3 - (own("bench") ? 10 : 0) + (it.wet ? 10 : 0)) / 100) *
+      (own("bath") ? 0 : Math.max(0, 35 - sk("master") * 3 - (own("bench") ? 10 : 0) + (it.wet ? 10 : 0)) / 100) *
       (rm == null ? 1 : rm);
     if (Math.random() < risk && g > 0) {
       g--;
       note = "Перестарались с чисткой — сохранность упала на ступень.";
     } else if (
       g < 4 &&
-      Math.random() <
-        sk("master") * 0.04 + (own("bench") ? 0.05 : 0) + (own("bath") ? 0.05 : 0) + (careful ? 0.06 : 0)
+      Math.random() < sk("master") * 0.04 + (own("bench") ? 0.05 : 0) + (own("bath") ? 0.05 : 0) + (careful ? 0.06 : 0)
     )
       g++;
   }

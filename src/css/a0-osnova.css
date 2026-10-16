@@ -1,0 +1,397 @@
+/* ===== Стиль А: основа — токены, шрифт, кнопки, метки, окна =====
+   Доска (гараж) — тёплое дерево; содержимое — пергамент с тёмной обводкой; действие — зелёная кнопка,
+   выбор — золотая, опасно — красная. Шрифт один — Nunito 700–900; Caveat только для пометок от руки. */
+:root {
+  --line: #3a1d0b;
+  --ink: #4a2a12;
+  --ink-dim: #8a5d34;
+  --faint: #a07a50;
+  --parch: #fbe9c0;
+  --parch2: #f1d7a3;
+  --parch3: #e6d2a6;
+  --edge: #e2bf7f;
+  --cream: #fff6d8;
+  --rule: #ecd29a;
+  --plank: #7a3f18;
+  --plank-hi: #b06a32;
+  --plank-lo: #5e2f12;
+  --on-wood: #fff1cf;
+  --on-wood-dim: #f6d39a;
+  --green: #44912a;
+  --green-d: #2c6a18;
+  --green-l: #7cc94f;
+  --green-o: #1f3d0c;
+  --gold: #ffcf3d;
+  --gold-d: #c98f12;
+  --gold-l: #fff08a;
+  --gold-o: #5a3a08;
+  --red: #c8402a;
+  --red-d: #8f2412;
+  --red-o: #5c1408;
+  --blue: #2f5fb0;
+  --wood:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0) 0 138px, rgba(58, 29, 11, 0.28) 138px 140px),
+    repeating-linear-gradient(180deg, #a8622e 0 26px, #9c5828 26px 46px, #5e2f12 46px 48px);
+  --plank-bg: repeating-linear-gradient(180deg, #7a3f18 0 18px, #723a16 18px 20px);
+  --font: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-n: var(--font);
+  --font-px: var(--font);
+  --hand: "Caveat", cursive;
+  /* старые имена, на которые ещё ссылается код */
+  --paper: var(--parch);
+  --paper-ink: var(--ink);
+  --lcd: #2d3b1a;
+  --lcd-on: #c7f05a;
+  --lcd-off: #3f5622;
+  color-scheme: light;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  background: #5e2f12;
+  color: var(--ink);
+}
+body {
+  margin: 0;
+  font: 700 15px/1.35 var(--font);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+[hidden] {
+  display: none !important;
+}
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
+}
+.nw {
+  white-space: nowrap;
+}
+button {
+  font-family: var(--font);
+  color: inherit;
+  cursor: pointer;
+}
+button:focus-visible,
+[role="button"]:focus-visible,
+summary:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+img {
+  image-rendering: pixelated;
+}
+.ic {
+  display: inline-block;
+  flex: none;
+  image-rendering: pixelated;
+}
+.ic svg,
+.px svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.px {
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+}
+html.noscroll,
+html.noscroll body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* ---------- кнопки ---------- */
+.btn,
+.buy,
+.nb-btn,
+.cm-next,
+.rd-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 50px;
+  padding: 6px 14px 9px;
+  border: 0;
+  border-radius: 6px;
+  font: 900 16px/1.1 var(--font);
+  letter-spacing: 0;
+  word-spacing: 0;
+  white-space: nowrap;
+  color: #fff;
+  background: var(--green);
+  box-shadow:
+    0 0 0 3px var(--green-o),
+    inset 0 3px 0 var(--green-l),
+    inset 0 -4px 0 var(--green-d);
+  text-shadow: 0 2px 0 var(--green-d);
+}
+.btn:active:not(:disabled),
+.buy:active:not(:disabled),
+.nb-btn:active:not(:disabled),
+.abtn:active:not(:disabled) {
+  transform: translateY(2px);
+}
+.btn:disabled,
+.buy:disabled,
+.nb-btn:disabled {
+  color: var(--ink-dim);
+  background: var(--parch3);
+  box-shadow:
+    0 0 0 3px #b8956a,
+    inset 0 -3px 0 #d6b57a;
+  text-shadow: none;
+  cursor: default;
+}
+.btn.ghost,
+.btn.w,
+.nb-btn.sm {
+  color: var(--ink);
+  background: var(--parch);
+  box-shadow:
+    0 0 0 3px var(--line),
+    inset 0 3px 0 #fff8e2,
+    inset 0 -4px 0 var(--edge);
+  text-shadow: none;
+}
+.btn.y {
+  color: var(--ink);
+  background: var(--gold);
+  box-shadow:
+    0 0 0 3px var(--gold-o),
+    inset 0 3px 0 var(--gold-l),
+    inset 0 -4px 0 var(--gold-d);
+  text-shadow: none;
+}
+.btn.r {
+  background: var(--red);
+  box-shadow:
+    0 0 0 3px var(--red-o),
+    inset 0 3px 0 #f2876c,
+    inset 0 -4px 0 var(--red-d);
+  text-shadow: 0 2px 0 var(--red-d);
+}
+/* цена или время в кнопке — отдельной плашкой */
+.cost {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  padding: 4px 8px 4px 6px;
+  border-radius: 12px;
+  font: 800 13px/1 var(--font);
+  white-space: nowrap;
+  text-shadow: none;
+  background: rgba(0, 0, 0, 0.2);
+  color: #fff;
+}
+.btn.ghost .cost,
+.btn.w .cost,
+.btn.y .cost,
+.btn:disabled .cost,
+.nb-btn.sm .cost {
+  background: rgba(90, 58, 8, 0.13);
+  color: var(--ink);
+}
+.cost .px {
+  width: 15px;
+  height: 15px;
+}
+.lbl {
+  display: block;
+}
+
+/* ---------- метки ---------- */
+.tag {
+  display: inline-block;
+  font: 800 12px/1 var(--font);
+  padding: 4px 7px 5px;
+  border-radius: 4px;
+  background: var(--parch3);
+  color: #6b3d17;
+  white-space: nowrap;
+}
+.warn {
+  color: var(--red) !important;
+  font-weight: 800;
+}
+.hint {
+  color: var(--ink-dim);
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 2px 0;
+}
+.empty {
+  color: var(--ink-dim);
+  font-size: 15px;
+  margin: 4px 0;
+}
+.mono {
+  font: 800 13px var(--font);
+  color: var(--ink-dim);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.meta {
+  font-size: 13px !important;
+}
+.dim {
+  color: var(--ink-dim);
+}
+
+/* ---------- окна поверх (листы) ---------- */
+.over {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(30, 14, 4, 0.62);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  pointer-events: auto;
+}
+.sheet {
+  position: relative;
+  width: min(380px, 100%);
+  max-height: calc(100% - 24px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--parch);
+  border-radius: 9px;
+  box-shadow:
+    0 0 0 3px var(--line),
+    inset 0 0 0 3px var(--edge),
+    0 10px 0 rgba(0, 0, 0, 0.35);
+  padding: 16px;
+  color: var(--ink);
+}
+.sheet h2 {
+  margin: 0 0 10px;
+  font: 900 22px/1.15 var(--font);
+  color: var(--ink);
+}
+.sheet p {
+  margin: 0 0 12px;
+  font: 700 15px/1.4 var(--font);
+  color: #6b3d17;
+}
+.sheet ul {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+}
+.sheet li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 2px solid var(--rule);
+  font-size: 15px;
+}
+.sheet li:last-child {
+  border-bottom: 0;
+}
+.sheet li small {
+  display: block;
+  color: var(--ink-dim);
+  font-size: 13px;
+}
+.sheet li button {
+  flex: none;
+  min-height: 34px;
+  padding: 0 12px 2px;
+  border: 0;
+  border-radius: 6px;
+  font: 900 13px var(--font);
+  color: var(--ink);
+  background: var(--parch2);
+  box-shadow:
+    0 0 0 2px #6b3d17,
+    inset 0 -3px 0 #d6b57a;
+}
+.sheet .row,
+.over .row {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 3px;
+}
+.esub {
+  display: block;
+  margin-top: 3px;
+  font: 800 13px/1.25 var(--font);
+  opacity: 0.9;
+  text-shadow: none;
+}
+.keys {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 12px;
+  font-size: 14px;
+  line-height: 1.35;
+  margin: 0 0 16px;
+}
+.keys span:nth-child(odd) {
+  color: var(--green-d);
+  font-weight: 900;
+}
+/* окно с дощатой шапкой */
+.sheet.plank {
+  padding: 0;
+  overflow: hidden auto;
+}
+.sheet.plank > h2:first-child,
+.sheet .mh {
+  margin: 0;
+  padding: 13px 16px 14px;
+  background: var(--plank-bg);
+  box-shadow:
+    inset 0 3px 0 var(--plank-hi),
+    inset 0 -5px 0 var(--plank-lo),
+    0 3px 0 var(--line);
+  color: var(--on-wood);
+  text-shadow: 0 3px 0 var(--line);
+}
+.sheet.plank > :not(h2:first-child) {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+.sheet.plank > :last-child {
+  margin-bottom: 18px;
+}
+.sheet.plank > h2:first-child + * {
+  margin-top: 14px;
+}
+
+/* ---------- шкалы ---------- */
+.xp,
+.eco-bar,
+.lv-bar,
+.alb-bar,
+.sc-bar {
+  height: 12px;
+  border-radius: 4px;
+  background: var(--parch3);
+  box-shadow: 0 0 0 2px #6b3d17;
+  overflow: hidden;
+}
+.xp i,
+.lv-bar i {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, var(--gold) 0 10px, #f2b82a 10px 12px);
+}

@@ -409,7 +409,7 @@ function buy(kind) {
   if (opened) showRegionIntro(nx.region);
 }
 function learn(id) {
-  if (G.sp < 1 || sk(id) >= SKMAX) return;
+  if (G.sp < 1 || skl(id) >= SKMAX) return;
   G.sp--;
   G.skills[id]++;
   SFX.levelup();
@@ -543,29 +543,55 @@ function go(id) {
     );
   }
 }
+let msgShown = "",
+  msgTimer = null;
+// сообщение «Вернулся домой…» — полоса над вкладками: висит 6 секунд, по нажатию закрывается
+function showMsg() {
+  const box = $("bMsg");
+  if (!G.msg) {
+    box.innerHTML = "";
+    box.className = "";
+    return;
+  }
+  if (G.msg === msgShown) return;
+  msgShown = G.msg;
+  const sav = G.msgSav && G.msg.startsWith(G.msgSav);
+  box.innerHTML = `<div class="bmsg${G.msgBad ? " bad" : ""}${sav ? " sav" : ""}">${sav ? `<img src="${savPic()}" alt="Савельич">` : ""}<div>${G.msg}</div><button class="bmsg-x" aria-label="Скрыть сообщение">${pxi("x", 12)}</button></div>`;
+  box.className = "on";
+  box.onclick = () => (box.className = "");
+  clearTimeout(msgTimer);
+  msgTimer = setTimeout(() => (box.className = ""), G.msgBad ? 9000 : 6000);
+}
 function renderBase() {
   $("bMoney").textContent = rub(G.money);
-  $("bRep").textContent = `Совесть ${G.rep > 0 ? "+" : ""}${G.rep}`;
-  $("bHeat").textContent = `Полиция ${G.heat}`;
-  $("bLvl").innerHTML = `Ур. ${G.lvl}${G.sp ? ` <i class="sp">+${G.sp}</i>` : ""}`;
+  $("bRep").textContent = `${G.rep > 0 ? "+" : ""}${G.rep}`;
+  $("bHeat").textContent = `${G.heat}`;
+  $("bLvl").innerHTML = `${G.lvl}${G.sp ? `<i class="sp">+${G.sp}</i>` : ""}`;
+  $("bLvlW").setAttribute("aria-label", `Уровень ${G.lvl}${G.sp ? `, свободных очков: ${G.sp}` : ""}`);
+  {
+    const d = $("bDebt");
+    d.hidden = !(G.debt > 0);
+    if (G.debt > 0) {
+      $("bDebtT").textContent = `Долг ${rub(G.debt)}`;
+      d.classList.toggle("bad", (G.debtMiss || 0) > 0);
+    }
+  }
   document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
   {
-    const sb = document.querySelector('#tabs button[data-tab="skills"]');
-    if (sb) sb.classList.toggle("alert", (G.sp || 0) > 0);
+    const sb = $("spBadge");
+    sb.hidden = !((G.sp || 0) > 0);
+    sb.textContent = G.sp || "";
   }
   {
     const tb = document.querySelector(`#tabs button[data-tab="${tab}"]`);
     if (tb) {
       $("gTitle").textContent = tb.querySelector("span").textContent;
-      $("gTitle").classList.toggle("long", $("gTitle").textContent.length > 8);
-      $("gIco").src = (tb.querySelector("img.i0") || tb.querySelector("img")).src;
+      $("gIco").src = tb.querySelector("img").src;
     }
   }
   ["sell", "gear", "skills", "maps", "ded"].forEach(t => ($("t_" + t).hidden = tab !== t));
   $("t_ded").innerHTML = renderDed();
-  $("bMsg").innerHTML = G.msg
-    ? `<div class="bmsg${G.msgBad ? " bad" : ""}${G.msgSav && G.msg.startsWith(G.msgSav) ? " sav" : ""}">${G.msgSav && G.msg.startsWith(G.msgSav) ? `<img src="${savPic()}" alt="Савельич">` : ""}<div>${G.msg}</div></div>`
-    : "";
+  showMsg();
   // находки
   const h = renderFinds();
   $("t_sell").innerHTML = h;
@@ -613,6 +639,7 @@ $("reset").onclick = () => {
   G = fresh();
   T = null;
   tab = "maps";
+  $("setOver").hidden = true;
   save();
   showBase();
 };
@@ -624,10 +651,17 @@ window.setSfx = setSfx;
 Object.defineProperty(window, "sfxOn", { get: () => sfxOn });
 window.$ = $;
 window.SK = {
-  albToggle: o => {
-    albOpen = o;
-  },
   albPick: (e, k) => albWin(Object.assign({ era: e }, ALB[e][k])),
+  openAlb,
+  openLegs,
+  albRow: e => {
+    albRow = e;
+    openAlb();
+  },
+  albOnly: v => {
+    albOnly = v;
+    openAlb();
+  },
   openMag,
   openFlea,
   fleaClose: closeFlea,

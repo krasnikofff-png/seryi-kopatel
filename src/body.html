@@ -24,7 +24,7 @@
       <div class="bars" id="bars"></div>
       <div class="lstat"><b id="ltype">Тишина</b><small id="ldepth"></small></div>
     </div>
-    <div class="depthrow" id="depthRow"><span>Глубина: <b id="dNow">0 см</b></span><span class="sep"></span><span>Предел: <b id="dMax">30 см</b></span></div>
+    <div class="depthrow" id="depthRow"><span>Глубина <b id="dNow">0 см</b></span><span class="sep"></span><span>до <b id="dMax">30 см</b></span></div>
     <div class="arow">
       <button class="abtn care" id="digCare">Копать аккуратно<small id="careInfo">+10 см · 20 мин</small></button>
       <button class="abtn fast" id="digFast">Копать быстро<small id="fastInfo">+20 см · 10 мин</small><small class="risk">Риск повреждения</small></button>
@@ -57,10 +57,12 @@
 <div id="comic" hidden></div>
 
 <div class="over" id="bagOver" hidden>
-  <div class="sheet">
-    <h2 id="bagTitle">Сумка</h2>
-    <ul id="bagList"></ul>
-    <button class="btn" id="bagClose">Закрыть</button>
+  <div class="sheet bag">
+    <span class="grab" aria-hidden="true"></span>
+    <div class="sh-h"><h2 id="bagTitle">Сумка</h2><span class="alb-tot" id="bagSub"></span></div>
+    <div class="bag-w" id="bagW"></div>
+    <ul id="bagList" class="flist"></ul>
+    <button class="btn" id="bagClose">Копать дальше</button>
   </div>
 </div>
 
@@ -79,21 +81,18 @@
 
 <main id="base" hidden>
   <div class="bwrap">
-    <div class="ghead"><h1 class="gtitle"><img id="gIco" src="" alt=""><span id="gTitle">Гараж</span></h1>
-      <div class="gmoney"><img class="gcoin" src="@art(ui/ui-0.png)" alt=""><b id="bMoney">5 000 ₽</b></div></div>
+    <header class="ghead">
+      <img id="gIco" src="" alt="">
+      <h1 class="gtitle"><span id="gTitle">Гараж</span></h1>
+      <div class="gmoney"><img class="gcoin" src="@art(ui/ui-0.png)" alt=""><b id="bMoney">5 000 ₽</b></div>
+      <button class="gset" id="setBtn" aria-label="Настройки" onclick="document.getElementById('setOver').hidden=false"><span data-px="gear" data-s="22"></span></button>
+    </header>
     <div class="gstats">
-      <div class="gstat"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="12" width="4" height="6" rx="1"/><rect x="8" y="8" width="4" height="10" rx="1"/><rect x="14" y="3" width="4" height="15" rx="1"/></svg><span id="bLvl">Ур. 1</span></div>
-      <div class="gstat"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 17.5S2.5 12.8 2.5 7.4C2.5 4.9 4.4 3 6.7 3c1.4 0 2.6.7 3.3 1.8C10.7 3.7 11.9 3 13.3 3c2.3 0 4.2 1.9 4.2 4.4 0 5.4-7.5 10.1-7.5 10.1z"/></svg><span id="bRep">Совесть 0</span></div>
-      <div class="gstat"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 9.5C3 6 6.1 4 10 4s7 2 7 5.5V11H3z"/><rect x="2" y="11.5" width="16" height="2.5" rx="1.2"/><rect x="8.5" y="6.2" width="3" height="2.6" rx=".6" fill="#2a2117"/></svg><span id="bHeat">Полиция 0</span></div>
+      <div class="gstat" id="bLvlW" title="Уровень"><span data-px="star" data-s="18"></span><span id="bLvl">1</span></div>
+      <div class="gstat" title="Совесть"><span data-px="heart" data-s="18"></span><span id="bRep">0</span></div>
+      <div class="gstat" title="Интерес полиции"><span data-px="shield" data-s="18"></span><span id="bHeat">0</span></div>
+      <button class="gstat debt" id="bDebt" hidden onclick="SK.debtHelp()"><span data-px="paper" data-s="18"></span><span id="bDebtT"></span></button>
     </div>
-    <div id="tabs" role="tablist">
-      <button role="tab" data-tab="sell" aria-selected="false"><img src="@art(ui/ui-1.png)" alt=""><span>Находки</span></button>
-      <button role="tab" data-tab="gear" aria-selected="false"><img src="@art(ui/ui-2.png)" alt=""><span>Снаряжение</span></button>
-      <button role="tab" data-tab="skills" aria-selected="false"><img src="@art(ui/ui-3.png)" alt=""><span>Навыки</span></button>
-      <button role="tab" data-tab="maps" aria-selected="true"><img class="i0" src="@art(ui/ui-4.png)" alt=""><img class="i1" src="@art(ui/ui-5.png)" alt=""><span>Карты</span></button>
-      <button role="tab" data-tab="ded" aria-selected="false"><img src="@art(ui/ui-6.png)" alt=""><span>Дед</span></button>
-    </div>
-    <div id="bMsg"></div>
     <div class="bpanel" id="t_sell" hidden></div>
     <div id="fsheet" hidden></div>
     <div id="scrub" hidden></div>
@@ -102,7 +101,23 @@
     <div class="bpanel" id="t_skills" hidden></div>
     <div class="bpanel" id="t_maps"></div>
     <div class="bpanel" id="t_ded" hidden></div>
-    <div class="bfoot"><span class="saved"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5"/><path d="M6 10.3l2.6 2.6L14.2 7.4" fill="none" stroke="#211a12" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Прогресс сохранён в браузере.</span><span class="bbtns"><button id="sfxBtn" onclick="setSfx(!sfxOn)">Звуки: вкл.</button><button id="reset">Начать заново</button></span></div>
+  </div>
+  <div id="bMsg" role="status"></div>
+  <nav id="tabs" role="tablist" aria-label="Разделы гаража">
+    <button role="tab" data-tab="sell" aria-selected="false"><img src="@art(ui/ui-1.png)" alt=""><span>Находки</span></button>
+    <button role="tab" data-tab="gear" aria-selected="false"><img src="@art(ui/ui-2.png)" alt=""><span>Снаряга</span></button>
+    <button role="tab" data-tab="skills" aria-selected="false"><img src="@art(ui/ui-3.png)" alt=""><span>Навыки</span><b class="tbadge" id="spBadge" hidden></b></button>
+    <button role="tab" data-tab="maps" aria-selected="true"><img src="@art(ui/ui-4.png)" alt=""><span>Карты</span></button>
+    <button role="tab" data-tab="ded" aria-selected="false"><img src="@art(ui/ui-6.png)" alt=""><span>Дед</span></button>
+  </nav>
+  <div class="over" id="setOver" hidden onclick="if(event.target===this)this.hidden=true">
+    <div class="sheet plank set">
+      <h2>Настройки</h2>
+      <div class="set-row"><span><b>Звуки</b><small>шаги, копка, деньги</small></span><button id="sfxBtn" onclick="setSfx(!sfxOn)">Звуки: вкл.</button></div>
+      <div class="set-row"><span><b>Сохранение</b><small>прогресс хранится в этом браузере</small></span><span data-px="check" data-s="20"></span></div>
+      <div class="set-row danger"><span><b>Начать заново</b><small>всё пропадёт: деньги, находки, уровень</small></span><button id="reset">Начать заново</button></div>
+      <button class="btn ghost" onclick="document.getElementById('setOver').hidden=true">Закрыть</button>
+    </div>
   </div>
 </main>
 

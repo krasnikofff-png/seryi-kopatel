@@ -89,7 +89,6 @@ const eraCap = e => {
   const n = ERAS[e].name;
   return n[0].toUpperCase() + n.slice(1);
 };
-const notCleanTxt = it => (it.c === 2 ? "Не очищен" : "Не очищена");
 function bestPrice(it) {
   if (it.leg) return LEGENDS[it.leg].price;
   const ant = CHANNELS[1].open();
@@ -99,8 +98,7 @@ const FI = {
   chev: '<svg viewBox="0 0 20 20" class="chev"><path d="M7.5 4.5L13 10l-5.5 5.5"/></svg>',
   coins:
     '<svg viewBox="0 0 24 24"><ellipse cx="9" cy="7" rx="6" ry="2.5"/><path d="M3 7v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V7"/><path d="M9 13.5v3c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5v-4c0-1.4-2.7-2.5-6-2.5"/></svg>',
-  museum:
-    '<svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5zM5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20.5h18"/></svg>',
+  museum: '<svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5zM5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20.5h18"/></svg>',
   lock: '<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>',
   dark: '<svg viewBox="0 0 24 24"><path d="M12 3c4 3 6 5.5 6 9a6 6 0 01-12 0c0-3.5 2-6 6-9z"/><path d="M9.5 13.5h5"/></svg>',
   star: '<svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>',
@@ -109,12 +107,35 @@ const FI = {
   scrap: '<svg viewBox="0 0 24 24"><path d="M4 7h16l-1.5 13h-13zM9 7V4h6v3M9.5 11v5M14.5 11v5"/></svg>',
   ok: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor" stroke="none"/><path d="M7 12.5l3.2 3.2L17 9" stroke="#211a12" stroke-width="2.6"/></svg>'
 };
+// строка находки: картинка, название, метки и цена справа; в земле — земляная ячейка и вилка цен
+function findRow(it, i) {
+  const dirty = !it.clean,
+    star = !dirty && ((G.order && G.order.name === it.name) || (CHANNELS[1].open() && antWants(it))),
+    cls = dirty ? "mud" : star ? "star" : "",
+    tag = it.leg
+      ? `<span class="tag leg">Легенда</span>`
+      : it.story && dirty
+        ? `<span class="tag">Загадка</span>`
+        : `<span class="tag k${it.c}">${CLASSES[it.c].name}</span>`,
+    sub = dirty ? "в земле" : it.leg ? "уникальная" : it.c === 0 ? "металлолом" : grTxt(it),
+    price = it.story
+      ? ""
+      : dirty
+        ? it.c === 0 || it.leg
+          ? ""
+          : `<b class="price range">${num(priceRange(it)[0])}–${num(priceRange(it)[1])}</b>`
+        : it.c === 0
+          ? `<b class="price range">лом</b>`
+          : `<b class="price">${it.leg && !bestPrice(it) ? "бесценно" : rub(bestPrice(it))}</b>`;
+  return `<li class="fi${dirty ? "" : " ok"}${it.leg ? " leg" : ""}" role="button" tabindex="0" onclick="SK.openFind(${i})"><span class="slot ${cls}"><img src="${findPic(it)}" alt=""></span><span class="fb"><b>${shownName(it)}</b><span class="frow">${tag}<small>${sub}</small></span></span>${price}</li>`;
+}
+const num = n => rub(n).replace(/\s?₽$/, "");
 function renderFinds() {
+  const shelf = `<div class="fshelf">${legShelf()}${albumShelf()}</div>`;
   if (!G.inv.length)
     return (
-      legShelf() +
-      albumShelf() +
-      `<section class="fbox"><h2 class="fh">Находки · 0</h2><p class="empty">Находок пока нет. На вкладке «Карты» можно поехать по карте или наугад.</p></section>`
+      shelf +
+      `<section class="fbox"><div class="fh-row"><h2 class="fh">Находки</h2></div><p class="empty">Находок пока нет. На вкладке «Карты» можно поехать по карте или наугад.</p></section>`
     );
   const dirty = G.inv.filter(i => !i.clean),
     clean = G.inv.filter(i => i.clean),
@@ -123,50 +144,43 @@ function renderFinds() {
     .map((it, i) => [it, i])
     .filter(([it]) => findFilter === "all" || (findFilter === "dirty" ? !it.clean : it.clean));
   const seg = [
-    ["all", "Все"],
-    ["dirty", "Не очищены"],
-    ["clean", "Опознаны"]
+    ["all", "Все", G.inv.length],
+    ["dirty", "В земле", dirty.length],
+    ["clean", "Чистые", clean.length]
   ]
     .map(
-      ([k, t]) => `<button aria-pressed="${findFilter === k}" onclick="SK.findFilter('${k}')">${t}</button>`
+      ([k, t, n]) =>
+        `<button aria-pressed="${findFilter === k}" onclick="SK.findFilter('${k}')">${t}<span class="n">${n}</span></button>`
     )
     .join("");
-  let bulk = "";
+  const acts = [];
   if (dirty.length > 1 && findFilter !== "clean")
-    bulk += `<div class="fbulk"><span>Не очищено: ${dirty.length}</span><button ${G.money < dirty.length * CLEAN_FEE ? "disabled" : ""} onclick="SK.cleanAll(false)">Всё мастеру · ${rub(dirty.length * CLEAN_FEE)}</button></div>`;
-  if (junk.length > 1 && findFilter !== "dirty")
-    bulk += `<div class="fbulk"><span>Мусор: ${junk.length}</span><button onclick="SK.sellJunk()">Всё в металлолом</button></div>`;
+    acts.push(
+      `<button class="btn y col" ${G.money < dirty.length * CLEAN_FEE ? "disabled" : ""} onclick="SK.cleanAll(false)"><span class="lbl">Почистить всё</span>${costPill(rub(dirty.length * CLEAN_FEE))}</button>`
+    );
   const sellable = clean.filter(i => !i.story && !i.leg && i.c !== 0); // мусор — отдельно, в металлолом
   if (sellable.length > 1 && findFilter !== "dirty") {
     const sum = sellable.reduce((a, i) => a + sellPrice(i, CHANNELS[0]), 0);
-    bulk += `<div class="fbulk"><span>Опознано: ${sellable.length}</span><button onclick="SK.sellAllBuy()">Сдать всё скупщику · ~${rub(sum)}</button></div>`;
+    acts.push(
+      `<button class="btn col" onclick="SK.sellAllBuy()"><span class="lbl">Продать чистые</span>${costPill("+" + rub(sum))}</button>`
+    );
   }
+  if (junk.length > 1 && findFilter !== "dirty")
+    acts.push(
+      `<button class="btn ghost col" onclick="SK.sellJunk()"><span class="lbl">Лом в металл</span>${costPill(junk.length + " шт.")}</button>`
+    );
   const antInfo = CHANNELS[1].open()
-    ? `<div class="antinfo"><b>Антиквар сейчас ищет:</b> ${(G.antWant || []).map(w => w.t).join(", ")}. Возьмёт ещё ${G.antLeft} ${plural(G.antLeft, "вещь", "вещи", "вещей")}.${G.antDue ? ` На комиссии: ${rub(G.antDue)} — придут после следующей поездки.` : ""}</div>`
+    ? `<div class="antinfo">${pxi("star", 18)}<span><b>Антиквар ищет:</b> ${(G.antWant || []).map(w => w.t.replace(/(\d{4}–\d{2,4})/g, '<span class="nw">$1</span>')).join(", ")}${G.antDue ? `. На комиссии ${rub(G.antDue)} — после поездки` : ""}</span><span class="tag k2">ещё ${G.antLeft}</span></div>`
     : "";
   const ordInfo = G.order
-    ? `<div class="antinfo ord"><b>Заказ коллекционера:</b> «${G.order.name}» — заплатит вдвое против антиквара. Осталось ${G.order.left} ${plural(G.order.left, "поездка", "поездки", "поездок")}.</div>`
+    ? `<div class="antinfo ord">${pxi("pin", 18)}<span><b>Заказ:</b> «${G.order.name}» — коллекционер платит вдвое</span><span class="tag k2">${G.order.left} ${plural(G.order.left, "поездка", "поездки", "поездок")}</span></div>`
     : "";
-  bulk = ordInfo + antInfo + bulk;
-  const rows = list
-    .map(([it, i]) => {
-      const meta = `${eraCap(it.era)} · ${it.depth} см${it.cache ? " · тайник" : ""}`;
-      if (!it.clean)
-        return `<li class="fi" onclick="SK.openFind(${i})"><span class="fpic"><img src="${findPic(it)}" alt=""></span>
-      <span class="fb"><b>${shownName(it)}</b>
-        <span class="frow"><span class="fchip dirty">${notCleanTxt(it)}</span><span class="fclean"><button ${G.money < CLEAN_FEE ? "disabled" : ""} onclick="event.stopPropagation();SK.clean(${i},false)">Очистить · ${rub(CLEAN_FEE)}</button><button class="self" onclick="event.stopPropagation();SK.clean(${i},true)" title="Бесплатно. Только так видна редкая разновидность, но можно поцарапать">Сам</button></span></span>
-        <small>${it.leg ? `<b class="legtxt">★ Легенда</b> · ${meta}` : it.story || it.c === 0 ? meta : `${rub(priceRange(it)[0])} – ${rub(priceRange(it)[1])} · ${meta}`}</small></span>${FI.chev}</li>`;
-      return `<li class="fi ok c${it.c}${it.leg ? " leg" : ""}" onclick="SK.openFind(${i})"><span class="fpic"><img src="${findPic(it)}" alt=""></span>
-      <span class="fb"><b>${it.name}</b><span class="frow">${it.leg ? `<span class="fchip legchip">★ Легенда</span>` : `<span class="fchip k${it.c}">${CLASSES[it.c].name}</span>`}</span>
-        <small>${it.leg ? "Уникальная" : grTxt(it)[0].toUpperCase() + grTxt(it).slice(1)} · <em>${it.c === 0 ? "металлолом" : it.leg && !bestPrice(it) ? "бесценно" : rub(bestPrice(it))}</em></small><small>${meta}</small></span>${FI.chev}</li>`;
-    })
-    .join("");
+  const raid = Math.min(100, Math.round(G.heat * 7 * (1 - sk("svyazi") * 0.08) * (G.rep <= -15 ? 2 : 1)));
   return (
-    legShelf() +
-    albumShelf() +
-    `<section class="fbox"><h2 class="fh">Находки · ${G.inv.length}</h2><div class="fseg">${seg}</div>${bulk}
-    <p class="fpick">${list.length ? "Выберите предмет" : "Здесь пока пусто"}</p><ol class="flist">${rows}</ol></section>
-    <p class="hint">Чёрный рынок платит больше всех, но растёт внимание полиции (шанс облавы сейчас ${Math.min(100, Math.round(G.heat * 7 * (1 - sk("svyazi") * 0.08) * (G.rep <= -15 ? 2 : 1)))}%). Дар музею поднимает совесть: чем старше вещь, тем больше. Антиквар платит вдвое больше скупщика и открывается на ${ANT_LVL}-м уровне.</p>`
+    shelf +
+    `<section class="fbox"><div class="fseg">${seg}</div>${ordInfo}${antInfo}${acts.length ? `<div class="fbulk n${acts.length}">${acts.join("")}</div>` : ""}
+    <ol class="flist">${list.length ? list.map(([it, i]) => findRow(it, i)).join("") : `<li class="empty">Здесь пока пусто</li>`}</ol>
+    <details class="fhelp"><summary>Кто сколько платит</summary><p>Скупщик берёт всё и сразу. Антиквар платит вдвое больше и открывается на ${ANT_LVL}-м уровне. Музей поднимает совесть: чем старше вещь, тем больше. Чёрный рынок платит больше всех, но растёт интерес полиции — шанс облавы сейчас ${raid}%.</p></details></section>`
   );
 }
 const archRep = it => Math.max(2, Math.round(giftRep(it) * 1.5));
@@ -216,14 +230,7 @@ function legSheet(it, i, opt, meta) {
       "+12 к совести",
       `SK.sellLeg(${i},'mus')`
     );
-    o += opt(
-      "plain",
-      FI.star,
-      "Повесить в гараже",
-      "Письмо в рамке над верстаком",
-      "",
-      `SK.sellLeg(${i},'wall')`
-    );
+    o += opt("plain", FI.star, "Повесить в гараже", "Письмо в рамке над верстаком", "", `SK.sellLeg(${i},'wall')`);
     o += opt(
       "amber",
       FI.coins,
@@ -241,14 +248,7 @@ function legSheet(it, i, opt, meta) {
       "+30 к совести",
       `SK.sellLeg(${i},'family')`
     );
-    o += opt(
-      "dark",
-      FI.dark,
-      "Чёрный рынок",
-      "−15 совести · полиция +4",
-      rub(L.price),
-      `SK.sellLeg(${i},'blk')`
-    );
+    o += opt("dark", FI.dark, "Чёрный рынок", "−15 совести · полиция +4", rub(L.price), `SK.sellLeg(${i},'blk')`);
     o += no("Антиквар", "«Уберите. Я этого не видел»") + no("Скупщик", "Не берёт — боится");
   } else if (id === "helm") {
     o += opt(
@@ -300,11 +300,10 @@ function legSheet(it, i, opt, meta) {
       `SK.sellLeg(${i},'mus')`
     );
   }
-  return `<p class="fs-state legst">★ Легендарная находка</p>
-    <img class="fs-pic" src="${findPic(it)}" alt=""><h2 class="fs-name">${it.name}</h2>
-    <span class="fchip fs-chip legchip">Легенда · 1 из 5</span><p class="fs-meta">${meta}</p><p class="fs-note">${L.desc}</p>
+  return `<div class="fs-head"><span class="slot big star"><img class="fs-pic" src="${findPic(it)}" alt=""></span><div class="fs-hb"><span class="frow"><span class="tag leg">Легенда</span><span class="tag">одна из пяти</span></span><h2 class="fs-name">${it.name}</h2><p class="fs-meta">${meta}</p></div></div>
+    <p class="fs-note">${L.desc}</p>
     ${L.letter ? `<div class="fs-story"><p>${L.letter}</p></div>` : ""}
-    <h3 class="fs-q">Что сделать с находкой?</h3>${o}<p class="fs-keep">Можно оставить находку у себя</p>`;
+    <h3 class="fs-q">Куда отдать</h3>${o}<p class="fs-keep">Можно оставить находку у себя</p>`;
 }
 function sellLeg(i, how) {
   const it = G.inv[i];

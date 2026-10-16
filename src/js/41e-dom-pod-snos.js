@@ -213,7 +213,7 @@ function hsSpot(id) {
 function renderHouse() {
   const H = T.hs,
     s = $("houseSheet");
-  s.innerHTML = `<div class="hs-top"><h2>Дом под снос</h2><span class="hs-clock"><span id="hsClk">${hsClock(T.minutes)}</span><small>снос в ${hsClock(HS_DEADLINE)}</small></span></div><p class="hs-sub">${H.street}. ${H.owner}</p><canvas id="hsCv" width="240" height="176"></canvas><div id="hsUi"></div>`;
+  s.innerHTML = `<div class="hs-top">${pxi("pin", 24)}<div class="hs-t"><h2>Старый дом</h2><small>${H.street}</small></div><span class="hs-clock"><span id="hsClk">${hsClock(T.minutes)}</span><small>снос в ${hsClock(HS_DEADLINE)}</small></span></div><div class="hs-time" aria-hidden="true"><i id="hsTime"></i></div><p class="hs-sub">${H.owner}</p><canvas id="hsCv" width="240" height="176"></canvas><div id="hsUi"></div>`;
   $("hsCv").addEventListener("pointerdown", e => {
     const c = e.currentTarget.getBoundingClientRect(),
       x = ((e.clientX - c.left) / c.width) * 240,
@@ -240,10 +240,12 @@ function hsUi() {
   if (!u) return;
   const ck = $("hsClk");
   if (ck) ck.textContent = hsClock(T.minutes);
+  const tm = $("hsTime");
+  if (tm) tm.style.width = Math.min(100, Math.round((T.minutes / HS_DEADLINE) * 100)) + "%";
   const over = T.minutes >= HS_DEADLINE;
   const chips = `<div class="hs-chips">${HS_SPOTS.map(s => {
     const left = hsLeft(s.id);
-    return `<button class="${H.sel === s.id ? "on" : ""}${left ? "" : " done"}" onclick="SK.hsSelect('${s.id}')">${s.n}${H.heard && H.heard[s.id] && left ? " 〰" : ""}${left ? "" : " ✓"}</button>`;
+    return `<button class="${H.sel === s.id ? "on" : ""}${left ? "" : " done"}" onclick="SK.hsSelect('${s.id}')">${left ? "" : pxi("check", 12)}${s.n}${H.heard && H.heard[s.id] && left ? pxi("sound", 14) : ""}</button>`;
   }).join("")}</div>`;
   const got = H.got.length
     ? `<div class="hs-got"><b>Нашли (${H.got.length}):</b> ${H.got.map(it => `<img src="${FIND_IMG[it.name] || ""}" alt="${it.name}" title="${it.name}">`).join("")}</div>`
@@ -262,13 +264,13 @@ function hsUi() {
       heard = H.heard && H.heard[s.id];
     const last = H.last
       ? H.last.it
-        ? `<div class="hs-find"><img src="${FIND_IMG[H.last.it.name] || ""}" alt=""><div><b>${H.last.it.name}</b><small class="k${H.last.it.c}">${CLASSES[H.last.it.c].name}${H.last.it.c ? " · почистите дома" : " · только в металлолом"}</small></div></div>`
+        ? `<div class="hs-find"><img src="${FIND_IMG[H.last.it.name] || ""}" alt=""><div><b>${H.last.it.name}</b><small><span class="tag k${H.last.it.c}">${CLASSES[H.last.it.c].name}</span> ${H.last.it.c ? "почистите дома" : "только в металлолом"}</small></div></div>`
         : `<p class="hs-empty">${pick(["Пусто: пыль, паутина и мышиный помёт.", "Ничего. Только труха и старые гвозди.", "Пусто — кто-то побывал тут раньше."])}</p>`
       : "";
     const fits = T.minutes + s.t <= HS_DEADLINE + 15;
-    box = `<div class="hs-box"><h3>${s.n}${st.done ? ` <small>осмотрено ${st.done} из ${s.L.length}</small>` : ""}</h3><p>${s.d}</p>${heard !== undefined && heard !== null && left ? `<p class="hs-det">Детектор: ${heard ? "звенит — но в старом доме везде гвозди" : "тихо"}.</p>` : ""}${last}${left ? `<button class="btn" ${fits ? "" : "disabled"} onclick="SK.hsSearch()">Искать ${s.L[st.done]} · ${s.t} мин</button>${fits ? "" : `<p class="hs-det">Не успеть до экскаватора.</p>`}` : `<p class="hs-det">Тут всё осмотрено.</p>`}</div>`;
+    box = `<div class="hs-box"><h3>${s.n}${st.done ? ` <small>осмотрено ${st.done} из ${s.L.length}</small>` : ""}</h3><p>${s.d}</p>${heard !== undefined && heard !== null && left ? `<p class="hs-det">Детектор: ${heard ? "звенит — но в старом доме везде гвозди" : "тихо"}.</p>` : ""}${last}${left ? `<button class="btn" ${fits ? "" : "disabled"} onclick="SK.hsSearch()"><span class="lbl">Искать ${s.L[st.done]}</span>${costPill(`${s.t} мин`)}</button>${fits ? "" : `<p class="hs-det">Не успеть до экскаватора.</p>`}` : `<p class="hs-det">Тут всё осмотрено.</p>`}</div>`;
   }
-  u.innerHTML = `${chips}${box}${got}<div class="row hs-row"><button class="btn ghost" ${H.heard || T.minutes + HS_LISTEN > HS_DEADLINE ? "disabled" : ""} onclick="SK.hsListen()">Прослушать детектором · ${HS_LISTEN} мин</button><button class="btn ghost" onclick="SK.hsLeave()">Уехать домой</button></div>`;
+  u.innerHTML = `${chips}${box}${got}<div class="row hs-row"><button class="btn ghost col" ${H.heard || T.minutes + HS_LISTEN > HS_DEADLINE ? "disabled" : ""} onclick="SK.hsListen()"><span class="lbl">Детектор</span>${costPill(`${HS_LISTEN} мин`)}</button><button class="btn ghost" onclick="SK.hsLeave()">Уехать домой</button></div>`;
 }
 function hsListen() {
   const H = T.hs;

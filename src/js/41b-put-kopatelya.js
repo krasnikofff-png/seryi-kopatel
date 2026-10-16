@@ -52,10 +52,15 @@ function lvlUpTxt() {
 }
 function trackBox() {
   const nx = TRACK.find(t => t.l > G.lvl);
-  return `<section class="track"><ol>${TRACK.map(t => {
+  const li = t => {
     const st = G.lvl >= t.l ? (t.soon ? "soon" : "done") : t === nx ? "next" : "lock";
-    return `<li class="${st}"><span class="tr-l">${t.l}</span><div><b>${t.ic ? `<img class="tr-ic" src="${t.ic}" alt="">` : ""}${t.n}${t.soon ? ` <em class="tr-soon">скоро</em>` : ""}</b><small>${t.d}</small></div><span class="tr-s">${st === "done" ? "✓" : st === "soon" ? "ждёт обновления" : st === "next" ? "следующий" : ""}</span></li>`;
-  }).join("")}</ol></section>`;
+    return `<li class="${st}"><span class="tr-l">${t.l}</span><div><b>${t.n}</b><small>${t.d}</small></div><span class="tr-s">${st === "done" ? pxi("check", 20) : st === "soon" ? `<em class="tr-soon">скоро</em>` : st === "next" ? `<em class="tr-next">Следующая</em>` : pxi("lock", 16)}</span></li>`;
+  };
+  // пройденное сворачиваем: видны два последних шага, следующая награда и что дальше
+  const past = TRACK.filter(t => G.lvl >= t.l),
+    hide = past.slice(0, Math.max(0, past.length - 2)),
+    rest = TRACK.filter(t => !hide.includes(t));
+  return `<section class="track">${hide.length ? `<details class="tr-past"><summary>${pxi("check", 16)}Пройдено ${hide.length} ${plural(hide.length, "шаг", "шага", "шагов")}</summary><ol>${hide.map(li).join("")}</ol></details>` : ""}<ol>${rest.map(li).join("")}</ol></section>`;
 }
 
 // ===== НОЧНЫЕ НАХОДКИ: только в ночную смену =====

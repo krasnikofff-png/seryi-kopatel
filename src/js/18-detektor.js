@@ -31,8 +31,7 @@ function buildBars() {
     const b = document.createElement("i"),
       k = i / (n - 1);
     b.style.height = Math.round(5 + k * 19) + "px";
-    if (G.det > 1)
-      b.style.setProperty("--c", `hsl(${Math.round(95 - k * 65)} 70% ${Math.round(55 + k * 5)}%)`);
+    if (G.det > 1) b.style.setProperty("--c", `hsl(${Math.round(95 - k * 65)} 70% ${Math.round(55 + k * 5)}%)`);
     barsEl.appendChild(b);
   }
   $("lcd").className = "lcd lv" + Math.min(3, G.det === 1 ? 1 : G.det <= 3 ? 2 : 3);
@@ -118,6 +117,7 @@ function updateLcd(sig) {
   $("ldepth").textContent = sub;
   $("dNow").textContent = h + " см";
   $("dMax").textContent = mx + " см";
+  $("depthRow").style.setProperty("--dp", Math.min(100, Math.round((h / mx) * 100)) + "%");
   $("depthRow").classList.toggle("max", h >= mx);
 }
 let actx = null,

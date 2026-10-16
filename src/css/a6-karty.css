@@ -1,0 +1,413 @@
+/* ===== Карты: полевой блокнот на пружине ===== */
+.nbw {
+  position: relative;
+}
+.nb {
+  position: relative;
+  padding: 16px 14px 18px 36px;
+  border-radius: 4px 9px 9px 4px;
+  background: #f6e6c2;
+  box-shadow:
+    0 0 0 3px var(--line),
+    0 7px 0 rgba(58, 29, 11, 0.5);
+  color: var(--ink);
+  font-family: var(--font);
+}
+/* пружина */
+.nb::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  border-radius: 4px 0 0 4px;
+  background:
+    radial-gradient(circle at 12px 14px, var(--line) 4px, #8a8f8a 5px 6px, rgba(0, 0, 0, 0) 7px) 0 0 / 24px 26px
+      repeat-y,
+    #e2cd9a;
+  box-shadow: inset -2px 0 0 #c9ad72;
+}
+.nb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.nb-head h2 {
+  margin: 0;
+  font: 900 21px/1.1 var(--font);
+  color: var(--ink);
+  white-space: nowrap;
+}
+.nb-head img {
+  width: 80px;
+  height: auto;
+  flex: none;
+  mix-blend-mode: multiply;
+  opacity: 0.8;
+  image-rendering: auto;
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 55%, #000 60%, transparent 100%);
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 55%, #000 60%, transparent 100%);
+}
+/* регионы и особые места */
+.nb-seg {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.nb-seg button {
+  grid-column: span 2;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 4px 2px;
+  border: 0;
+  border-radius: 5px;
+  font: 900 13px var(--font);
+  color: #6b3d17;
+  background: var(--parch2);
+  box-shadow: 0 0 0 2px #6b3d17;
+  white-space: nowrap;
+}
+.nb-seg button.pl {
+  grid-column: span 3;
+}
+.nb-seg button[aria-pressed="true"] {
+  color: #fff;
+  background: var(--green);
+  box-shadow:
+    0 0 0 2px var(--green-o),
+    inset 0 3px 0 var(--green-l),
+    inset 0 -3px 0 var(--green-d);
+}
+.nb-seg button.lock {
+  opacity: 0.65;
+  cursor: default;
+}
+.nb-seg button.lock[disabled] {
+  pointer-events: none;
+}
+.lk {
+  width: 11px;
+  height: 14px;
+  flex: none;
+}
+/* строка «Сегодня»: слёт, дом под снос, барахолка */
+.nb-today {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+.nb-today > span {
+  font: 700 18px/1 var(--hand);
+  color: var(--blue);
+}
+.nb-today button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 10px 2px 6px;
+  border: 0;
+  border-radius: 6px;
+  font: 900 13px var(--font);
+  color: var(--ink);
+  background: var(--parch);
+  box-shadow:
+    0 0 0 2px var(--line),
+    inset 0 -3px 0 var(--edge);
+  white-space: nowrap;
+}
+.nb-today img {
+  width: 20px;
+  height: 20px;
+}
+/* регион и сезон — заметки на полях */
+.nb-reg,
+.nb-season {
+  margin: 0 0 12px;
+  padding: 9px 12px;
+  border-radius: 5px;
+  background: #efdcae;
+  box-shadow: inset 0 0 0 2px #d6b57a;
+  color: var(--ink);
+}
+.nb-reg b {
+  display: block;
+  font: 900 15px var(--font);
+  margin-bottom: 2px;
+}
+.nb-reg p,
+.nb-season p {
+  margin: 0 0 6px;
+  font: 700 13px/1.35 var(--font);
+  color: #6b3d17;
+}
+.nb-season p {
+  margin: 4px 0 0;
+}
+.nb-reg ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 12px;
+  font: 800 13px var(--font);
+}
+.nb-reg li {
+  display: contents;
+}
+.nb-reg li span {
+  color: var(--ink-dim);
+  font-weight: 700;
+}
+.nbs-top {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+.nbs-top b {
+  font: 900 15px var(--font);
+}
+.nbs-top span {
+  font: 700 13px var(--font);
+  color: var(--ink-dim);
+}
+.nbs-top em {
+  margin-left: auto;
+  font: 900 13px var(--font);
+  font-style: normal;
+  color: var(--green-d);
+}
+/* транспорт */
+.nb-tr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+  padding: 6px 12px 6px 6px;
+  border-radius: 5px;
+  background: #efdcae;
+  box-shadow: inset 0 0 0 2px #d6b57a;
+}
+.nb-tr .spr {
+  width: 56px;
+  height: 56px;
+  flex: none;
+}
+.nb-tr .art {
+  width: 56%;
+  height: auto;
+  flex: none;
+  mix-blend-mode: multiply;
+  image-rendering: auto;
+}
+.nb-tr-t {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font: 800 13px var(--font);
+  color: var(--ink-dim);
+}
+.nb-tr-t .nm {
+  font: 900 15px var(--font);
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nb-tr-t b {
+  font: 900 14px var(--font);
+  color: var(--green-d);
+}
+.nb-tr-t small {
+  display: none;
+}
+/* карточка карты */
+.nbc {
+  display: flex;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 2px dashed #d9bf88;
+}
+.nbc:last-of-type {
+  border-bottom: 0;
+}
+.nbc-pic {
+  position: relative;
+  flex: none;
+  width: 40%;
+  max-width: 160px;
+  align-self: flex-start;
+}
+.nbc-pic img {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  box-shadow:
+    0 0 0 2px #6b3d17,
+    3px 4px 0 rgba(58, 29, 11, 0.25);
+  transform: rotate(-1.5deg);
+}
+.nbc:nth-of-type(even) .nbc-pic img {
+  transform: rotate(1.5deg);
+}
+.nbc-pic.raw img {
+  border: 5px solid #fffaf0;
+}
+.nbc-pic.raw::after {
+  content: "";
+  position: absolute;
+  left: 34%;
+  top: -8px;
+  width: 32%;
+  height: 16px;
+  background: rgba(214, 200, 160, 0.85);
+  transform: rotate(-3deg);
+}
+.nbc-pic.spr {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  max-width: 110px;
+  border-radius: 5px;
+  background: #efcf95;
+  box-shadow:
+    0 0 0 2px #6b3d17,
+    inset 2px 2px 0 #c99a5a,
+    inset -2px -2px 0 #fff3d4;
+}
+.nbc-pic.spr img {
+  width: 72%;
+  box-shadow: none;
+  transform: none;
+}
+.nbc-pic.hs-pic img {
+  border: 4px solid #fffaf0;
+}
+.nbc.off .nbc-pic img {
+  filter: grayscale(0.6) brightness(0.95);
+}
+.nbc-b {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.nbc-b h3 {
+  margin: 0;
+  padding-right: 70px;
+  font: 900 19px/1.1 var(--font);
+  color: var(--ink);
+}
+.nbc-b p {
+  margin: 0;
+  font: 700 13px/1.4 var(--font);
+  color: #6b3d17;
+}
+.nbc ul {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 2px solid #ecd29a;
+}
+.nbc li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 700 12.5px/1.25 var(--font);
+  color: var(--ink);
+}
+.nbc li svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.nbc-hand {
+  position: absolute;
+  top: -12px;
+  right: -2px;
+  font: 700 18px/0.9 var(--hand);
+  color: var(--blue);
+  text-align: center;
+  transform: rotate(-8deg);
+}
+.nbc-tag {
+  align-self: flex-start;
+  font: 800 12px var(--font);
+  padding: 3px 8px 4px;
+  border-radius: 4px;
+  background: var(--parch3);
+  color: #6b3d17;
+}
+.nbc-tag.have {
+  background: #cfe8a8;
+  color: var(--green-d);
+}
+.nb-btn {
+  margin-top: auto;
+  min-height: 42px;
+  font-size: 15px;
+}
+.nb-btn.sm {
+  min-height: 38px;
+  font-size: 14px;
+}
+.nb-warn {
+  margin: 0;
+  font: 800 12.5px/1.3 var(--font);
+  color: var(--red);
+}
+.nb-note {
+  display: none;
+}
+.nb-link {
+  display: none;
+}
+.nbc.place {
+  flex-direction: column;
+}
+.nbc.place .nbc-pic {
+  width: 100%;
+  max-width: none;
+}
+.nbc.place .nbc-b {
+  width: 100%;
+}
+.nbc.place .nbc-hand {
+  top: -2px;
+  right: 6px;
+}
+.nbc.lead .nbc-b > p {
+  font: 700 19px/1.1 var(--hand);
+  color: var(--blue);
+}
+.nbc.lead .nbc-b h3 {
+  padding-right: 34px;
+}
+@media (max-width: 370px) {
+  .nbc {
+    flex-direction: column;
+  }
+  .nbc-pic {
+    width: 62%;
+    max-width: none;
+  }
+}

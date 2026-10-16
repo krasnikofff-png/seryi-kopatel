@@ -100,6 +100,7 @@ function rollEvent(t) {
   }
   return pick(pool);
 }
+const EV_ART = { gai: "@art(event/gai.png)" }; // картинки к событиям в дороге
 function showEvent() {
   const ev = T && T.event ? EVENTS[T.event] : null,
     box = $("evt");
@@ -110,7 +111,13 @@ function showEvent() {
   }
   paused = true;
   SFX.paper();
-  box.innerHTML = `<div class="sheet"><h2>${ev.title}</h2><p>${ev.text()}</p><div class="row">${ev.opts.map(o => `<button class="btn" data-o="${o.id}" ${o.ok && !o.ok() ? "disabled" : ""}>${o.label()}${o.sub ? `<small class="esub">${o.sub()}</small>` : ""}</button>`).join("")}</div></div>`;
+  const art = EV_ART[T.event];
+  box.innerHTML = `<div class="sheet plank evs"><h2>${ev.title}</h2>${art ? `<img class="ev-art" src="${art}" alt="">` : ""}<p>${ev.text()}</p><div class="row">${ev.opts
+    .map(
+      (o, k) =>
+        `<button class="btn${k === 1 ? " y" : k > 1 ? " ghost" : ""}${o.sub ? " col" : ""}" data-o="${o.id}" ${o.ok && !o.ok() ? "disabled" : ""}>${o.sub ? `<span class="ev-l">${lblCost(o.label())}</span><small class="esub">${o.sub()}</small>` : lblCost(o.label())}</button>`
+    )
+    .join("")}</div></div>`;
   box.hidden = false;
   box.querySelectorAll("button").forEach(
     b =>

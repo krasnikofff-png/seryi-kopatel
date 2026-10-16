@@ -1,0 +1,481 @@
+/* ===== Навыки: уровень, очки, навыки, звание, путь копателя ===== */
+.lvbox {
+  gap: 10px;
+}
+.lv-h {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+.lv-h h2 {
+  margin: 0;
+  font: 900 22px var(--font);
+}
+.lv-h span {
+  font: 800 13px var(--font);
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+.lv-bar {
+  height: 14px;
+}
+.lvbox p {
+  margin: 0;
+  font: 700 13px/1.4 var(--font);
+  color: var(--ink-dim);
+}
+.sp-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 800 14px/1.3 var(--font);
+  color: var(--ink-dim);
+}
+.sp-box.on {
+  color: var(--ink);
+}
+.sp-num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 4px;
+  border-radius: 15px;
+  background: var(--gold);
+  box-shadow: 0 0 0 2px var(--gold-o);
+  font: 900 16px var(--font);
+  color: var(--ink);
+}
+.sp-go {
+  margin-left: auto;
+  flex: none;
+  min-height: 34px;
+  padding: 0 12px 2px;
+  border: 0;
+  border-radius: 6px;
+  font: 900 14px var(--font);
+  color: var(--ink);
+  background: var(--gold);
+  box-shadow:
+    0 0 0 2.5px var(--gold-o),
+    inset 0 2px 0 var(--gold-l),
+    inset 0 -3px 0 var(--gold-d);
+}
+.lv-next {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 2px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--parch2);
+  box-shadow: inset 0 0 0 2px #d6b57a;
+  color: var(--ink);
+  text-align: left;
+}
+.lv-next-l {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #6b3d17;
+  color: var(--parch);
+  font: 900 14px var(--font);
+}
+.lv-next-b {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.lv-next-b small {
+  font: 700 12px var(--font);
+  color: var(--ink-dim);
+}
+.lv-next-b b {
+  font: 900 15px var(--font);
+}
+.lv-next em {
+  font-style: normal;
+}
+.lv-next-t {
+  margin-top: 6px !important;
+}
+.sk-tabs button {
+  gap: 8px;
+}
+.sk-badge {
+  font-style: normal;
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: var(--gold);
+  color: var(--ink);
+  font: 900 12px var(--font);
+  text-shadow: none;
+}
+.sk-cnt {
+  font-style: normal;
+  font: 800 12px var(--font);
+  opacity: 0.85;
+}
+/* карточка навыка — компактная строка с «+1» */
+.skc {
+  gap: 6px;
+  padding: 10px 10px 10px 8px;
+}
+.sk-top {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.sk-ic {
+  width: 50px;
+  height: 50px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  background: #efcf95;
+  box-shadow:
+    0 0 0 2px #6b3d17,
+    inset 2px 2px 0 #c99a5a,
+    inset -2px -2px 0 #fff3d4;
+}
+.sk-ic img {
+  width: 38px;
+  height: 38px;
+}
+.sk-hd {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.sk-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.sk-hd h3 {
+  margin: 0;
+  font: 900 16px var(--font);
+}
+.sk-lv {
+  font: 800 13px var(--font);
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+.boxes {
+  display: flex;
+  gap: 4px;
+}
+.boxes i {
+  flex: 1;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--parch3);
+  box-shadow: 0 0 0 1.5px #b8956a;
+}
+.boxes i.on {
+  background: var(--green);
+  box-shadow: 0 0 0 1.5px var(--green-o);
+}
+.sk-e {
+  margin: 0;
+  font: 800 13px var(--font);
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+.sk-e b {
+  color: var(--ink);
+  font-weight: 900;
+}
+.sk-e b.up {
+  color: var(--green-d);
+}
+.sk-plus {
+  flex: none;
+  width: 50px;
+  height: 50px;
+  border: 0;
+  border-radius: 6px;
+  font: 900 18px var(--font);
+  color: var(--ink);
+  background: var(--gold);
+  box-shadow:
+    0 0 0 2.5px var(--gold-o),
+    inset 0 3px 0 var(--gold-l),
+    inset 0 -4px 0 var(--gold-d);
+}
+.sk-plus:disabled {
+  color: var(--ink-dim);
+  background: var(--parch3);
+  box-shadow:
+    0 0 0 2.5px #b8956a,
+    inset 0 -3px 0 #d6b57a;
+}
+.sk-max {
+  flex: none;
+  width: 50px;
+  display: grid;
+  place-items: center;
+}
+.sk-n {
+  margin: 0 0 0 61px;
+  font: 700 12px/1.35 var(--font);
+  color: var(--faint);
+}
+.karto {
+  display: none;
+}
+/* звание */
+.rk-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.rk-top small {
+  font: 800 12px var(--font);
+  color: var(--faint);
+}
+.rk-top h3 {
+  margin: 2px 0 0;
+  font: 900 18px/1.2 var(--font);
+}
+.rk-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 10px 2px 7px;
+  border-radius: 6px;
+  background: var(--parch);
+  box-shadow:
+    0 0 0 2px var(--line),
+    inset 0 -3px 0 var(--edge);
+  font: 900 14px var(--font);
+  white-space: nowrap;
+}
+.rk-p {
+  margin: 0;
+  font: 700 14px/1.4 var(--font);
+  color: var(--ink-dim);
+}
+.rkbox details {
+  border-top: 2px solid var(--rule);
+}
+.rkbox summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 2px;
+  font: 900 15px var(--font);
+  cursor: pointer;
+}
+.rkbox summary::-webkit-details-marker {
+  display: none;
+}
+.rkbox summary::after {
+  content: "›";
+  margin-left: auto;
+  font-size: 22px;
+  line-height: 0.7;
+  color: var(--ink-dim);
+  transition: transform 0.15s;
+}
+.rkbox details[open] summary::after {
+  transform: rotate(90deg);
+}
+.q {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--ink-dim);
+  font: 900 12px var(--font);
+  color: var(--ink-dim);
+}
+.rk-list {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rk-list li {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 0 10px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  font: 700 13px var(--font);
+  color: var(--ink-dim);
+}
+.rk-list li b {
+  color: var(--ink);
+  font: 900 14px var(--font);
+}
+.rk-list li small {
+  grid-column: 2;
+  font-size: 13px;
+}
+.rk-list li.cur {
+  background: #fff3c4;
+  box-shadow: inset 0 0 0 2px #e8b93a;
+}
+.rk-how {
+  padding: 0 2px 10px;
+  font: 700 13px/1.4 var(--font);
+  color: var(--ink-dim);
+}
+.rk-how p {
+  margin: 0 0 6px;
+}
+/* путь копателя */
+.track ol {
+  list-style: none;
+  margin: 0;
+  padding: 0 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.track li {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 12px 9px 8px;
+  border-radius: 7px;
+  background: var(--parch);
+  box-shadow:
+    0 0 0 2.5px var(--line),
+    inset 0 -3px 0 var(--edge);
+}
+.track li div {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.track li b {
+  font: 900 15px/1.2 var(--font);
+}
+.track li small {
+  font: 700 12px/1.3 var(--font);
+  color: var(--ink-dim);
+}
+.track .tr-l {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font: 900 15px var(--font);
+  color: var(--ink-dim);
+  background: var(--parch3);
+  box-shadow: 0 0 0 2px #b8956a;
+}
+.track .tr-s {
+  flex: none;
+  display: grid;
+  place-items: center;
+}
+.track li.done {
+  background: #e3efc6;
+  box-shadow:
+    0 0 0 2.5px var(--line),
+    inset 0 -3px 0 #c4dc94;
+}
+.track li.done .tr-l {
+  color: #fff;
+  background: var(--green);
+  box-shadow: 0 0 0 2px var(--green-o);
+}
+.track li.next {
+  box-shadow:
+    0 0 0 2.5px var(--line),
+    0 0 0 6px var(--gold),
+    inset 0 -3px 0 var(--edge);
+}
+.track li.next .tr-l {
+  color: var(--ink);
+  background: var(--gold);
+  box-shadow: 0 0 0 2px var(--gold-o);
+}
+.track li.lock {
+  opacity: 0.75;
+}
+.track li.soon {
+  box-shadow:
+    0 0 0 2.5px var(--line),
+    inset 0 -3px 0 var(--edge);
+}
+.tr-next,
+.tr-soon {
+  font-style: normal;
+  white-space: nowrap;
+  padding: 6px 12px 7px;
+  border-radius: 14px;
+  font: 900 13px var(--font);
+  color: var(--ink);
+  background: var(--gold);
+  box-shadow:
+    0 0 0 2.5px var(--gold-o),
+    inset 0 2px 0 var(--gold-l),
+    inset 0 -3px 0 var(--gold-d);
+}
+.tr-soon {
+  background: var(--parch3);
+  box-shadow: 0 0 0 2px #b8956a;
+  color: var(--ink-dim);
+}
+.antinfo.ord {
+  border-left: 0;
+}
+.tr-past {
+  margin-bottom: 12px;
+}
+.tr-past summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  height: 34px;
+  margin: 0 3px;
+  padding: 0 12px 2px 8px;
+  border-radius: 6px;
+  background: #e3efc6;
+  box-shadow:
+    0 0 0 2px var(--line),
+    inset 0 -3px 0 #c4dc94;
+  font: 900 14px var(--font);
+  cursor: pointer;
+}
+.tr-past summary::-webkit-details-marker {
+  display: none;
+}
+.tr-past[open] summary {
+  margin-bottom: 12px;
+}

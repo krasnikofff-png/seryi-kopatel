@@ -1,5 +1,4 @@
 // ===== АЛЬБОМ НАХОДОК: всё, что бывает в земле; не найденное — тёмным «?» =====
-let albOpen = false;
 const ALB = (() => {
   const seen = new Set(),
     by = [[], [], [], [], []];
@@ -30,29 +29,56 @@ function dexSync() {
     if (!i.story && !i.leg) G.dex[i.name] = 1;
   });
 }
+// альбом и легенды — две фишки над находками; сам альбом открывается окном
+let albRow = -1,
+  albOnly = false;
+const albName = e => (e < 5 ? ERAS[e].name[0].toUpperCase() + ERAS[e].name.slice(1) : ALB_ROW[e - 5]);
 function albumShelf() {
   dexSync();
   const d = G.dex,
     tot = ALB.reduce((a, b) => a + b.length, 0),
     got = ALB.reduce((a, b) => a + b.filter(x => d[x.name]).length, 0);
-  return `<details class="legs alb" ${albOpen ? "open" : ""} ontoggle="SK.albToggle(this.open)"><summary><b>Альбом находок · ${got}/${tot}</b><span class="alb-bar"><i style="width:${Math.round((got / tot) * 100)}%"></i></span></summary>
-    ${ALB.map((a, e) => {
-      const g = a.filter(x => d[x.name]).length;
-      return `<div class="alb-era"><div class="alb-h"><span>${e < 5 ? ERAS[e].name[0].toUpperCase() + ERAS[e].name.slice(1) : ALB_ROW[e - 5]}</span><b>${g}/${a.length}</b></div><div class="alb-g">${a.map((x, k) => (d[x.name] ? `<button class="k${x.c}" onclick="SK.albPick(${e},${k})"><img src="${FIND_IMG[x.name] || ""}" alt="${x.name}"></button>` : `<button class="no k${x.c}" onclick="SK.albPick(${e},${k})">${perk("book") ? `<img class="sil" src="${FIND_IMG[x.name] || ""}" alt="">` : "?"}</button>`)).join("")}</div></div>`;
-    }).join("")}</details>`;
-}
-// окошко с карточкой вещи из альбома (найденной — с картинкой и описанием, не найденной — с подсказкой, где искать)
-function albWin(x) {
-  const o = $("albOver"),
-    got = G.dex && G.dex[x.name],
-    era = ERAS[x.era].name[0].toUpperCase() + ERAS[x.era].name.slice(1);
-  $("albSheet").innerHTML = got
-    ? `<img class="alb-big" src="${FIND_IMG[x.name] || ""}" alt=""><h2>${x.name}</h2><p class="alb-tags"><span class="fchip k${x.c}">${CLASSES[x.c].name}</span> ${era}</p>${FIND_DESC[x.name] ? `<p>${FIND_DESC[x.name]}</p>` : ""}<p class="alb-got">✓ Есть в альбоме</p><button class="btn" onclick="SK.albClose()">Закрыть</button>`
-    : `${perk("book") ? `<img class="alb-big sil" src="${FIND_IMG[x.name] || ""}" alt="">` : `<div class="alb-big no">?</div>`}<h2>Пока не найдено</h2><p class="alb-tags"><span class="fchip k${x.c}">${CLASSES[x.c].name}</span> ${era}</p><p>Ищите ${x.night ? "в ночную смену (9-й уровень): светится в темноте" : x.kurgan ? "на кургане (15-й уровень), глубоко в насыпи" : x.house ? "в старом доме под снос (11-й уровень): чердак, печь, стены, подпол" : x.mag ? "поисковым магнитом с берега (6-й уровень): река у Городища, затопленная деревня, болото, пруд усадьбы" : ALB_TIP[x.era]}.</p><button class="btn" onclick="SK.albClose()">Закрыть</button>`;
-  o.hidden = false;
+  return `<button class="fchipbtn" onclick="SK.openAlb()">${pxi("paper", 20)}<span>Альбом</span><b>${got}/${tot}</b></button>`;
 }
 function legShelf() {
   const got = Object.keys(LEGENDS).filter(k => G.leg && G.leg[k]).length;
+  return `<button class="fchipbtn leg" onclick="SK.openLegs()">${pxi("star", 20)}<span>Легенды</span><b>${got}/5</b></button>`;
+}
+const sheetTop = () =>
+  `<span class="grab" aria-hidden="true"></span><button class="sx" onclick="SK.albClose()" aria-label="Закрыть">${pxi("x", 16)}</button>`;
+function openAlb() {
+  dexSync();
+  const d = G.dex,
+    tot = ALB.reduce((a, b) => a + b.length, 0),
+    got = ALB.reduce((a, b) => a + b.filter(x => d[x.name]).length, 0);
+  if (albRow < 0) {
+    albRow = ALB.findIndex(a => a.some(x => d[x.name]));
+    if (albRow < 0) albRow = 0;
+  }
+  const rows = ALB.map((a, e) => {
+    const g = a.filter(x => d[x.name]).length;
+    return `<button class="alb-lay${e === albRow ? " on" : ""}" onclick="SK.albRow(${e})"><span>${albName(e)}</span><span class="alb-bar"><i style="width:${Math.round((g / a.length) * 100)}%"></i></span><b>${g}/${a.length}</b></button>`;
+  }).join("");
+  const cells = ALB[albRow]
+    .map((x, k) => [x, k])
+    .filter(([x]) => !albOnly || d[x.name])
+    .map(([x, k]) =>
+      d[x.name]
+        ? `<button class="k${x.c}" onclick="SK.albPick(${albRow},${k})"><img src="${FIND_IMG[x.name] || ""}" alt="${x.name}"></button>`
+        : `<button class="no k${x.c}" onclick="SK.albPick(${albRow},${k})" aria-label="Не найдено">${perk("book") ? `<img class="sil" src="${FIND_IMG[x.name] || ""}" alt="">` : "?"}</button>`
+    )
+    .join("");
+  $("albSheet").className = "sheet alb-win";
+  $("albSheet").innerHTML = `${sheetTop()}
+  <div class="sh-h"><h2>Альбом находок</h2><span class="alb-tot">собрано ${got} из ${tot}</span></div>
+  <div class="alb-lays">${rows}</div>
+  <div class="fseg"><button aria-pressed="${!albOnly}" onclick="SK.albOnly(false)">Все вещи</button><button aria-pressed="${albOnly}" onclick="SK.albOnly(true)">Только найденные</button></div>
+  <h3 class="alb-cap">${albName(albRow)}</h3>
+  <div class="alb-g">${cells || `<p class="empty">В этом слое пока ничего не найдено.</p>`}</div>
+  <p class="hint">${perk("book") ? "Нажмите на силуэт — подскажу, где такое искать." : "Нажмите на «?» — подскажу, где такое искать."}</p>`;
+  $("albOver").hidden = false;
+}
+function openLegs() {
   const st = {
     found: "у вас",
     mus: "в музее",
@@ -62,15 +88,31 @@ function legShelf() {
     ant: "у антиквара",
     buy: "у скупщика"
   };
-  return `<details class="legs"><summary><b>Легенды · ${got}/5</b><span class="legmini">${Object.keys(LEGENDS)
-    .map(k => (G.leg && G.leg[k] ? `<img src="${FIND_IMG[LEGENDS[k].name]}" alt="">` : `<i>?</i>`))
-    .join("")}</span></summary>
-    <ul>${Object.entries(LEGENDS)
-      .map(([k, L]) => {
-        const s = G.leg && G.leg[k];
-        return `<li class="${s ? "got" : ""}">${s ? `<img src="${FIND_IMG[L.name]}" alt="">` : `<i>?</i>`}<span><b>${s ? L.name : "???"}</b><small>${s ? st[s] || "" : L.hint}</small></span></li>`;
-      })
-      .join("")}</ul></details>`;
+  const got = Object.keys(LEGENDS).filter(k => G.leg && G.leg[k]).length;
+  $("albSheet").className = "sheet alb-win legs-win";
+  $("albSheet").innerHTML = `${sheetTop()}
+  <div class="sh-h"><h2>Легенды</h2><span class="alb-tot">найдено ${got} из 5</span></div>
+  <p>Пять вещей, о которых рассказывают на форуме. Каждая — одна на всю игру.</p>
+  <ul class="legs-l">${Object.entries(LEGENDS)
+    .map(([k, L]) => {
+      const s = G.leg && G.leg[k];
+      return `<li class="${s ? "got" : ""}"><span class="slot${s ? " star" : " no"}">${s ? `<img src="${FIND_IMG[L.name]}" alt="">` : "?"}</span><span><b>${s ? L.name : "Неизвестная легенда"}</b><small>${s ? st[s] || "" : L.hint}</small></span></li>`;
+    })
+    .join("")}</ul>`;
+  $("albOver").hidden = false;
+}
+// карточка вещи из альбома: найденной — с картинкой и описанием, не найденной — с подсказкой, где искать
+function albWin(x) {
+  const o = $("albOver"),
+    got = G.dex && G.dex[x.name],
+    era = ERAS[x.era] ? ERAS[x.era].name[0].toUpperCase() + ERAS[x.era].name.slice(1) : "";
+  $("albSheet").className = "sheet alb-win one";
+  $("albSheet").innerHTML = `${sheetTop()}
+  ${got ? `<span class="slot big star"><img src="${FIND_IMG[x.name] || ""}" alt=""></span>` : perk("book") ? `<span class="slot big no"><img class="sil" src="${FIND_IMG[x.name] || ""}" alt=""></span>` : `<span class="slot big no">?</span>`}
+  <h2>${got ? x.name : "Пока не найдено"}</h2><p class="alb-tags"><span class="tag k${x.c}">${CLASSES[x.c].name}</span>${era ? `<span class="tag">${era}</span>` : ""}${got ? `<span class="tag ok">Есть в альбоме</span>` : ""}</p>
+  ${got ? (FIND_DESC[x.name] ? `<p>${FIND_DESC[x.name]}</p>` : "") : `<p>Ищите ${x.night ? "в ночную смену (9-й уровень): светится в темноте" : x.kurgan ? "на кургане (15-й уровень), глубоко в насыпи" : x.house ? "в старом доме под снос (11-й уровень): чердак, печь, стены, подпол" : x.mag ? "поисковым магнитом с берега (6-й уровень): река у Городища, затопленная деревня, болото, пруд усадьбы" : ALB_TIP[x.era]}.</p>`}
+  <button class="btn ghost" onclick="SK.openAlb()">${pxi("back", 14)}К альбому</button>`;
+  o.hidden = false;
 }
 function renderFindSheet() {
   const box = $("fsheet"),
@@ -81,18 +123,26 @@ function renderFindSheet() {
     return;
   }
   const it = openFind,
-    meta = `${eraCap(it.era)} · глубина ${it.depth} см${it.cache ? " · тайник с карты" : ""}`;
+    meta = `${eraCap(it.era)}, ${it.depth} см${it.cache ? ", тайник с карты" : ""}`;
+  const PI = {
+    [FI.brush]: "bench",
+    [FI.hand]: "brush",
+    [FI.coins]: "coin",
+    [FI.star]: "star",
+    [FI.museum]: "heart",
+    [FI.dark]: "shield",
+    [FI.lock]: "lock",
+    [FI.scrap]: "trash"
+  };
+  const icon = ic =>
+    PI[ic] === "coin" ? `<img src="${COIN_IMG}" alt="" width="30" height="30">` : pxi(PI[ic] || "star", 28);
   const opt = (cls, ic, title, sub, right, onclick, dis) =>
-    `<button class="fopt ${cls}" ${dis ? "disabled" : ""} onclick="${onclick}"><span class="fo-ic">${ic}</span><span class="fo-t"><b>${title}</b>${sub ? `<small>${sub}</small>` : ""}</span><span class="fo-r">${right}</span>${dis ? "" : FI.chev}</button>`;
+    `<button class="fopt ${cls}" ${dis ? "disabled" : ""} onclick="${onclick}"><span class="fo-ic">${icon(ic)}</span><span class="fo-t"><b>${title}</b>${sub ? `<small>${sub}</small>` : ""}</span><span class="fo-r">${right}</span></button>`;
   let body;
   if (!it.clean) {
-    const risk = own("bath")
-      ? 0
-      : Math.max(0, 35 - sk("master") * 3 - (own("bench") ? 10 : 0) + (it.wet ? 10 : 0));
-    body = `<p class="fs-state"><span class="dot dirty"></span>Находка не очищена</p>
-      <img class="fs-pic${it.story ? "" : " dirty"}" src="${findPic(it)}" alt=""><h2 class="fs-name">${shownName(it)}</h2>
-      <p class="fs-meta">${meta}</p><p class="fs-note">${it.leg ? "★ Легендарная находка — такое бывает раз в жизни. Почистите: ей ничего не грозит." : it.story ? "Под грязью и ржавчиной может быть что угодно." : it.c === 0 ? "Мусор — сохранность ему не поможет." : `${rangeCh().id === "ant" ? "Антиквар" : "Скупщик"} даст от ${rub(priceRange(it)[0])} до ${rub(priceRange(it)[1])} — всё решит сохранность. Почистите и узнаете. Редкая разновидность — ×${rareM(it)}, но её видно, только если чистить самому: мастер чистит на потоке и такое не замечает.`}</p>
-      <h3 class="fs-q">Что сделать с находкой?</h3>
+    const risk = own("bath") ? 0 : Math.max(0, 35 - sk("master") * 3 - (own("bench") ? 10 : 0) + (it.wet ? 10 : 0));
+    body = `<div class="fs-head"><span class="slot big mud"><img class="fs-pic" src="${findPic(it)}" alt=""></span><div class="fs-hb"><span class="frow"><span class="tag">В земле</span>${it.leg ? `<span class="tag leg">Легенда</span>` : it.story ? "" : `<span class="tag k${it.c}">${CLASSES[it.c].name}</span>`}</span><h2 class="fs-name">${shownName(it)}</h2><p class="fs-meta">${meta}</p></div></div><p class="fs-note">${it.leg ? "★ Легендарная находка — такое бывает раз в жизни. Почистите: ей ничего не грозит." : it.story ? "Под грязью и ржавчиной может быть что угодно." : it.c === 0 ? "Мусор — сохранность ему не поможет." : `${rangeCh().id === "ant" ? "Антиквар" : "Скупщик"} даст от ${rub(priceRange(it)[0])} до ${rub(priceRange(it)[1])} — всё решит сохранность. Почистите и узнаете. Редкая разновидность — ×${rareM(it)}, но её видно, только если чистить самому: мастер чистит на потоке и такое не замечает.`}</p>
+      <h3 class="fs-q">Что сделать</h3>
       ${opt("green", FI.brush, "Отдать мастеру", "Ничего не испортит", rub(CLEAN_FEE), `SK.clean(${i},false)`, G.money < CLEAN_FEE)}
       ${opt("plain", FI.hand, "Почистить самому", `Бесплатно, риск испортить ${risk}%${sk("master") || own("bench") || own("bath") ? " · шанс улучшить сохранность" : ""}`, "0 ₽", `SK.clean(${i},true)`)}
       ${it.story || it.leg ? "" : opt("amber", FI.coins, "Скупщику как есть", "Верные деньги, без риска и без сюрпризов", rub(dirtyPrice(it)), `SK.sellDirty(${i})`)}`;
@@ -109,26 +159,19 @@ function renderFindSheet() {
     if (it.nyura)
       opts += opt("gold", FI.star, "Отнести деду", "Это брошка его сестры", "+5 к совести", `SK.toDed(${i})`);
     if (SI) {
-      opts += opt(
-        "gold",
-        it.story === "medal" ? FI.star : FI.museum,
-        SI.btn,
-        SI.sub,
-        "",
-        `SK.storyAct(${i})`
-      );
+      opts += opt("gold", it.story === "medal" ? FI.star : FI.museum, SI.btn, SI.sub, "", `SK.storyAct(${i})`);
     } else if (it.c === 0)
-      opts = opt(
-        "amber",
-        FI.scrap,
-        "Сдать в металлолом",
-        "Пробки, гвозди, банки",
-        "5–20 ₽",
-        `SK.sellOneJunk(${i})`
-      );
+      opts = opt("amber", FI.scrap, "Сдать в металлолом", "Пробки, гвозди, банки", "5–20 ₽", `SK.sellOneJunk(${i})`);
     else {
       if (G.order && G.order.name === it.name)
-        opts += opt("gold", FI.star, "Отдать коллекционеру", "По заказу · платит вдвое против антиквара", rub(orderPrice(it)), `SK.sellOrder(${i})`);
+        opts += opt(
+          "gold",
+          FI.star,
+          "Отдать коллекционеру",
+          "По заказу · платит вдвое против антиквара",
+          rub(orderPrice(it)),
+          `SK.sellOrder(${i})`
+        );
       opts += opt(
         "amber",
         FI.coins,
@@ -169,9 +212,7 @@ function renderFindSheet() {
           "green",
           FI.museum,
           "Отдать археологам",
-          (G.arch || 0) >= 3
-            ? "Экспедиция помнит вас"
-            : `Сдайте ${3 - (G.arch || 0)} — и архивные карты подешевеют`,
+          (G.arch || 0) >= 3 ? "Экспедиция помнит вас" : `Сдайте ${3 - (G.arch || 0)} — и архивные карты подешевеют`,
           `+${archRep(it)} к совести`,
           `SK.toArch(${i})`
         );
@@ -184,10 +225,7 @@ function renderFindSheet() {
         `SK.sell(${i},'mus')`
       );
       if (it.c >= 2) {
-        const raid = Math.min(
-          100,
-          Math.round(G.heat * 7 * (1 - sk("svyazi") * 0.08) * (G.rep <= -15 ? 2 : 1))
-        );
+        const raid = Math.min(100, Math.round(G.heat * 7 * (1 - sk("svyazi") * 0.08) * (G.rep <= -15 ? 2 : 1)));
         opts += opt(
           "dark",
           FI.dark,
@@ -208,18 +246,27 @@ function renderFindSheet() {
           true
         );
     }
-    body = `${SI ? `<p class="fs-state story">★ Это про деда</p>` : `<p class="fs-state ok">${FI.ok}Находка опознана${n && n.self ? " · почистили сами" : n ? " · после мастера" : ""}</p>`}
-      <img class="fs-pic" src="${findPic(it)}" alt=""><h2 class="fs-name">${it.name}</h2>
-      ${SI ? `<span class="fchip fs-chip story">Улика · ${SI.ch}</span>` : `<span class="fchip k${it.c} fs-chip">${C.name}</span>`}${SI ? `<div class="fs-story"><p>${SI.note}</p><small>${SI.keep}</small></div>` : ""}<p class="fs-meta">${meta}</p>${FIND_DESC[it.name] ? `<p class="fs-note">${FIND_DESC[it.name]}</p>` : ""}
+    body = `<div class="fs-head"><span class="slot big star"><img class="fs-pic" src="${findPic(it)}" alt=""></span><div class="fs-hb"><span class="frow">${SI ? `<span class="tag leg">Про деда</span><span class="tag">Улика, ${SI.ch}</span>` : `<span class="tag ok">Опознана</span><span class="tag k${it.c}">${C.name}</span>`}</span><h2 class="fs-name">${it.name}</h2><p class="fs-meta">${meta}${n && n.self ? ", почистили сами" : n ? ", после мастера" : ""}</p></div></div>
+      ${SI ? `<div class="fs-story"><p>${SI.note}</p><small>${SI.keep}</small></div>` : ""}${FIND_DESC[it.name] ? `<p class="fs-note">${FIND_DESC[it.name]}</p>` : ""}
       ${n && n.note ? `<p class="warn fs-warn">${n.note}</p>` : ""}
-      ${it.gr != null && it.c !== 0 ? `<div class="fs-grade${anim ? " anim" : ""}${it.gr === 5 ? " rare" : ""}"><span>Сохранность</span><b>${GRADES[it.gr].n}</b><b class="gm">×${String(grM(it)).replace(".", ",")}</b><ol>${GRADES.map((g, k) => `<li class="${k <= it.gr ? "on" : ""}${k === it.gr ? " fin" : ""}${k === 5 ? " r" : ""}" style="--d:${k * 0.18}s">${g.s}</li>`).join("")}</ol></div>` : it.gr != null ? "" : `<div class="fs-cond"><span>Состояние</span><b>${cond}%</b><i style="--w:${cond}%"></i></div>`}
-      <h3 class="fs-q">Что сделать с находкой?</h3>${opts}
+      ${
+        it.gr != null && it.c !== 0
+          ? `<div class="fs-grade${anim ? " anim" : ""}${it.gr === 5 ? " rare" : ""}"><span>Сохранность</span><b>${GRADES[it.gr].n}, цена ×${String(grM(it)).replace(".", ",")}</b><ol aria-hidden="true">${GRADES.slice(
+              0,
+              it.gr === 5 ? 6 : 5
+            )
+              .map(
+                (g, k) =>
+                  `<li class="g${k}${k <= it.gr ? " on" : ""}${k === it.gr ? " fin" : ""}${k === 5 ? " r" : ""}" style="--d:${k * 0.18}s"></li>`
+              )
+              .join("")}</ol></div>`
+          : it.gr != null
+            ? ""
+            : `<div class="fs-cond"><span>Состояние</span><b>${cond}%</b><i style="--w:${cond}%"></i></div>`
+      }
+      <h3 class="fs-q">Куда отдать</h3>${opts}
       ${SI ? "" : `<p class="fs-keep">Можно оставить находку у себя</p>`}`;
   }
-  const stats = `<div class="fs-stats"><span class="fs-money">${iconSvg("coin")}<b>${rub(G.money)}</b></span>
-    <span><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="12" width="4" height="6" rx="1"/><rect x="8" y="8" width="4" height="10" rx="1"/><rect x="14" y="3" width="4" height="15" rx="1"/></svg>Ур. ${G.lvl}</span>
-    <span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 17.5S2.5 12.8 2.5 7.4C2.5 4.9 4.4 3 6.7 3c1.4 0 2.6.7 3.3 1.8C10.7 3.7 11.9 3 13.3 3c2.3 0 4.2 1.9 4.2 4.4 0 5.4-7.5 10.1-7.5 10.1z"/></svg>${G.rep > 0 ? "+" : ""}${G.rep}</span>
-    <span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 9.5C3 6 6.1 4 10 4s7 2 7 5.5V11H3z"/><rect x="2" y="11.5" width="16" height="2.5" rx="1.2"/></svg>${G.heat}</span></div>`;
-  box.innerHTML = `<div class="fs-back" onclick="SK.closeFind()"></div><div class="fs${openFind && openFind.story ? " story" : ""}" role="dialog" aria-label="Находка"><span class="fs-grip"></span><button class="fs-x" onclick="SK.closeFind()" aria-label="Закрыть">×</button>${stats}${body}<button class="fs-ret" onclick="SK.closeFind()">Вернуться к находкам</button></div>`;
+  box.innerHTML = `<div class="fs-back" onclick="SK.closeFind()"></div><div class="fs${openFind && openFind.story ? " story" : ""}" role="dialog" aria-label="Находка"><span class="fs-grip"></span><button class="sx" onclick="SK.closeFind()" aria-label="Закрыть">${pxi("x", 16)}</button>${body}<button class="btn ghost fs-ret" onclick="SK.closeFind()">К находкам</button></div>`;
   box.hidden = false;
 }

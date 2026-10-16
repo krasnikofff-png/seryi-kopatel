@@ -1,0 +1,674 @@
+/* ===== Сюжет: комикс, выбор, вкладка «Дед», облава ===== */
+#comic {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(env(safe-area-inset-top, 0px) + 14px) 14px calc(env(safe-area-inset-bottom, 0px) + 16px);
+  background: #2a1508;
+  animation: rdIn 0.3s ease-out;
+}
+@keyframes rdIn {
+  from {
+    opacity: 0;
+  }
+}
+.cm {
+  width: 100%;
+  max-width: 420px;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.cm-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.cm-top span {
+  padding: 5px 10px 6px;
+  border-radius: 5px;
+  background: var(--plank);
+  box-shadow:
+    0 0 0 2px var(--line),
+    inset 0 2px 0 var(--plank-hi);
+  font: 900 13px var(--font);
+  color: var(--on-wood);
+  white-space: nowrap;
+}
+.cm-skip {
+  min-height: 34px;
+  padding: 0 12px 2px;
+  border: 0;
+  border-radius: 5px;
+  background: rgba(255, 241, 207, 0.12);
+  box-shadow: 0 0 0 2px #5e3a1e;
+  font: 800 13px var(--font);
+  color: var(--on-wood-dim);
+}
+.cm-frame {
+  flex: 0 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 7px;
+  background: var(--parch);
+  box-shadow:
+    0 0 0 3px var(--line),
+    0 8px 0 rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  animation: cmIn 0.35s ease-out;
+}
+@keyframes cmIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.cm-frame img {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  flex: 0 1 auto;
+  aspect-ratio: 160/200;
+  max-height: 56vh;
+  object-fit: cover;
+  object-position: 50% var(--fy, 40%);
+  background: #000;
+  image-rendering: pixelated;
+}
+.cm-frame img[src^="data:image/webp"] {
+  image-rendering: auto;
+}
+.cm-cap {
+  padding: 12px 14px 13px;
+  border-top: 3px solid var(--line);
+  overflow-y: auto;
+  font: 700 16px/1.45 var(--font);
+  color: var(--ink);
+  background: var(--parch);
+}
+.cm-cap.say {
+  font-style: italic;
+  background: var(--cream);
+}
+.cm.choice .cm-frame {
+  cursor: default;
+}
+.cm.choice .cm-frame img {
+  max-height: 46vh;
+}
+.cm-hint {
+  margin: 0;
+  text-align: center;
+  font: 800 13px var(--font);
+  color: var(--on-wood-dim);
+}
+.cm-ch {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 3px 3px;
+}
+.cm-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 9px 14px 12px;
+  border: 0;
+  border-radius: 6px;
+  text-align: left;
+  color: #fff;
+  background: var(--green);
+  box-shadow:
+    0 0 0 3px var(--green-o),
+    inset 0 3px 0 var(--green-l),
+    inset 0 -4px 0 var(--green-d);
+}
+.cm-opt > span:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cm-opt b {
+  font: 900 16px/1.15 var(--font);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
+}
+.cm-opt small {
+  font: 800 13px/1.25 var(--font);
+  opacity: 0.9;
+}
+.cm-k {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
+  font: 900 15px var(--font);
+}
+.cm-opt.gold {
+  color: var(--ink);
+  background: var(--gold);
+  box-shadow:
+    0 0 0 3px var(--gold-o),
+    inset 0 3px 0 var(--gold-l),
+    inset 0 -4px 0 var(--gold-d);
+}
+.cm-opt.gold b {
+  text-shadow: none;
+}
+.cm-opt.dark {
+  background: var(--red);
+  box-shadow:
+    0 0 0 3px var(--red-o),
+    inset 0 3px 0 #f2876c,
+    inset 0 -4px 0 var(--red-d);
+}
+.cm-opt:disabled {
+  opacity: 0.45;
+}
+.cm-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 0 3px 3px;
+}
+.cm-dots {
+  display: flex;
+  gap: 6px;
+}
+.cm-dots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #5e3a1e;
+}
+.cm-dots i.on {
+  width: 22px;
+  border-radius: 5px;
+  background: var(--gold);
+}
+.cm-next {
+  width: auto;
+  min-width: 140px;
+}
+
+/* ---------- вкладка «Дед» ---------- */
+.dd-card {
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+.dd-photo {
+  flex: none;
+  padding: 6px 6px 16px;
+  background: #fffaf0;
+  box-shadow:
+    0 0 0 2px #6b3d17,
+    3px 4px 0 rgba(58, 29, 11, 0.3);
+  transform: rotate(-2deg);
+}
+.dd-photo img {
+  display: block;
+  width: 76px;
+  height: auto;
+}
+.dd-card > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dd-card h2 {
+  margin: 0;
+  font: 900 20px/1.15 var(--font);
+}
+.dd-card p {
+  margin: 0;
+  font: 700 13px/1.4 var(--font);
+}
+.dd-goal {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px 14px;
+  border-radius: 7px;
+  background: #fff3c4;
+  box-shadow:
+    0 0 0 3px var(--line),
+    0 0 0 6px var(--gold),
+    0 9px 0 rgba(58, 29, 11, 0.45);
+}
+.dd-goal > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.dd-goal small {
+  font: 800 12px var(--font);
+  color: var(--faint);
+}
+.dd-goal b {
+  font: 900 18px/1.2 var(--font);
+  color: var(--ink);
+}
+.dd-goal p {
+  margin: 0;
+  font: 700 14px/1.4 var(--font);
+  color: #6b3d17;
+}
+.dd-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px 6px;
+  border-radius: 7px;
+  background: var(--parch);
+  box-shadow:
+    0 0 0 3px var(--line),
+    inset 0 0 0 3px var(--edge),
+    0 7px 0 rgba(58, 29, 11, 0.5);
+}
+.dd-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.dd-list li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 9px 0;
+  border-top: 2px solid var(--rule);
+}
+.dd-ic {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  background: #efcf95;
+  box-shadow: 0 0 0 2px #6b3d17;
+  font: 900 18px var(--font);
+  color: var(--faint);
+}
+.dd-ic img {
+  width: 32px;
+  height: 32px;
+}
+.dd-list li div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dd-list small {
+  font: 800 12px var(--font);
+  color: var(--faint);
+}
+.dd-list b {
+  font: 900 15px/1.2 var(--font);
+}
+.dd-list p {
+  margin: 0;
+  font: 700 13px/1.4 var(--font);
+  color: var(--ink-dim);
+}
+.dd-list li.off {
+  align-items: center;
+}
+.dd-list li.off .dd-ic {
+  background: var(--parch3);
+  box-shadow: 0 0 0 2px #b8956a;
+}
+.dd-list li.off b {
+  color: var(--faint);
+}
+.dd-replay {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 8px 3px 10px;
+}
+.dd-replay button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 12px 2px;
+  border: 0;
+  border-radius: 6px;
+  font: 900 14px var(--font);
+  color: var(--ink);
+  background: var(--parch);
+  box-shadow:
+    0 0 0 2.5px var(--line),
+    inset 0 -3px 0 var(--edge);
+  white-space: nowrap;
+}
+.sk-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sk-title h2 {
+  margin: 0;
+  font: 900 20px var(--font);
+  color: var(--on-wood);
+  text-shadow: 0 2px 0 var(--line);
+}
+.sk-title span {
+  flex: 1;
+  height: 2px;
+  background: rgba(255, 241, 207, 0.3);
+}
+
+/* ---------- облава: протокол — бумага с машинописью ---------- */
+#raid {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(env(safe-area-inset-top, 0px) + 20px) 12px calc(env(safe-area-inset-bottom, 0px) + 12px);
+  background: rgba(30, 14, 4, 0.82);
+  animation: rdIn 0.25s ease-out;
+}
+.rd {
+  width: 100%;
+  max-width: 440px;
+  max-height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-radius: 9px;
+  background: var(--parch);
+  box-shadow:
+    0 0 0 3px var(--line),
+    0 10px 0 rgba(0, 0, 0, 0.35);
+}
+.rd-scene {
+  position: relative;
+  height: 150px;
+  flex: none;
+  overflow: hidden;
+  background: repeating-linear-gradient(#5a4a3a 0 14px, #4f4032 14px 16px);
+  border-bottom: 3px solid var(--line);
+}
+.rd-ruler {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 40px;
+  width: 34px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-left: 6px;
+  border-right: 2px solid #3a332d;
+  font:
+    11px "IBM Plex Mono",
+    monospace;
+  color: #c9b48a;
+}
+.rd-ruler span {
+  border-top: 1px solid #8a7a5a;
+  padding-top: 1px;
+}
+.rd-cop {
+  position: absolute;
+  left: 32%;
+  bottom: 24px;
+  width: 132px;
+  transform: translateX(-50%);
+  animation: rdCop 0.5s steps(4) both;
+}
+@keyframes rdCop {
+  from {
+    transform: translate(-50%, 40px);
+  }
+  to {
+    transform: translate(-50%, 0);
+  }
+}
+.rd-say {
+  position: absolute;
+  right: 8px;
+  top: 12px;
+  max-width: 44%;
+  padding: 6px 8px;
+  border-radius: 5px;
+  background: var(--cream);
+  box-shadow: 0 0 0 2px var(--line);
+  font: 700 13px/1.3 var(--font);
+  color: var(--ink);
+}
+.rd-say::after {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 12px;
+  border: 5px solid transparent;
+  border-right: 7px solid var(--line);
+  border-left: 0;
+}
+.rd-counter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 28px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: #5e6b4c;
+  border-top: 3px solid #7d8b66;
+  box-shadow: inset 0 -6px 0 #46513a;
+}
+.rd-counter i {
+  width: 26px;
+  height: 4px;
+  background: #3c4532;
+}
+.rd-desk {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 12px 6px;
+  background: var(--parch2);
+}
+.rd-paper {
+  position: relative;
+  padding: 16px 18px 14px;
+  background: #fffaf0;
+  color: #5a3d30;
+  font-family: "IBM Plex Mono", monospace;
+  box-shadow:
+    0 0 0 2px #c9b48a,
+    2px 3px 0 rgba(58, 29, 11, 0.2);
+  animation: rdPaper 0.35s 0.15s ease-out both;
+}
+@keyframes rdPaper {
+  from {
+    transform: translateY(30px) rotate(-2deg);
+    opacity: 0;
+  }
+}
+.rd-paper::before {
+  content: "";
+  position: absolute;
+  inset: 6px 10px;
+  border: 1px solid #e2cd9a;
+  pointer-events: none;
+}
+.rd-head {
+  max-width: 60%;
+  min-height: 116px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.rd-head small {
+  font-size: 12px;
+  color: #8a6d5a;
+}
+.rd-head h3 {
+  margin: 2px 0;
+  font:
+    600 17px/1.3 "IBM Plex Mono",
+    monospace;
+  color: #5a3d30;
+}
+.rd-tag {
+  position: absolute;
+  right: 16px;
+  top: 14px;
+  width: 96px;
+  padding: 14px 6px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  border-radius: 4px 4px 10px 10px;
+  background: #e8dcb4;
+  box-shadow:
+    0 0 0 2px #a8976a,
+    2px 3px 0 rgba(60, 40, 20, 0.25);
+  transform: rotate(4deg);
+}
+.rd-tag::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border-radius: 50%;
+  background: #5a3d30;
+}
+.rd-tag b {
+  font-size: 12px;
+  color: var(--red);
+}
+.rd-tag img {
+  width: 56px;
+  height: 56px;
+}
+.rd-tag span {
+  font-size: 11px;
+  color: #6a4b3c;
+}
+.rd-f {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 7px 10px;
+  margin: 8px 0 0;
+  align-items: end;
+}
+.rd-f dt {
+  font-size: 13px;
+  color: #8a6d5a;
+}
+.rd-f dd {
+  margin: 0;
+  padding: 0 2px 1px;
+  border-bottom: 1px solid #8a6d5a;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #4a3328;
+}
+.rd-f dd.red {
+  color: var(--red);
+}
+.rd-sign {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #8a6d5a;
+}
+.rd-sign svg {
+  flex: 1;
+  height: 30px;
+  border-bottom: 1px solid #8a6d5a;
+}
+.rd-sign path {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 260;
+  stroke-dashoffset: 260;
+}
+.rd.signed .rd-sign path {
+  transition: stroke-dashoffset 0.7s ease-in-out;
+  stroke-dashoffset: 0;
+}
+.rd-stamp {
+  position: absolute;
+  right: 20px;
+  bottom: 12px;
+  padding: 6px 10px;
+  border: 3px double var(--red);
+  border-radius: 4px;
+  transform: rotate(-14deg);
+  font:
+    600 20px "IBM Plex Mono",
+    monospace;
+  color: var(--red);
+  opacity: 0.85;
+  mix-blend-mode: multiply;
+  animation: rdStamp 0.25s 0.6s cubic-bezier(0.3, 1.6, 0.6, 1) both;
+}
+@keyframes rdStamp {
+  from {
+    transform: rotate(-14deg) scale(2.4);
+    opacity: 0;
+  }
+}
+.rd-foot {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 15px 16px;
+  background: var(--parch);
+  border-top: 2px solid var(--rule);
+}
+.rd-foot p {
+  margin: 0;
+  text-align: center;
+  font: 800 14px var(--font);
+  color: var(--red);
+}
+.rd.signed .rd-btn {
+  opacity: 0.6;
+}
+@media (prefers-reduced-motion: reduce) {
+  #comic,
+  .cm-frame,
+  #raid,
+  .rd-cop,
+  .rd-paper,
+  .rd-stamp {
+    animation: none;
+  }
+}

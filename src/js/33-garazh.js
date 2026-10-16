@@ -28,6 +28,11 @@ function showBase() {
     G.debtV = 3;
   }
   if (!G.own) G.own = {};
+  if (!G.skv6 && G.skills) {
+    // навыки стали шестиуровневыми: прежние уровни 0…10 → 0…6
+    for (const k in G.skills) G.skills[k] = Math.min(SKMAX, Math.round(G.skills[k] * 0.6));
+    G.skv6 = 1;
+  }
   if (!G.vit) G.vit = [];
   if (!G.wx) rollWx();
   if (!G.antWant) rollAnt();
