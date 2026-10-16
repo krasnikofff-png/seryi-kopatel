@@ -14,26 +14,246 @@ const HERO_DET = [
   im.src = u;
   return im;
 });
-// ===== ОДЕЖДА: слои поверх листа копателя (штаны, куртка, шапка). Новая одежда — строка в WEAR и свой слой =====
+// ===== ОДЕЖДА: слои поверх листа копателя (штаны, верх, рюкзак, шапка). Новая вещь — строка в WEAR и свой слой =====
+// Слои и иконки рисует tools/sprites/wear_more.py и wear_icons.py.
+// Как открывается: l — уровень; ok() — условие (проверяется в гараже); flea — только лотом на барахолке.
+// how — подсказка в гардеробе, pr() — прогресс [сейчас, нужно], fx — что даёт.
 const WEAR_SLOTS = [
   ["hat", "Шапка"],
-  ["jacket", "Куртка"],
-  ["pants", "Штаны"]
+  ["jacket", "Верх"],
+  ["pants", "Штаны"],
+  ["pack", "Рюкзак"]
 ];
+const wst = k => (G.wst && G.wst[k]) || 0;
+const empireHalf = () => {
+  if (typeof ALB === "undefined" || !ALB[2]) return [0, 1];
+  dexSync();
+  const a = ALB[2];
+  return [a.filter(x => G.dex[x.name]).length, Math.ceil(a.length / 2)];
+};
 const WEAR = {
   hat: [
     { id: "cap", n: "Кепка", l: 1, ic: "@art(ui/cap.png)" },
-    { id: "ushanka", n: "Ушанка", l: 3, ic: "@art(ui/ushanka.png)", ov: "@art(hero-det/ov-ushanka.png)" }
+    { id: "ushanka", n: "Ушанка", l: 3, auto: 1, ic: "@art(ui/ushanka.png)", ov: "@art(hero-det/ov-ushanka.png)" },
+    {
+      id: "helmet",
+      n: "Каска СШ-40",
+      ok: () => G.inv.some(i => i.name === "Каска СШ-40" && i.clean && i.gr >= 3),
+      how: "Найти каску СШ-40, почистить до «очень хорошей» сохранности и привезти домой",
+      ic: "@art(ui/w-helmet.png)",
+      ov: "@art(hero-det/ov-helmet.png)"
+    },
+    {
+      id: "panama",
+      n: "Панама-«афганка»",
+      ok: () => (G.sletWins || 0) > 0,
+      how: "Выиграть слёт копателей",
+      ic: "@art(ui/w-panama.png)",
+      ov: "@art(hero-det/ov-panama.png)"
+    },
+    {
+      id: "petushok",
+      n: "Шапка-«петушок»",
+      flea: 1,
+      how: "Иногда лежит в лоте на барахолке",
+      ic: "@art(ui/w-petushok.png)",
+      ov: "@art(hero-det/ov-petushok.png)"
+    },
+    {
+      id: "bandana",
+      n: "Бандана с черепом",
+      ok: () => wst("blk") >= 5,
+      pr: () => [wst("blk"), 5],
+      how: "Продать 5 вещей на чёрном рынке",
+      fx: "Чёрный рынок платит на 5% больше, но полиция после поездки не остывает",
+      ic: "@art(ui/w-bandana.png)",
+      ov: "@art(hero-det/ov-bandana.png)"
+    },
+    {
+      id: "forester",
+      n: "Фуражка лесника",
+      ok: () => G.rep >= 40,
+      pr: () => [Math.max(0, G.rep), 40],
+      how: "Звание «Хранитель памяти»: совесть +40",
+      fx: "На посту ДПС уважают: договориться вдвое дешевле",
+      ic: "@art(ui/w-forester.png)",
+      ov: "@art(hero-det/ov-forester.png)"
+    },
+    {
+      id: "headlamp",
+      n: "Шапка с фонарём",
+      ok: () => own("lamp"),
+      how: "Купить налобный фонарь в магазине",
+      fx: "В ночную смену светит дальше — туда, куда смотрит Серый",
+      ic: "@art(ui/w-headlamp.png)",
+      ov: "@art(hero-det/ov-headlamp.png)"
+    }
   ],
   jacket: [
     { id: "green", n: "Зелёная куртка", l: 1, ic: "@art(ui/jacket.png)" },
-    { id: "gorka", n: "Розовая «горка»", l: 9, ic: "@art(ui/gorka.png)", ov: "@art(hero-det/ov-gorka.png)" }
+    { id: "gorka", n: "Розовая «горка»", l: 9, auto: 1, ic: "@art(ui/gorka.png)", ov: "@art(hero-det/ov-gorka.png)" },
+    {
+      id: "vest",
+      n: "Жилет рыболова",
+      l: 6,
+      ic: "@art(ui/w-vest.png)",
+      ov: "@art(hero-det/ov-vest.png)"
+    },
+    {
+      id: "vatnik",
+      n: "Телогрейка",
+      ok: () => wst("winter") > 0,
+      how: "Съездить в поле зимой",
+      fx: "Зимой день в поле на 30 минут длиннее",
+      ic: "@art(ui/w-vatnik.png)",
+      ov: "@art(hero-det/ov-vatnik.png)"
+    },
+    {
+      id: "telnyashka",
+      n: "Тельняшка",
+      ok: () => wst("flood") > 0,
+      how: "Съездить к затопленной деревне",
+      ic: "@art(ui/w-telnyashka.png)",
+      ov: "@art(hero-det/ov-telnyashka.png)"
+    },
+    {
+      id: "ozk",
+      n: "Плащ ОЗК",
+      ok: () => wst("rain") >= 6,
+      pr: () => [wst("rain"), 6],
+      how: "Шесть поездок в дождь",
+      ic: "@art(ui/w-ozk.png)",
+      ov: "@art(hero-det/ov-ozk.png)"
+    },
+    {
+      id: "olimpiyka",
+      n: "Олимпийка",
+      flea: 1,
+      how: "Иногда лежит в лоте на барахолке",
+      ic: "@art(ui/w-olimpiyka.png)",
+      ov: "@art(hero-det/ov-olimpiyka.png)"
+    },
+    {
+      id: "deer",
+      n: "Свитер с оленями",
+      ok: () => !!(G.story && G.story.clues && G.story.clues.includes("nyura")),
+      how: "Подарок бабы Нюры — в истории деда",
+      fx: "Бабушки у поля добрее: за возвращённое кольцо — ещё 300 ₽",
+      ic: "@art(ui/w-deer.png)",
+      ov: "@art(hero-det/ov-deer.png)"
+    },
+    {
+      id: "gimnast",
+      n: "Гимнастёрка деда",
+      ok: () => !!(G.story && G.story.end === "good"),
+      how: "Финал «Вернулся» в истории деда",
+      ic: "@art(ui/w-gimnast.png)",
+      ov: "@art(hero-det/ov-gimnast.png)"
+    }
   ],
   pants: [
     { id: "jeans", n: "Джинсы", l: 1, ic: "@art(ui/jeans.png)" },
-    { id: "gorka", n: "Штаны «горка»", l: 9, ic: "@art(ui/gorka-pants.png)", ov: "@art(hero-det/ov-gorka-pants.png)" }
+    {
+      id: "gorka",
+      n: "Штаны «горка»",
+      l: 9,
+      auto: 1,
+      ic: "@art(ui/gorka-pants.png)",
+      ov: "@art(hero-det/ov-gorka-pants.png)"
+    },
+    { id: "flora", n: "Камуфляж «флора»", l: 12, ic: "@art(ui/w-flora.png)", ov: "@art(hero-det/ov-flora.png)" },
+    {
+      id: "treniki",
+      n: "Треники с лампасами",
+      flea: 1,
+      how: "Иногда лежат в лоте на барахолке",
+      ic: "@art(ui/w-treniki.png)",
+      ov: "@art(hero-det/ov-treniki.png)"
+    },
+    {
+      id: "zabrody",
+      n: "Болотные заброды",
+      ok: () => wst("swamp") >= 10,
+      pr: () => [wst("swamp"), 10],
+      how: "Найти 10 вещей на болоте",
+      fx: "На болоте день на 30 минут длиннее: ноги сухие",
+      ic: "@art(ui/w-zabrody.png)",
+      ov: "@art(hero-det/ov-zabrody.png)"
+    },
+    {
+      id: "shorts",
+      n: "Шорты",
+      ok: () => wst("summer") >= 8,
+      pr: () => [wst("summer"), 8],
+      how: "Восемь поездок летом",
+      ic: "@art(ui/w-shorts.png)",
+      ov: "@art(hero-det/ov-shorts.png)"
+    },
+    {
+      id: "galife",
+      n: "Галифе и сапоги",
+      ok: () => {
+        const [a, b] = empireHalf();
+        return a >= b;
+      },
+      pr: empireHalf,
+      how: "Собрать в альбоме половину слоя империи",
+      ic: "@art(ui/w-galife.png)",
+      ov: "@art(hero-det/ov-galife.png)"
+    }
+  ],
+  pack: [
+    { id: "pack", n: "Рюкзак", l: 1, ic: "@art(ui/w-pack.png)" },
+    {
+      id: "meshok",
+      n: "Вещмешок",
+      ok: () => G.transport >= 2,
+      how: "Купить велосипед с багажником",
+      ic: "@art(ui/w-meshok.png)",
+      ov: "@art(hero-det/ov-meshok.png)"
+    },
+    {
+      id: "ermak",
+      n: "Рюкзак «Ермак»",
+      ok: () => G.transport >= 4,
+      how: "Купить «Москвич» с прицепом",
+      ic: "@art(ui/w-ermak.png)",
+      ov: "@art(hero-det/ov-ermak.png)"
+    },
+    {
+      id: "baul",
+      n: "Клетчатый баул",
+      flea: 1,
+      how: "Иногда лежит в лоте на барахолке",
+      ic: "@art(ui/w-baul.png)",
+      ov: "@art(hero-det/ov-baul.png)"
+    }
   ]
 };
+// комплекты: три вещи вместе дают прибавку
+const WEAR_SETS = [
+  {
+    id: "rek",
+    n: "Поисковик-реконструктор",
+    w: { hat: "helmet", jacket: "gimnast", pants: "galife" },
+    fx: "Дар музею — совесть +1 сверху",
+    say: "Савельич: «Хоть сейчас в строй. Только каску не снимай»."
+  },
+  {
+    id: "d90",
+    n: "Лихие девяностые",
+    w: { hat: "petushok", jacket: "olimpiyka", pants: "treniki" },
+    fx: "Скупщик платит на 10% больше",
+    say: "Скупщик: «О, свой человек. Для своих — по-братски»."
+  },
+  {
+    id: "ryb",
+    n: "Рыбак",
+    w: { hat: "panama", jacket: "vest", pants: "zabrody" },
+    fx: "Магнит закидывается вдвое быстрее",
+    say: "На берегу кивают: «Клюёт?» — «Железо клюёт»."
+  }
+];
 Object.values(WEAR).forEach(a =>
   a.forEach(w => {
     if (!w.ov) return;
@@ -42,34 +262,60 @@ Object.values(WEAR).forEach(a =>
     w.img = im;
   })
 );
-// новая одежда надевается сама, как только открылась; потом её можно сменить в гардеробе
+const wearKey = (s, w) => s + ":" + w.id;
+const wearOpen = (s, w) =>
+  (G.wearGot || []).includes(wearKey(s, w)) || (w.l && (G.lvl || 1) >= w.l) || (!!w.ok && !w.flea && w.ok());
+// новая вещь: ушанка и «горка» надеваются сами (так обещает «Путь копателя»), остальное — по кнопке в окне «Обновка»
 function wearSync() {
   G.wear = G.wear || {};
   G.wearSeen = G.wearSeen || [];
+  G.wearGot = G.wearGot || [];
+  G.wearNew = G.wearNew || [];
   WEAR_SLOTS.forEach(([s]) =>
     WEAR[s].forEach(w => {
-      const k = s + ":" + w.id;
-      if ((G.lvl || 1) >= w.l && !G.wearSeen.includes(k)) {
-        G.wearSeen.push(k);
-        G.wear[s] = w.id;
-      }
+      const k = wearKey(s, w);
+      if (G.wearSeen.includes(k) || !wearOpen(s, w)) return;
+      G.wearSeen.push(k);
+      if (!G.wearGot.includes(k)) G.wearGot.push(k);
+      if (w.auto) G.wear[s] = w.id;
+      if (w.l !== 1) G.wearNew.push(k);
     })
   );
 }
+// барахолка: одежда, которой ещё нет, иногда лежит в купленном лоте
+function wearFlea() {
+  wearSync();
+  const left = [];
+  WEAR_SLOTS.forEach(([s]) => WEAR[s].forEach(w => w.flea && !G.wearSeen.includes(wearKey(s, w)) && left.push([s, w])));
+  if (!left.length || Math.random() > 0.35) return null;
+  const [s, w] = left[Math.floor(Math.random() * left.length)];
+  G.wearGot.push(wearKey(s, w));
+  wearSync();
+  return w;
+}
 const wearOn = s => WEAR[s].find(w => w.id === (G.wear && G.wear[s])) || WEAR[s][0];
+const wearIs = (s, id) => wearOn(s).id === id;
+const setOn = id => {
+  const S = WEAR_SETS.find(x => x.id === id);
+  return !!S && Object.entries(S.w).every(([s, v]) => wearIs(s, v));
+};
 const heroCache = {};
 let wearLvl = -1;
-function heroImg(d) {
+const WEAR_ORDER = ["pants", "jacket", "pack", "hat"];
+// лист копателя с надетыми слоями; ws — что надето (по умолчанию — текущее)
+function heroImg(d, ws) {
   if (wearLvl !== G.lvl) {
     wearLvl = G.lvl;
     wearSync();
   }
   const base = HERO_DET[d];
   if (!base || !base.complete || !base.naturalWidth) return base;
-  const lay = ["pants", "jacket", "hat"].map(wearOn).filter(w => w.img);
+  const lay = WEAR_ORDER.map(s => (ws && ws[s] ? WEAR[s].find(w => w.id === ws[s]) || wearOn(s) : wearOn(s))).filter(
+    w => w.img
+  );
   if (!lay.length) return base;
   if (lay.some(w => !w.img.complete || !w.img.naturalWidth)) return base;
-  const key = d + ":" + lay.map(w => w.id).join(",");
+  const key = d + ":" + lay.map(w => w.ov).join(",");
   if (!heroCache[key]) {
     const c = document.createElement("canvas");
     c.width = base.naturalWidth;
@@ -96,7 +342,7 @@ function heroCoil(x, y, fr) {
 }
 function drawHeroDet(x, y, sig) {
   const im = heroImg(G.det);
-  if (!im || (im.complete === false) || im.naturalWidth === 0) return false;
+  if (!im || im.complete === false || im.naturalWidth === 0) return false;
   const fr = P.moving ? [0, 1, 0, 2][((Math.floor(P.walk * 8) % 4) + 4) % 4] : 0;
   x = Math.round(x);
   y = Math.round(y);
@@ -134,8 +380,7 @@ function drawShovel(cx, cy) {
   rect(ctx, x, y + 4, 1, 1, "#a9aaa5");
 }
 function draw() {
-  const camX =
-    WW <= VW ? Math.floor((WW - VW) / 2) : Math.max(0, Math.min(WW - VW, Math.round(P.x - VW / 2)));
+  const camX = WW <= VW ? Math.floor((WW - VW) / 2) : Math.max(0, Math.min(WW - VW, Math.round(P.x - VW / 2)));
   const mid = viewMidY || VH / 2,
     camY = Math.max(-Math.round(viewTop), Math.min(WH - VH + Math.round(viewBot), Math.round(P.y - 8 - mid)));
   CX = camX;
@@ -192,12 +437,7 @@ function draw() {
     for (let i = 0; i < N; i++) {
       if (i % 8 > 3) continue;
       const a = i / Z.r;
-      ctx.fillRect(
-        Math.round(Z.x + Math.cos(a) * Z.r - camX),
-        Math.round(Z.y + Math.sin(a) * Z.r - camY),
-        1,
-        1
-      );
+      ctx.fillRect(Math.round(Z.x + Math.cos(a) * Z.r - camX), Math.round(Z.y + Math.sin(a) * Z.r - camY), 1, 1);
     }
   }
   // стрелка к зоне, пока игрок не дошёл до кольца
@@ -212,10 +452,7 @@ function draw() {
     if (zx < 4 || zx > VW - 4 || zy < top || zy > bot) {
       const dx = zx - cx,
         dy = zy - cy,
-        k = Math.min(
-          (VW / 2 - 13) / Math.max(1e-3, Math.abs(dx)),
-          (bot - top) / 2 / Math.max(1e-3, Math.abs(dy))
-        );
+        k = Math.min((VW / 2 - 13) / Math.max(1e-3, Math.abs(dx)), (bot - top) / 2 / Math.max(1e-3, Math.abs(dy)));
       const ax = cx + dx * k,
         ay = cy + dy * k,
         a = Math.atan2(dy, dx),

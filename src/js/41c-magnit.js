@@ -367,7 +367,7 @@ function magFinish() {
   MG.ph = "done";
   MG.hold = 0;
   const far = (MG.tx - M_T0) / M_TR;
-  MG.cost = 10 + Math.round(far * 10);
+  MG.cost = Math.round((10 + Math.round(far * 10)) * (setOn("ryb") ? 0.5 : 1));
   T.minutes += MG.cost;
   T.mag.pool.forEach(o => delete o.miss);
   let xp = 0;

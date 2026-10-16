@@ -14,7 +14,9 @@ fs.writeFileSync(page,'<!doctype html><html><head><meta charset="utf-8"><meta na
 const IT=(name,c,era,base,clean,extra)=>Object.assign({name,c,era,w:.3,base,cond:.85,depth:25,clean,gr:2},extra||{});
 const SAVE={money:84500,trips:30,det:4,shovel:4,transport:3,rep:22,heat:2,lvl:13,xp:300,sp:1,seenIntro:true,vdiTip:1,pinTip:1,forestSeen:1,ploughSeen:1,manorSeen:1,swampSeen:1,
  msg:"Вернулся домой. Продал скупщику пять вещей за 4 200 ₽.",wx:"clear",debt:60000,debtTrip:28,debtV:3,debtM:3,debtMiss:0,own:{pin:1,phones:1},
- skills:{torg:3,karto:2,master:1,svyazi:0},dex:{"Пятак 1811":1,"Кокарда":1,"Каска СШ-40":1,"Георгиевский крест":1,"Крестик нательный":1},story:{st:3,clues:["letter","pp","zheton","photo"]},
+ skills:{torg:3,karto:2,master:1,svyazi:0},wear:{hat:"panama",jacket:"vest",pants:"zabrody",pack:"meshok"},
+ wearGot:["hat:panama","pants:zabrody","jacket:olimpiyka"],wst:{rain:4,swamp:12,blk:2},
+ wearSeen:["hat:cap","hat:ushanka","hat:helmet","hat:panama","hat:petushok","hat:bandana","hat:forester","hat:headlamp","jacket:green","jacket:gorka","jacket:vest","jacket:vatnik","jacket:telnyashka","jacket:ozk","jacket:olimpiyka","jacket:deer","jacket:gimnast","pants:jeans","pants:gorka","pants:flora","pants:treniki","pants:zabrody","pants:shorts","pants:galife","pack:pack","pack:meshok","pack:ermak","pack:baul"],dex:{"Пятак 1811":1,"Кокарда":1,"Каска СШ-40":1,"Георгиевский крест":1,"Крестик нательный":1},story:{st:3,clues:["letter","pp","zheton","photo"]},
  inv:[IT("Пятак 1811",2,2,1200,true),IT("Каска СШ-40",3,1,2500,true),IT("Крестик нательный",1,2,640,true),IT("Кокарда",3,2,3000,false),IT("Солдатская фляга",3,1,1500,false),IT("Пуговица с орлом",1,2,400,false),IT("Георгиевский крест",4,2,9000,true)]};
 const SC=[];const S=(n,f)=>SC.push([n,f]);
 const tab=t=>p=>p.evaluate(t=>document.querySelector(`#tabs button[data-tab=${t}]`).click(),t);
@@ -22,6 +24,9 @@ S('sell',tab('sell'));S('sell-2',async p=>{await tab('sell')(p);await p.evaluate
 S('find',async p=>{await tab('sell')(p);await p.evaluate(()=>SK.openFind(0))});
 S('find-dirty',async p=>{await tab('sell')(p);await p.evaluate(()=>SK.openFind(3))});
 for(const g of ['shovel','det','transport','acc','ws','wd'])S('gear-'+g,async p=>{await tab('gear')(p);await p.evaluate(g=>SK.gearTab(g),g)});
+S('gear-wd-2',async p=>{await tab('gear')(p);await p.evaluate(()=>{SK.gearTab('wd');SK.wdTap('hat','bandana');document.getElementById('base').scrollTop=520})});
+S('gear-wd-3',async p=>{await tab('gear')(p);await p.evaluate(()=>{SK.gearTab('wd');document.getElementById('base').scrollTop=1100})});
+S('wd-new',async p=>{await p.evaluate(()=>{__X.G.wearNew=['jacket:deer'];__X.G.wearGot.push('jacket:deer');SK.gearTab('wd')});await p.clock.runFor(800)});
 S('skills',async p=>{await tab('skills')(p);await p.evaluate(()=>SK.skTab('sk'))});
 S('path',async p=>{await tab('skills')(p);await p.evaluate(()=>SK.skTab('tr'))});
 S('maps',tab('maps'));S('maps-2',async p=>{await tab('maps')(p);await p.evaluate(()=>document.getElementById('base').scrollTop=700)});

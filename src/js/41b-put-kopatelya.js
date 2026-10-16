@@ -14,8 +14,9 @@ const TRACK = [
   {
     l: 6,
     id: "magnet",
-    n: "Поисковый магнит",
-    d: "У воды: закинуть магнит и вытянуть со дна железо, которое детектор не берёт"
+    n: "Поисковый магнит и жилет",
+    d: "У воды: закинуть магнит и вытянуть со дна железо, которое детектор не берёт. В гардеробе — жилет рыболова",
+    ic: "@art(ui/w-vest.png)"
   },
   { l: 7, id: "flea", n: "Барахолка", d: "Лоты вслепую и старые письма с наводками на новые места" },
   {
@@ -38,7 +39,13 @@ const TRACK = [
     d: "Иногда коллекционер ищет конкретную вещь и платит вдвое"
   },
   { l: 11, id: "house", n: "Дом под снос", d: "Новое место: подпол, чердак, печь — ищете руками" },
-  { l: 12, id: "slet", n: "Слёт копателей", d: "Раз в сезон — соревнование на общем поле" },
+  {
+    l: 12,
+    id: "slet",
+    n: "Слёт копателей",
+    d: "Раз в сезон — соревнование на общем поле. В гардеробе — камуфляж «флора», а победителю — панама",
+    ic: "@art(ui/w-flora.png)"
+  },
   { l: 13, id: "forum", n: "Имя на форуме", d: "Скупщик платит на 10% больше, слухи приходят чаще" },
   { l: 15, id: "kurgan", n: "Курган", d: "Новое особое место: скифский курган в степи и погребение в центре" }
 ];
@@ -169,7 +176,8 @@ function drawNight(camX, camY) {
   const g = nightCv.getContext("2d"),
     px = P.x - camX,
     py = P.y - 6 - camY,
-    R = own("lamp") ? 70 : 52;
+    lampHat = wearIs("hat", "headlamp"),
+    R = (own("lamp") ? 70 : 52) + (lampHat ? 12 : 0);
   g.globalCompositeOperation = "source-over";
   g.clearRect(0, 0, VW, VH);
   g.fillStyle = "rgba(6,10,28,.8)";
@@ -182,6 +190,19 @@ function drawNight(camX, camY) {
   g.beginPath();
   g.arc(px, py, R, 0, 7);
   g.fill();
+  if (lampHat) {
+    // луч фонаря на лбу — вперёд, куда смотрит Серый
+    const d = { down: [0, 1], up: [0, -1], left: [-1, 0], right: [1, 0] }[P.dir] || [0, 1],
+      bx = px + d[0] * R * 0.75,
+      by = py + d[1] * R * 0.75,
+      gb = g.createRadialGradient(bx, by, 4, bx, by, R * 0.6);
+    gb.addColorStop(0, "rgba(0,0,0,1)");
+    gb.addColorStop(1, "rgba(0,0,0,0)");
+    g.fillStyle = gb;
+    g.beginPath();
+    g.arc(bx, by, R * 0.6, 0, 7);
+    g.fill();
+  }
   ctx.drawImage(nightCv, 0, 0);
   const t = performance.now() / 1000;
   for (const it of items) {

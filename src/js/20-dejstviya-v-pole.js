@@ -306,9 +306,17 @@ function endTrip(text) {
     dirty = G.inv.filter(i => !i.clean).length;
   const wasManor = T && T.map === 3;
   const sBefore = seasonIdx();
+  if (T && !T.slet) {
+    const se = season().id;
+    if (se === "winter") wstAdd("winter");
+    if (se === "summer") wstAdd("summer");
+    if (G.wx === "rain") wstAdd("rain");
+    if (worldKind === "flooded") wstAdd("flood");
+    if (worldKind === "swamp") wstAdd("swamp", n);
+  }
   T = null;
   G.trips++;
-  G.heat = Math.max(0, G.heat - 1);
+  if (!wearIs("hat", "bandana")) G.heat = Math.max(0, G.heat - 1);
   rollWx();
   const sNew = seasonIdx() !== sBefore ? `<br><b>Наступила ${season().name.toLowerCase()}.</b> ${season().line}` : "";
   const due = G.antDue || 0;

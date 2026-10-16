@@ -277,7 +277,8 @@ function sell(idx, chId) {
     else SFX.coins(ch.id === "ant" ? 3 : p > 5000 ? 8 : 5);
     G.inv.splice(idx, 1);
     G.heat = Math.max(0, G.heat + ch.heat);
-    const d = ch.id === "mus" ? giftRep(it) : ch.id === "blk" ? blackRep(it) : 0;
+    const d = ch.id === "mus" ? giftRep(it) + (setOn("rek") ? 1 : 0) : ch.id === "blk" ? blackRep(it) : 0;
+    if (ch.id === "blk") wstAdd("blk");
     G.rep += d;
     msg(
       ch.id === "mus"
@@ -616,6 +617,8 @@ function renderBase() {
   $("t_skills").innerHTML = renderSkills();
   // карты
   $("t_maps").innerHTML = renderMaps();
+  wearSync();
+  if ((G.wearNew || []).length) setTimeout(wearNewShow, 450);
 }
 let resetArmed = false,
   resetTimer = null;
@@ -674,6 +677,9 @@ window.SK = {
   goHouse,
   goSlet,
   wearPick,
+  wdTap,
+  wearSet,
+  wearNewOk,
   sletInfo,
   hsSelect,
   hsSearch,

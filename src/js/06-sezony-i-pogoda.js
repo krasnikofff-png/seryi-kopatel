@@ -56,10 +56,14 @@ function rollWx() {
   }
   return (G.wx = "clear");
 }
+// одежда: телогрейка зимой и заброды на болоте — по полчаса
+const wearDay = () =>
+  (isWinter() && wearIs("jacket", "vatnik") ? 30 : 0) + (worldKind === "swamp" && wearIs("pants", "zabrody") ? 30 : 0);
 const dayEnd = () =>
   T && T.slet
     ? T.slet.end
-    : Math.min(780, season().end + (own("lamp") ? 60 : 0) + (perk("thermos") ? 60 : 0)) + (T && T.night ? 180 : 0);
+    : Math.min(780, season().end + (own("lamp") ? 60 : 0) + (perk("thermos") ? 60 : 0) + wearDay()) +
+      (T && T.night ? 180 : 0);
 const hhmmAbs = m => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
 function seasonStrip() {
   const S = season(),

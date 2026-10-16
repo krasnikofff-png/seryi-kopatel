@@ -251,7 +251,8 @@ function buyLot(j) {
       if (l2) leads.push(l2);
     }
   }
-  fleaOpen = { lot, got, leads, luck };
+  const cloth = wearFlea();
+  fleaOpen = { lot, got, leads, luck, cloth };
   SFX.coins(luck ? 6 : 2);
   if (leads.length) setTimeout(() => SFX.paper(), 300);
   save();
@@ -266,11 +267,11 @@ function renderFlea() {
   const s = $("fleaSheet"),
     st = fleaStall();
   if (fleaOpen) {
-    const { lot, got, leads, luck } = fleaOpen,
+    const { lot, got, leads, luck, cloth } = fleaOpen,
       L = LOTS[lot.k];
     const val = got.reduce((a, it) => a + (it.c === 0 ? 0 : sellPrice(it, CHANNELS[0])), 0),
       antOk = got.some(it => ANT_CLS.includes(it.c) && it.gr >= 2);
-    s.innerHTML = `<span class="grab" aria-hidden="true"></span><h2>${L.n}</h2>${luck ? `<p class="fl-luck">Повезло! Продавец не знал, что продаёт: скупщик даст вчетверо больше, чем вы заплатили.</p>` : ""}<p class="fl-sub">Заплатили ${rub(lot.p)}.${got.some(i => i.c > 0) ? ` Скупщик даст за всё ~${rub(val)}.${antOk ? " Антиквар за монеты, военное и редкое заплатит вдвое больше." : ""}` : ""}</p>${got.length ? `<ul class="mg-got fl-got">${got.map(it => `<li><img src="${FIND_IMG[it.name] || ""}" alt=""><span>${it.name}<small class="k${it.c}">${fleaTag(it)}</small></span></li>`).join("")}</ul>` : ""}${leads.map(l => leadCard(l)).join("")}${!got.length && !leads.length ? `<p>Пусто: только газеты и пыль.</p>` : ""}${lot.k === "pack" && !leads.length ? `<p>Письма как письма — про погоду и урожай. Наводок нет.</p>` : ""}<div class="row"><button class="btn" onclick="SK.fleaBack()">К рядам</button></div>`;
+    s.innerHTML = `<span class="grab" aria-hidden="true"></span><h2>${L.n}</h2>${luck ? `<p class="fl-luck">Повезло! Продавец не знал, что продаёт: скупщик даст вчетверо больше, чем вы заплатили.</p>` : ""}<p class="fl-sub">Заплатили ${rub(lot.p)}.${got.some(i => i.c > 0) ? ` Скупщик даст за всё ~${rub(val)}.${antOk ? " Антиквар за монеты, военное и редкое заплатит вдвое больше." : ""}` : ""}</p>${got.length ? `<ul class="mg-got fl-got">${got.map(it => `<li><img src="${FIND_IMG[it.name] || ""}" alt=""><span>${it.name}<small class="k${it.c}">${fleaTag(it)}</small></span></li>`).join("")}</ul>` : ""}${leads.map(l => leadCard(l)).join("")}${cloth ? `<div class="fl-cloth"><img src="${cloth.ic}" alt=""><span><b>${cloth.n}</b>На самом дне, аккуратно сложено. Теперь в гардеробе.</span></div>` : ""}${!got.length && !leads.length && !cloth ? `<p>Пусто: только газеты и пыль.</p>` : ""}${lot.k === "pack" && !leads.length ? `<p>Письма как письма — про погоду и урожай. Наводок нет.</p>` : ""}<div class="row"><button class="btn" onclick="SK.fleaBack()">К рядам</button></div>`;
     return;
   }
   const leadsN = (G.leads || []).length;

@@ -514,8 +514,8 @@
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  height: 196px;
-  margin: 2px 0 4px;
+  height: 186px;
+  margin: 2px 3px 4px;
   border-radius: 5px;
   overflow: hidden;
   background: radial-gradient(ellipse 60% 70% at 50% 42%, #5a3418 0, #3a2010 55%, #24140a 100%);
@@ -528,81 +528,285 @@
   position: absolute;
   left: 50%;
   bottom: 14px;
-  width: 120px;
-  height: 16px;
-  margin-left: -60px;
+  width: 96px;
+  height: 14px;
+  margin-left: -126px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.4);
+  box-shadow: 156px 0 0 rgba(0, 0, 0, 0.4);
 }
 .wd-prev img {
   position: relative;
-  width: 240px;
-  height: 180px;
-  margin-bottom: 6px;
+  width: 300px;
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 8px;
 }
-.wd-grid {
-  display: grid;
-  grid-template-columns: 62px repeat(2, minmax(0, 1fr));
-  gap: 10px 8px;
-  align-items: center;
-  padding: 0 3px 3px;
+.wd-say {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(255, 246, 216, 0.92);
+  box-shadow: 0 0 0 2px var(--line);
+  font: 700 17px/1.1 var(--hand);
+  color: var(--blue);
+  text-align: center;
 }
-.wd-slot {
-  display: contents;
-}
-.wd-slot h3 {
-  margin: 0;
-  font: 900 14px var(--font);
-  color: var(--ink);
-}
-.wd-opts {
-  display: contents;
-}
-.wd-o {
+/* карточка выбранной вещи */
+.wd-card {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-width: 0;
-  padding: 6px 8px;
-  border: 0;
-  border-radius: 6px;
-  text-align: left;
-  background: #f6e2b8;
-  box-shadow: 0 0 0 2px #6b3d17;
-  color: var(--ink);
+  gap: 12px;
+  margin: 12px 3px 14px;
+  padding: 10px 12px;
+  border-radius: 7px;
+  background: var(--cream);
+  box-shadow:
+    0 0 0 2.5px var(--line),
+    inset 0 -3px 0 var(--rule);
 }
-.wd-o img {
-  width: 34px;
-  height: 34px;
+.wd-card > img {
+  width: 52px;
+  height: 52px;
   flex: none;
+  padding: 4px;
+  border-radius: 6px;
+  background: radial-gradient(circle at 50% 42%, #6a4022 0, #4a2a14 62%, #34200f 100%);
+  box-shadow: 0 0 0 2px var(--line);
 }
-.wd-o span {
+.wd-cb {
+  flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  font: 900 14px/1.15 var(--font);
+  align-items: flex-start;
+  gap: 4px;
 }
-.wd-o small {
+.wd-cb b {
+  font: 900 16px/1.15 var(--font);
+}
+.wd-cb p {
+  margin: 0;
+  font: 700 13px/1.35 var(--font);
+  color: #6b3d17;
+}
+.wd-fx {
   display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  margin: 0;
+  font: 800 13px/1.35 var(--font);
+  color: var(--green-d) !important;
+}
+.wd-fx .px {
+  margin-top: 1px;
+}
+.wd-pr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+.wd-pr .alb-bar {
+  flex: 1;
+  height: 9px;
+}
+.wd-pr .alb-bar i {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+}
+.wd-pr em {
+  font: 800 12px var(--font);
+  font-style: normal;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+.btn.wd-on {
+  flex: none;
+  width: auto;
+  min-height: 40px;
+  padding: 0 14px 3px;
+  font-size: 15px;
+}
+.wd-st {
+  display: inline-flex;
   align-items: center;
   gap: 3px;
   font: 800 12px var(--font);
   color: var(--ink-dim);
   white-space: nowrap;
 }
-.wd-o.on {
-  background: var(--cream);
+.wd-st.on {
+  color: var(--green-d);
+}
+/* ряды плиток по слотам */
+.wd-slot {
+  margin: 0 3px 14px;
+}
+.wd-slot h3,
+.wd-h {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 8px;
+  font: 900 15px var(--font);
+  color: var(--ink);
+}
+.wd-slot h3 small {
+  font: 800 12px var(--font);
+  color: var(--ink-dim);
+}
+.wd-h {
+  margin: 4px 3px 8px;
+}
+.wd-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 9px;
+}
+.wd-t {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: radial-gradient(circle at 50% 42%, #6a4022 0, #4a2a14 62%, #34200f 100%);
+  box-shadow: 0 0 0 2px var(--line);
+}
+.wd-t img {
+  width: 76%;
+  height: 76%;
+}
+.wd-t.lock img {
+  filter: grayscale(1) brightness(0.9);
+  opacity: 0.75;
+}
+.wd-t i {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--parch);
+  box-shadow: 0 0 0 1.5px var(--line);
+}
+.wd-t.on {
   box-shadow:
     0 0 0 2.5px var(--line),
     0 0 0 5px var(--gold);
 }
-.wd-o.on small {
-  color: var(--green-d);
+.wd-t.sel:not(.on) {
+  box-shadow:
+    0 0 0 2.5px var(--line),
+    0 0 0 5px var(--parch3);
 }
-.wd-o.lock {
-  opacity: 0.55;
+/* комплекты */
+.wd-sets {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 0 3px 3px;
 }
-.wd-o.lock img {
-  filter: grayscale(1);
+.wd-set {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px 7px 7px;
+  border-radius: 7px;
+  background: #f6e2b8;
+  box-shadow: 0 0 0 2px #6b3d17;
+}
+.wd-set.on {
+  background: #fff3c4;
+  box-shadow:
+    0 0 0 2px var(--gold-o),
+    inset 0 0 0 2px var(--gold);
+}
+.wd-si {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 5px;
+  background: #4a2a14;
+}
+.wd-si img {
+  width: 26px;
+  height: 26px;
+}
+.wd-si img.lock {
+  filter: grayscale(1) brightness(0.9);
+  opacity: 0.75;
+}
+.wd-sb {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.wd-sb b {
+  font: 900 14px/1.15 var(--font);
+}
+.wd-sb small {
+  font: 700 12px/1.3 var(--font);
+  color: var(--ink-dim);
+}
+.btn.wd-son {
+  flex: none;
+  width: auto;
+  min-height: 34px;
+  padding: 0 12px 3px;
+  font-size: 14px;
+}
+/* окно «Обновка» */
+.wdn-pic {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 10px 0 4px;
+  border-radius: 6px;
+  background: radial-gradient(ellipse 60% 70% at 50% 42%, #5a3418 0, #3a2010 55%, #24140a 100%);
+  box-shadow: 0 0 0 2px var(--line);
+}
+.wdn-pic > img:first-child {
+  width: 144px;
+  height: auto;
+}
+.wdn-ic {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 48px;
+  height: 48px;
+  padding: 4px;
+  border-radius: 6px;
+  background: var(--parch);
+  box-shadow: 0 0 0 2px var(--line);
+}
+.sheet .wdn-n {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 12px 16px 6px;
+}
+.wdn-n b {
+  font: 900 20px/1.15 var(--font);
+  color: var(--ink);
+}
+.wdn-n small {
+  font: 700 13px/1.35 var(--font);
+  color: var(--ink-dim);
+}
+.sheet.wdn .wd-fx {
+  margin: 0 16px 12px;
 }

@@ -115,8 +115,9 @@ function sellPrice(it, ch) {
   const m = grM(it),
     cond = ch.id === "ant" ? (it.gr != null ? m * (it.gr >= 3 ? 1.15 : 1) : m * m) : m,
     dem = ch.id === "ant" ? antDem(it) * (isWinter() ? 1.15 : 1) : 1;
-  const forum = ch.id === "buy" && perk("forum") ? 1.1 : 1;
-  return Math.round(it.base * cond * ch.mult * blk * dem * forum * (1 + sk("torg") * 0.02));
+  const forum = ch.id === "buy" && perk("forum") ? 1.1 : 1,
+    wear = ch.id === "blk" && wearIs("hat", "bandana") ? 1.05 : ch.id === "buy" && setOn("d90") ? 1.1 : 1;
+  return Math.round(it.base * cond * ch.mult * blk * dem * forum * wear * (1 + sk("torg") * 0.02));
 }
 const museumPay = it => (G.rep >= 15 ? Math.round(sellPrice(it, CHANNELS[1]) * 0.25) : 0);
 const GRADES = [
@@ -180,6 +181,11 @@ function dirtyName(it) {
       }[it.story] || "Странная вещь"
     );
   return it.c === 2 ? "Кружок, похоже на монету" : it.iron ? "Ржавая железка" : "Окисленная вещица";
+}
+// счётчики для гардероба: поездки зимой, летом, в дождь, находки на болоте, продажи на чёрном рынке
+function wstAdd(k, n = 1) {
+  G.wst = G.wst || {};
+  G.wst[k] = (G.wst[k] || 0) + n;
 }
 function gainXp(n) {
   G.xp += n;
