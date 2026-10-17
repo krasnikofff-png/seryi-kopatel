@@ -563,12 +563,43 @@ function showMsg() {
   clearTimeout(msgTimer);
   msgTimer = setTimeout(() => (box.className = ""), G.msgBad ? 9000 : 6000);
 }
+// подсказки к фишкам уровня, совести и полиции: наведение мышью или касание
+function gTipFill() {
+  // стрелка подсказки — под своей фишкой
+  ["bLvlW", "bRepW", "bHeatW"].forEach(id => {
+    const b = $(id);
+    if (b.offsetWidth) b.querySelector(".gtip").style.setProperty("--ax", b.offsetLeft + b.offsetWidth / 2 - 6 + "px");
+  });
+  const need = xpNeed(G.lvl),
+    nx = TRACK.find(t => t.l > G.lvl);
+  $("tipLvl").innerHTML =
+    `<b>Уровень ${G.lvl}</b><span>Опыт ${G.xp} из ${need}. Опыт дают найденные вещи: чем ценнее, тем больше.</span>${G.sp ? `<span>Свободных очков навыка: ${G.sp} — вкладка «Навыки».</span>` : ""}${nx ? `<span>На ${nx.l}-м уровне: ${nx.n.toLowerCase()}.</span>` : ""}`;
+  const R0 = rank(),
+    up = RANKS.slice()
+      .reverse()
+      .find(r => r.min > G.rep);
+  $("tipRep").innerHTML =
+    `<b>Совесть ${G.rep > 0 ? "+" : ""}${G.rep} · «${R0.name}»</b><span>${R0.perk[0].toUpperCase() + R0.perk.slice(1)}.</span>${up ? `<span>До «${up.name}» — ${up.min - G.rep} ${plural(up.min - G.rep, "очко", "очка", "очков")}.</span>` : ""}<span class="gt-how">Растёт: дар музею, перезахоронить бойца, вернуть чужое. Падает: чёрный рынок, могилы, чужие тайники.</span>`;
+  const raid = Math.round(G.heat * 7 * (1 - sk("svyazi") * 0.08) * (G.rep <= -15 ? 2 : 1));
+  $("tipHeat").innerHTML =
+    `<b>Интерес полиции ${G.heat}</b><span>${G.heat ? `Облава при продаже на чёрном <span class="nw">рынке — ${Math.min(100, raid)}%.</span>` : "Полиция вами не интересуется: облав на чёрном рынке не будет."}</span><span>${wearIs("hat", "bandana") ? "В бандане с черепом интерес после поездки не спадает." : "После каждой поездки спадает на 1."}</span><span class="gt-how">Растёт: чёрный рынок, ночная смена, раскопки у памятников, свидетели. Падает: дар музею, время.</span>`;
+}
+function gTip(b) {
+  const was = b.classList.contains("open");
+  document.querySelectorAll(".gstat.open").forEach(x => x.classList.remove("open"));
+  if (!was) b.classList.add("open");
+}
+document.addEventListener("pointerdown", e => {
+  if (!e.target.closest || !e.target.closest(".tipb"))
+    document.querySelectorAll(".gstat.open").forEach(x => x.classList.remove("open"));
+});
 function renderBase() {
   $("bMoney").textContent = rub(G.money);
   $("bRep").textContent = `${G.rep > 0 ? "+" : ""}${G.rep}`;
   $("bHeat").textContent = `${G.heat}`;
   $("bLvl").innerHTML = `${G.lvl}${G.sp ? `<i class="sp">+${G.sp}</i>` : ""}`;
   $("bLvlW").setAttribute("aria-label", `Уровень ${G.lvl}${G.sp ? `, свободных очков: ${G.sp}` : ""}`);
+  gTipFill();
   {
     const d = $("bDebt");
     d.hidden = !(G.debt > 0);
@@ -677,6 +708,7 @@ window.SK = {
   goHouse,
   goSlet,
   wearPick,
+  gTip,
   wdTap,
   wearSet,
   wearNewOk,

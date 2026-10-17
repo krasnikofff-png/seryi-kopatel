@@ -10,6 +10,8 @@
   if(!chars.length)continue;const lines=[];let cur=null;
   for(const c of chars){if(!cur||c.top>=cur.bot-3&&c.x<cur.lastx){cur={bot:c.bot,s:'',lastx:c.x};lines.push(cur)}cur.s+=c.ch;cur.lastx=c.x;cur.bot=Math.max(cur.bot,c.bot)}
   if(lines.length>1){lines.forEach(L=>{const l=L.s.replace(/[^\p{L}\p{N}₽%]/gu,'');if(l.length<=3)res.push({type:'перенос',text:desc(b),line:L.s})});if(b.tagName==='BUTTON'&&!b.querySelector('small,.cost,.lbl,span[style*=block]'))res.push({type:'кнопка в 2 строки',text:desc(b)})}
-  const mx=Math.max(...chars.map(c=>c.right));if(mx>innerWidth+1)res.push({type:'за экраном',text:desc(b)})}
+  const mx=Math.max(...chars.map(c=>c.right));if(mx>innerWidth+1)res.push({type:'за экраном',text:desc(b)});
+  // текст шире своей кнопки или рамки с overflow (обрезан или вылез)
+  for(let e=b;e&&e!==document.body;e=e.parentElement){const cs=getComputedStyle(e);if(cs.overflowX==='visible'&&(cs.position==='absolute'||cs.position==='fixed'))break;if(e.tagName==='BUTTON'||cs.overflowX!=='visible'){const R=e.getBoundingClientRect();if(mx>R.right+0.5||Math.min(...chars.map(c=>c.x))<R.left-0.5)res.push({type:'вылезает из рамки',text:desc(b)});break}}}
  for(const el of document.querySelectorAll('body *')){if(!vis(el))continue;const r=el.getBoundingClientRect();if(!inView(r))continue;const cs=getComputedStyle(el);if(el.scrollWidth>el.clientWidth+1&&(cs.overflow==='hidden'||cs.overflowX==='hidden')&&el.innerText&&el.innerText.trim()&&el.children.length<3&&!el.querySelector('img,canvas'))res.push({type:cs.textOverflow==='ellipsis'?'многоточие':'обрезано',text:desc(el)})}
  return res}

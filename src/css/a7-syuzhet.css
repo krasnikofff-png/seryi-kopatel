@@ -624,7 +624,7 @@
 }
 .rd-stamp {
   position: absolute;
-  right: 20px;
+  right: 36px;
   bottom: 12px;
   padding: 6px 10px;
   border: 3px double var(--red);

@@ -88,9 +88,9 @@
       <button class="gset" id="setBtn" aria-label="Настройки" onclick="document.getElementById('setOver').hidden=false"><span data-px="gear" data-s="22"></span></button>
     </header>
     <div class="gstats">
-      <div class="gstat" id="bLvlW" title="Уровень"><span data-px="star" data-s="18"></span><span id="bLvl">1</span></div>
-      <div class="gstat" title="Совесть"><span data-px="heart" data-s="18"></span><span id="bRep">0</span></div>
-      <div class="gstat" title="Интерес полиции"><span data-px="shield" data-s="18"></span><span id="bHeat">0</span></div>
+      <button class="gstat tipb" id="bLvlW" aria-label="Уровень" onclick="SK.gTip(this)"><span data-px="star" data-s="18"></span><span id="bLvl">1</span><span class="gtip" id="tipLvl" role="tooltip"></span></button>
+      <button class="gstat tipb" id="bRepW" aria-label="Совесть" onclick="SK.gTip(this)"><span data-px="heart" data-s="18"></span><span id="bRep">0</span><span class="gtip" id="tipRep" role="tooltip"></span></button>
+      <button class="gstat tipb" id="bHeatW" aria-label="Интерес полиции" onclick="SK.gTip(this)"><span data-px="shield" data-s="18"></span><span id="bHeat">0</span><span class="gtip" id="tipHeat" role="tooltip"></span></button>
       <button class="gstat debt" id="bDebt" hidden onclick="SK.debtHelp()"><span data-px="paper" data-s="18"></span><span id="bDebtT"></span></button>
     </div>
     <div class="bpanel" id="t_sell" hidden></div>

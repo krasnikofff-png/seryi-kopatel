@@ -100,7 +100,7 @@
 .trow button.chip.on {
   background: #b06a32;
 }
-.place {
+#hud .place {
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
@@ -110,7 +110,7 @@
   white-space: nowrap;
   overflow: hidden;
 }
-.place .ic {
+#hud .place .ic {
   display: none;
 }
 #placeF {

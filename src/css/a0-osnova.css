@@ -336,6 +336,13 @@ html.noscroll body {
   font: 800 13px/1.25 var(--font);
   opacity: 0.9;
   text-shadow: none;
+  white-space: normal;
+  text-wrap: pretty;
+}
+/* в кнопке с пояснением подпись тоже может переноситься */
+.btn.col .ev-l {
+  white-space: normal;
+  text-align: left;
 }
 .keys {
   display: grid;
