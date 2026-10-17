@@ -132,7 +132,8 @@ function renderMaps() {
   const r = G.region,
     RG = REGIONS[r],
     tr = TRANSPORT[G.transport];
-  const head = `<div class="nb-head"><h2>Полевой блокнот</h2><img src="${NB_ART.pine}" alt=""></div>`;
+  // отсюда уезжают копать — говорим это прямо; первые поездки — подробнее
+  const head = `<div class="nb-head"><div><small class="nb-kick">Полевой блокнот</small><h2>Куда едем копать?</h2></div><img src="${NB_ART.pine}" alt=""></div><p class="nb-how">${(G.trips || 0) < 3 ? `Выберите место ниже и нажмите зелёную кнопку <b>«Ехать»</b> — Серый поедет в поле с детектором. Вечером вернётся в гараж с находками.` : `Выберите место и жмите <b>«Ехать»</b> — день в поле с детектором.`}</p>`;
   if (G.place && !placeOpen(G.place)) G.place = 0; // закрытое место не открываем
   const pl = G.place || 0;
   const seg = `<div class="nb-seg">${[1, 2, 3]

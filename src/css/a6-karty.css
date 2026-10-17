@@ -41,6 +41,19 @@
   color: var(--ink);
   white-space: nowrap;
 }
+.nb-kick {
+  display: block;
+  font: 700 19px/1 var(--hand);
+  color: var(--blue);
+}
+.nb-how {
+  margin: -4px 0 12px;
+  font: 700 13px/1.4 var(--font);
+  color: #6b3d17;
+}
+.nb-how b {
+  color: var(--green-d);
+}
 .nb-head img {
   width: 80px;
   height: auto;
