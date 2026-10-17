@@ -156,7 +156,7 @@ function renderFinds() {
   const acts = [];
   if (dirty.length > 1 && findFilter !== "clean")
     acts.push(
-      `<button class="btn y col" ${G.money < dirty.length * CLEAN_FEE ? "disabled" : ""} onclick="SK.cleanAll(false)"><span class="lbl">Почистить всё</span>${costPill(rub(dirty.length * CLEAN_FEE))}</button>`
+      `<button class="btn y col" ${G.money < dirty.length * CLEAN_FEE ? "disabled" : ""} onclick="SK.cleanAll(false)" title="Мастер почистит все грязные находки — по ${rub(CLEAN_FEE)} за вещь"><span class="lbl">Отдать мастеру</span>${costPill(`${dirty.length} шт. · ${rub(dirty.length * CLEAN_FEE)}`)}</button>`
     );
   const sellable = clean.filter(i => !i.story && !i.leg && i.c !== 0); // мусор — отдельно, в металлолом
   if (sellable.length > 1 && findFilter !== "dirty") {
