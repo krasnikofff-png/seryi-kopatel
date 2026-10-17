@@ -11,7 +11,7 @@
       <div class="chip money"><span class="ic" data-ic="coin" style="width:16px;height:16px"></span><span id="moneyF">5 000 ₽</span></div>
       <button class="chip snd" id="snd" aria-pressed="false" title="Писк детектора" aria-label="Писк детектора"><span class="ic" id="sndIco" data-ic="sndOff" style="width:20px;height:18px"></span><span hidden><span id="sndTxt">выкл.</span></span></button>
     </div>
-    <div class="trow2"><button class="chip pzb" id="pzBtn" hidden onclick="SK.openPz()"></button><button class="chip pzb mgb" id="magBtn" hidden onclick="SK.openMag()"></button><button class="chip pzb slb" id="sletBtn" hidden onclick="SK.sletInfo()"></button>
+    <div class="trow2"><button class="chip pzb" id="pzBtn" hidden onclick="SK.openPz()"></button><button class="chip pzb mgb" id="magBtn" hidden onclick="SK.openMag()"></button><button class="chip pzb slb" id="sletBtn" hidden onclick="SK.sletInfo()"></button><button class="chip pzb qb" id="qBtn" hidden onclick="SK.qInfo()"></button><span class="chip pzb fartc" id="fartChip" hidden></span>
     <label class="chip dvol" id="dvol" hidden><span>Писк</span><input type="range" id="dvolR" min="0" max="100" step="5" aria-label="Громкость детектора"><b id="dvolV"></b></label></div>
   </div>
 
@@ -24,6 +24,7 @@
       <div class="bars" id="bars"></div>
       <div class="lstat"><b id="ltype">Тишина</b><small id="ldepth"></small></div>
     </div>
+    <div class="betrow" id="betRow" hidden></div>
     <div class="depthrow" id="depthRow"><span>Глубина <b id="dNow">0 см</b></span><span class="sep"></span><span>до <b id="dMax">30 см</b></span></div>
     <div class="arow">
       <button class="abtn care" id="digCare">Копать аккуратно<small id="careInfo">+10 см · 20 мин</small></button>

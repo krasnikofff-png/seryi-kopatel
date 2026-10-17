@@ -147,7 +147,9 @@
   gap: 8px;
   margin-top: 10px;
 }
-.trow2:has(> #pzBtn[hidden]):has(> #magBtn[hidden]):has(> #sletBtn[hidden]):has(> #dvol[hidden]) {
+.trow2:has(> #pzBtn[hidden]):has(> #magBtn[hidden]):has(> #sletBtn[hidden]):has(> #dvol[hidden]):has(
+    > #qBtn[hidden]
+  ):has(> #fartChip[hidden]) {
   display: none;
 }
 #hud .pzb {

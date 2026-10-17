@@ -51,6 +51,12 @@ S('pz',async p=>{await p.evaluate(()=>SK.buyGo(2));await p.clock.runFor(1500);aw
 S('tip-lvl',async p=>{await tab('skills')(p);await p.evaluate(()=>document.getElementById('bLvlW').click())});
 S('tip-rep',async p=>{await tab('skills')(p);await p.evaluate(()=>document.getElementById('bRepW').click())});
 S('tip-heat',async p=>{await tab('skills')(p);await p.evaluate(()=>document.getElementById('bHeatW').click())});
+S('hag',async p=>{await tab('sell')(p);await p.evaluate(()=>SK.hagOpen(1))});
+S('hag-2',async p=>{await tab('sell')(p);await p.evaluate(()=>{SK.hagOpen(1);SK.hagSet(99999);SK.hagOffer()})});
+S('auc',async p=>{await tab('sell')(p);await p.evaluate(()=>SK.aucOpen(0));await p.clock.runFor(6000)});
+S('el',async p=>{await tab('sell')(p);await p.evaluate(()=>{__X.G.inv.push({name:'Штык-нож',c:3,era:1,w:0.4,base:1800,cond:0.8,depth:30,clean:false,iron:true});SK.elOpen(__X.G.inv.length-1);SK.elStart()});await p.clock.runFor(3000)});
+S('glue',async p=>{await tab('sell')(p);await p.evaluate(()=>{__X.G.inv.push({name:'Кокарда',c:3,era:2,w:0.02,base:3000,cond:0.9,depth:30,clean:true,gr:3,broken:6});SK.glueOpen(__X.G.inv.length-1)})});
+S('field-q',async p=>{await p.evaluate(()=>SK.buyGo(2));await p.clock.runFor(1500);await p.evaluate(()=>{const e=document.getElementById('evt');if(e&&!e.hidden){const b=e.querySelector('button');b&&b.click()}SK.qInfo&&SK.qInfo()})});
 S('settings',async p=>{await p.evaluate(()=>document.getElementById('setBtn').click())});
 S('legs',async p=>{await p.evaluate(()=>SK.openLegs())});
 S('albitem',async p=>{await p.evaluate(()=>SK.albPick(1,1))});

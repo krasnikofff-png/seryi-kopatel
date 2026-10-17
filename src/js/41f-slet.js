@@ -220,12 +220,13 @@ function rvDigDone(r) {
     toast(`${r.n} откопал жетон прямо у вас под носом. «Кто первый встал — того и тапки».`);
   return p > 0;
 }
-// отрисовка соперников: перекрашенные спрайты копателя
+// отрисовка соперников: перекрашенные спрайты копателя (общая для слёта и конкурента в поле)
 const rvSheets = {};
-function rvSheet(i) {
-  if (rvSheets[i]) return rvSheets[i];
-  const R0 = SLET_RIVALS[i],
-    im = HERO_DET[R0.k];
+const rvSheet = i => hueSheet(SLET_RIVALS[i].k, SLET_RIVALS[i].hue);
+function hueSheet(k, hue) {
+  const key = k + ":" + hue;
+  if (rvSheets[key]) return rvSheets[key];
+  const im = HERO_DET[k];
   if (!im || !im.complete || !im.naturalWidth) return null;
   const c = document.createElement("canvas");
   c.width = im.naturalWidth;
@@ -249,7 +250,7 @@ function rvSheet(i) {
     h *= 60;
     if (h < 0) h += 360;
     if (h > 10 && h < 40 && l > 0.6) continue; // кожа
-    h = (h + R0.hue) % 360;
+    h = (h + hue) % 360;
     const C = (1 - Math.abs(2 * l - 1)) * s,
       X = C * (1 - Math.abs(((h / 60) % 2) - 1)),
       m = l - C / 2,
@@ -267,70 +268,71 @@ function rvSheet(i) {
     a[p + 2] = Math.round((b1 + m) * 255);
   }
   g.putImageData(d, 0, 0);
-  return (rvSheets[i] = c);
+  return (rvSheets[key] = c);
+}
+// соперник на поле: плавно догоняет свою клетку, копает с комьями земли, над головой — имя и всплывающие очки
+function rvDraw(ents, r, sh, camX, camY, now) {
+  const fx = r.tx * TS + 8,
+    fy = r.ty * TS + 13;
+  if (r.rx == null) {
+    r.rx = fx;
+    r.ry = fy;
+  }
+  const dt = Math.min(0.05, (now - (r._t || now)) / 1000);
+  r._t = now;
+  const dx = fx - r.rx,
+    dy = fy - r.ry,
+    L = Math.hypot(dx, dy),
+    sp = 90 * dt;
+  if (L > 240) {
+    r.rx = fx;
+    r.ry = fy;
+  } else if (L > sp) {
+    r.rx += (dx / L) * sp;
+    r.ry += (dy / L) * sp;
+    r.walk = (r.walk || 0) + dt;
+  } else {
+    r.rx = fx;
+    r.ry = fy;
+  }
+  const moving = L > sp,
+    x = Math.round(r.rx - camX),
+    y = Math.round(r.ry - camY);
+  if (x < -30 || y < -40 || x > VW + 30 || y > VH + 30) return;
+  ents.push({
+    y: r.ry,
+    f: () => {
+      disc(ctx, x, y + 1, 5, 1, "rgba(20,30,10,.35)");
+      const fr = moving ? [0, 1, 0, 2][Math.floor(r.walk * 8) % 4] : 0,
+        bob = r.dl > 0 ? Math.floor(now / 180) % 2 : 0;
+      if (sh) ctx.drawImage(sh, fr * 40, HD_ROW[r.dir || "down"] * 42, 40, 42, x - 20, y - 29 + bob, 40, 42);
+      if (r.dl > 0 && Math.floor(now / 180) % 2) {
+        ctx.fillStyle = "#6a4a2a";
+        ctx.fillRect(x + 6, y - 2, 2, 2);
+        ctx.fillRect(x + 9, y - 4, 2, 2);
+      }
+      ctx.font = "bold 7px sans-serif";
+      const w = ctx.measureText(r.n).width + 4;
+      ctx.fillStyle = "rgba(20,16,10,.7)";
+      ctx.fillRect(x - w / 2, y - 34, w, 9);
+      ctx.fillStyle = "#f6dc6a";
+      ctx.fillText(r.n, x - w / 2 + 2, y - 27);
+      if (r.pop && r.pop.txt && now - r.pop.t < 1800) {
+        const k = (now - r.pop.t) / 1800;
+        ctx.globalAlpha = 1 - k;
+        ctx.fillStyle = "#fff6c8";
+        ctx.font = "bold 8px sans-serif";
+        ctx.fillText(r.pop.txt, x - 8, y - 38 - k * 10);
+        ctx.globalAlpha = 1;
+      }
+    }
+  });
 }
 function sletEnts(ents, camX, camY) {
   const S = T && T.slet;
   if (!S) return;
   const now = performance.now();
-  S.rivals.forEach(r => {
-    const fx = r.tx * TS + 8,
-      fy = r.ty * TS + 13;
-    if (r.rx == null) {
-      r.rx = fx;
-      r.ry = fy;
-    }
-    const dt = Math.min(0.05, (now - (r._t || now)) / 1000);
-    r._t = now;
-    const dx = fx - r.rx,
-      dy = fy - r.ry,
-      L = Math.hypot(dx, dy),
-      sp = 90 * dt;
-    if (L > 240) {
-      r.rx = fx;
-      r.ry = fy;
-    } else if (L > sp) {
-      r.rx += (dx / L) * sp;
-      r.ry += (dy / L) * sp;
-      r.walk = (r.walk || 0) + dt;
-    } else {
-      r.rx = fx;
-      r.ry = fy;
-    }
-    const moving = L > sp,
-      x = Math.round(r.rx - camX),
-      y = Math.round(r.ry - camY);
-    if (x < -30 || y < -40 || x > VW + 30 || y > VH + 30) return;
-    ents.push({
-      y: r.ry,
-      f: () => {
-        disc(ctx, x, y + 1, 5, 1, "rgba(20,30,10,.35)");
-        const sh = rvSheet(r.i),
-          fr = moving ? [0, 1, 0, 2][Math.floor(r.walk * 8) % 4] : 0,
-          bob = r.dl > 0 ? Math.floor(now / 180) % 2 : 0;
-        if (sh) ctx.drawImage(sh, fr * 40, HD_ROW[r.dir || "down"] * 42, 40, 42, x - 20, y - 29 + bob, 40, 42);
-        if (r.dl > 0 && Math.floor(now / 180) % 2) {
-          ctx.fillStyle = "#6a4a2a";
-          ctx.fillRect(x + 6, y - 2, 2, 2);
-          ctx.fillRect(x + 9, y - 4, 2, 2);
-        }
-        ctx.font = "bold 7px sans-serif";
-        const w = ctx.measureText(r.n).width + 4;
-        ctx.fillStyle = "rgba(20,16,10,.7)";
-        ctx.fillRect(x - w / 2, y - 34, w, 9);
-        ctx.fillStyle = "#f6dc6a";
-        ctx.fillText(r.n, x - w / 2 + 2, y - 27);
-        if (r.pop && r.pop.txt && now - r.pop.t < 1800) {
-          const k = (now - r.pop.t) / 1800;
-          ctx.globalAlpha = 1 - k;
-          ctx.fillStyle = "#fff6c8";
-          ctx.font = "bold 8px sans-serif";
-          ctx.fillText(r.pop.txt, x - 8, y - 38 - k * 10);
-          ctx.globalAlpha = 1;
-        }
-      }
-    });
-  });
+  S.rivals.forEach(r => rvDraw(ents, r, rvSheet(r.i), camX, camY, now));
 }
 function sletEnd() {
   const S = T.slet,

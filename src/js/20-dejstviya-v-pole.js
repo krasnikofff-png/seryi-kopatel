@@ -14,12 +14,12 @@ toastEl.addEventListener("pointerdown", e => {
 function card(it, hurt, up, more) {
   cardEl.classList.toggle("leg", !!it.leg);
   if (it.leg) {
-    cardEl.innerHTML = `<span class="x">${pxi("x", 12)}</span><div class="k">Легенда, ${it.depth} см, ${ERAS[it.era].name}</div><span class="slot star cpic"><img src="${FIND_IMG[it.name] || ""}" alt=""></span><h2>${it.name}</h2><p>Такое находят раз в жизни. Руки дрожат. Почистите дома — ей ничего не грозит.${up ? lvlUpTxt() : ""}</p>`;
+    cardEl.innerHTML = `<span class="x">${pxi("x", 12)}</span><div class="k">Легенда, ${it.depth} см, ${ERAS[it.era].name}</div><span class="slot star cpic"><img src="${FIND_IMG[it.name] || ""}" alt=""></span><h2>${it.name}</h2><p>Такое находят раз в жизни. Руки дрожат. Почистите дома — ей ничего не грозит.${up ? lvlUpTxt() : ""}${cardXTake()}</p>`;
     cardEl.hidden = false;
     toastEl.hidden = true;
     return;
   }
-  cardEl.innerHTML = `<span class="x">${pxi("x", 12)}</span><div class="k">${it.cache ? "Тайник с карты, " : "Находка, "}${it.depth} см, ${ERAS[it.era].name}${it.vdi ? ", ВДИ " + it.vdi : ""}</div>${it.story ? "" : `<span class="slot mud cpic"><img src="${FIND_IMG[it.name] || ""}" alt=""></span>`}<h2>${shownName(it)}</h2><p>${hurt ? "Кажется, задели лопатой — сохранность может пострадать. " : ""}${it.story ? "Что это — станет ясно после чистки." : it.c === 0 ? "Мусор. Только в металлолом." : `<span class="crange">${CLASSES[it.c].name}: ${rangeCh().id === "ant" ? "антиквар" : "скупщик"} даст ${rub(priceRange(it)[0])} – ${rub(priceRange(it)[1])}</span>Цену решит сохранность — узнаете после чистки. Бывают и редкие разновидности ×${rareM(it)} — их видно, только если чистить самому.`}${it.story ? `<br><b>★ Сердце ёкнуло: кажется, это то, что вы искали. Почистите дома.</b>` : ""}${more ? `<br><b>Детектор над ямой не умолкает — глубже лежит что-то ещё.</b>` : ""}${up ? lvlUpTxt() : ""}</p>`;
+  cardEl.innerHTML = `<span class="x">${pxi("x", 12)}</span><div class="k">${it.cache ? "Тайник с карты, " : "Находка, "}${it.depth} см, ${ERAS[it.era].name}${it.vdi ? ", ВДИ " + it.vdi : ""}</div>${it.story ? "" : `<span class="slot mud cpic"><img src="${FIND_IMG[it.name] || ""}" alt=""></span>`}<h2>${shownName(it)}</h2><p>${hurt ? "Кажется, задели лопатой — сохранность может пострадать. " : ""}${it.story ? "Что это — станет ясно после чистки." : it.c === 0 ? "Мусор. Только в металлолом." : `<span class="crange">${CLASSES[it.c].name}: ${rangeCh().id === "ant" ? "антиквар" : "скупщик"} даст ${rub(priceRange(it)[0])} – ${rub(priceRange(it)[1])}</span>Цену решит сохранность — узнаете после чистки. Бывают и редкие разновидности ×${rareM(it)} — их видно, только если чистить самому.`}${it.story ? `<br><b>★ Сердце ёкнуло: кажется, это то, что вы искали. Почистите дома.</b>` : ""}${more ? `<br><b>Детектор над ямой не умолкает — глубже лежит что-то ещё.</b>` : ""}${it.broken ? `<br>Вещь в обломках — дома можно склеить.` : ""}${up ? lvlUpTxt() : ""}${cardXTake()}</p>`;
   cardEl.hidden = false;
   toastEl.hidden = true;
 }
@@ -77,6 +77,14 @@ function finishDig() {
   burst(tx * TS + 8, ty * TS + 9);
   const here = items.filter(i => !i.found && i.tx === tx && i.ty === ty).sort((a, b) => a.depth - b.depth),
     got = here.find(i => i.depth <= h);
+  questDig(h);
+  if (!got) potWarn(here, h);
+  if (got && got.pot) {
+    potDig(got, digFast);
+    updateHud();
+    save();
+    return;
+  }
   if (got) {
     if (bagW() + soilW(got.w) > bagCap()) {
       holes.set(k, Math.max(0, got.depth - 1));
@@ -140,10 +148,15 @@ function finishDig() {
       it.gr = 2;
     }
     if (!it.story && !it.leg) dexAdd(it.name);
+    // вещь могла прийти обломками — дома её склеивают
+    if (!it.story && !it.leg && (it.c === 1 || it.c === 3 || it.c === 4) && Math.random() < 0.14)
+      it.broken = Math.random() < 0.5 ? 4 : 6;
     G.inv.push(it);
     SFX.clink();
     if (it.leg) setTimeout(() => SFX.legend(), 250);
-    const up = gainXp(CLASSES[got.c].xp);
+    const xpF = betResolve(got, it, tx, ty);
+    questFound(got, it, digFast && cond < 0.7);
+    const up = gainXp(CLASSES[got.c].xp + xpF);
     const more = here.find(
       i => i !== got && i.depth > got.depth && i.depth - h <= DET[G.det].depth + (own("coil") ? 15 : 0)
     );
@@ -305,7 +318,8 @@ function endTrip(text) {
   const n = T ? T.found : 0,
     dirty = G.inv.filter(i => !i.clean).length;
   const wasManor = T && T.map === 3;
-  const sBefore = seasonIdx();
+  const sBefore = seasonIdx(),
+    azT = azartEnd();
   if (T && !T.slet) {
     const se = season().id;
     if (se === "winter") wstAdd("winter");
@@ -318,7 +332,7 @@ function endTrip(text) {
   G.trips++;
   if (!wearIs("hat", "bandana")) G.heat = Math.max(0, G.heat - 1);
   rollWx();
-  const sNew = seasonIdx() !== sBefore ? `<br><b>Наступила ${season().name.toLowerCase()}.</b> ${season().line}` : "";
+  const sNew = seasonIdx() !== sBefore ? `<br><b>${season().id === "summer" ? "Наступило" : "Наступила"} ${season().name.toLowerCase()}.</b> ${season().line}` : "";
   const due = G.antDue || 0;
   G.money += due;
   G.antDue = 0;
@@ -327,7 +341,7 @@ function endTrip(text) {
   G.money += exc;
   G.msgBad = false;
   const dtxt = debtTick() + orderTick() + houseTick();
-  G.msg = `${text}${due ? ` Антиквар продал вещи с комиссии: <b>+${rub(due)}</b>.` : ""}${exc ? ` Экскурсии по витрине: +${rub(exc)}.` : ""}${dtxt} Находок за поездку: ${n}.${dirty ? ` Неочищенных вещей: ${dirty} — почистите, чтобы узнать, что это.` : ""}${sNew}${rumorLine()}`;
+  G.msg = `${text}${due ? ` Антиквар продал вещи с комиссии: <b>+${rub(due)}</b>.` : ""}${exc ? ` Экскурсии по витрине: +${rub(exc)}.` : ""}${dtxt} Находок за поездку: ${n}.${azT}${dirty ? ` Неочищенных вещей: ${dirty} — почистите, чтобы узнать, что это.` : ""}${sNew}${rumorLine()}`;
   G.msgBad = dtxt.includes("коллектор");
   if (wasManor) {
     G.manorN = (G.manorN || 0) + 1;

@@ -905,6 +905,9 @@ function loadTrip(t) {
   dest = null;
   mark = null;
   digT = 0;
+  betTile = null;
+  qChip();
+  fartChip();
   try {
     buildTrail(T);
   } catch (e) {

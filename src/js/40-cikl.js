@@ -26,6 +26,7 @@ function update(dt) {
     return;
   }
   sletTick();
+  rivalTick();
   if (T.minutes >= dayEnd() && T.slet) {
     sletEnd();
     return;

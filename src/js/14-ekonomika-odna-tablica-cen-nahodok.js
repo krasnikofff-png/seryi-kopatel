@@ -15,10 +15,7 @@ const ECON = {
 }; // шанс, что вещь дороже 10 тыс. заменится классом попроще
 function econBase(c, era, mult) {
   const r = ECON.cls[c] || ECON.cls[1];
-  return Math.min(
-    ECON.cap,
-    Math.round((rnd(r[0], r[1]) * ECON.era[era || 0] * (ECON.reg[mult] || mult)) / 10) * 10
-  );
+  return Math.min(ECON.cap, Math.round((rnd(r[0], r[1]) * ECON.era[era || 0] * (ECON.reg[mult] || mult)) / 10) * 10);
 }
 function makeItem(c, eraW, mult, forceEra, noBoost) {
   let e = forceEra !== undefined ? forceEra : pickW(regW(eraW, "era")),
@@ -105,10 +102,7 @@ function newTrip(map, region) {
     region,
     items: [],
     holes: {},
-    minutes:
-      REG_INFO[region].start +
-      (season().id === "spring" && region === 3 ? 30 : 0) +
-      (G.wx === "frost" ? 30 : 0),
+    minutes: REG_INFO[region].start + (season().id === "spring" && region === 3 ? 30 : 0) + (G.wx === "frost" ? 30 : 0),
     wx: G.wx || "clear",
     season: season().id,
     digBonus: G.wx === "rain" ? 5 : 0,
@@ -199,10 +193,7 @@ function newTrip(map, region) {
   if (
     map.cache &&
     R() <
-      Math.min(
-        1,
-        map.cache.chance * (region === 3 ? 1.5 : 1) * (region === 3 && season().id === "winter" ? 1.5 : 1)
-      )
+      Math.min(1, map.cache.chance * (region === 3 ? 1.5 : 1) * (region === 3 && season().id === "winter" ? 1.5 : 1))
   ) {
     const cx = Math.floor(ZC.x / TS),
       cy = Math.floor(ZC.y / TS);
@@ -244,10 +235,7 @@ function newTrip(map, region) {
       if (e < b.era && it.depth > b.depth - 12) it.depth = Math.max(3, b.depth - 12 - Math.floor(R() * 6));
       if (Math.abs(it.depth - b.depth) < 10) continue;
       t.items.push(
-        Object.assign(
-          { tx: b.tx, ty: b.ty, x: b.x + (R() - 0.5) * 4, y: b.y + (R() - 0.5) * 4, stack: true },
-          it
-        )
+        Object.assign({ tx: b.tx, ty: b.ty, x: b.x + (R() - 0.5) * 4, y: b.y + (R() - 0.5) * 4, stack: true }, it)
       );
     }
   }
@@ -309,29 +297,17 @@ function newTrip(map, region) {
         used.add(tx + "," + ty);
         const it = makeItem(cls, null, mult, era);
         if (dep) it.depth = dep;
-        t.items.push(
-          Object.assign({ tx, ty, x: tx * TS + 4 + R() * 8, y: ty * TS + 4 + R() * 8, spot: 1 }, it)
-        );
+        t.items.push(Object.assign({ tx, ty, x: tx * TS + 4 + R() * 8, y: ty * TS + 4 + R() * 8, spot: 1 }, it));
         return;
       }
     };
     if (worldKind === "hillfort") {
-      t.items = t.items.filter(
-        i => !HF_PITS.some(([x, y]) => Math.hypot(i.x - x, i.y - y) < 30) || i.leg || i.story
-      ); // конкуренты уже всё выбрали
+      t.items = t.items.filter(i => !HF_PITS.some(([x, y]) => Math.hypot(i.x - x, i.y - y) < 30) || i.leg || i.story); // конкуренты уже всё выбрали
       for (let k = 0; k < 3; k++)
-        near(
-          HF_RK.x + HF_RK.w / 2,
-          HF_RK.y + HF_RK.h / 2,
-          40,
-          pickW([0, 0.2, 0.35, 0.3, 0.15]),
-          R() < 0.6 ? 4 : 3
-        ); // археологи не докопали
+        near(HF_RK.x + HF_RK.w / 2, HF_RK.y + HF_RK.h / 2, 40, pickW([0, 0.2, 0.35, 0.3, 0.15]), R() < 0.6 ? 4 : 3); // археологи не докопали
       if (R() < 0.5) near(HF_BL.x, HF_BL.y, 24, R() < 0.5 ? 4 : 3, 4); // тайник у валуна
       for (let k = 0; k < 2; k++) near(HF_TW.x, HF_TW.y, 24, 3, 4);
-      t.items = t.items.filter(
-        i => !HF_PITS.some(([x, y]) => Math.hypot(i.x - x, i.y - y) < 30) || i.leg || i.story
-      );
+      t.items = t.items.filter(i => !HF_PITS.some(([x, y]) => Math.hypot(i.x - x, i.y - y) < 30) || i.leg || i.story);
     } // у башни — наконечники, оружие
     if (worldKind === "flooded") {
       for (let k = 0; k < 3; k++)
@@ -387,15 +363,13 @@ function newTrip(map, region) {
     t.event = "nyura";
   if (G.stashOwner) t.event = "stashOwner";
   if (G.debt > 0 && (G.debtMiss || 0) >= 2) t.event = "collector";
-  if (
-    G.story &&
-    G.story.st === 5 &&
-    !(G.debt > 0) &&
-    worldKind === "swamp" &&
-    !G.inv.some(i => i.story === "medal")
-  )
+  if (G.story && G.story.st === 5 && !(G.debt > 0) && worldKind === "swamp" && !G.inv.some(i => i.story === "medal"))
     t.event = season().id === "winter" ? "ice" : "gat";
   if (worldKind === "kurgan") kurganItems(t, used, mult);
   eyeSpots(t, used, mult);
+  if (map.id !== 8 && worldKind !== "kurgan") {
+    questGen(t, used, mult, map);
+    rivalGen(t);
+  }
   return t;
 }

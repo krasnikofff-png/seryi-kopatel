@@ -561,6 +561,7 @@ function draw() {
   }
   // сущности по глубине
   const sig = signal({ x: P.x, y: P.y - 5 });
+  betSync(sig);
   if (
     own("pin") &&
     !paused &&
@@ -615,6 +616,7 @@ function draw() {
     }
   });
   sletEnts(ents, camX, camY);
+  azartEnts(ents, camX, camY);
   ents.sort((a, b) => a.y - b.y).forEach(e => e.f());
   if (worldKind === "swamp") {
     ctx.globalAlpha = 0.09;

@@ -108,7 +108,12 @@ function antWhy(it) {
       ? `Сохранность «${GRADES[it.gr].n.toLowerCase()}» — берёт от «хорошей»`
       : `Состояние ${Math.round(it.cond * 100)}% — ниже 70% не берёт`;
   if ((G.antLeft ?? ANT_LIMIT) <= 0) return "Больше не берёт — приходите после следующей поездки";
+  if (G.antOff === G.trips) return "Обиделся после торга — приходите после следующей поездки";
   return "";
+}
+// цена с учётом обломков: разбитая вещь стоит четверть, склеенная — 85%
+function brokeM(it) {
+  return it.broken ? 0.25 : it.glued ? 0.85 : 1;
 }
 function sellPrice(it, ch) {
   const blk = ch.id === "blk" ? (G.rep <= -15 ? 1.4 : G.rep <= -5 ? 1.2 : 1) : 1;
@@ -117,7 +122,7 @@ function sellPrice(it, ch) {
     dem = ch.id === "ant" ? antDem(it) * (isWinter() ? 1.15 : 1) : 1;
   const forum = ch.id === "buy" && perk("forum") ? 1.1 : 1,
     wear = ch.id === "blk" && wearIs("hat", "bandana") ? 1.05 : ch.id === "buy" && setOn("d90") ? 1.1 : 1;
-  return Math.round(it.base * cond * ch.mult * blk * dem * forum * wear * (1 + sk("torg") * 0.02));
+  return Math.round(it.base * cond * ch.mult * blk * dem * forum * wear * brokeM(it) * (1 + sk("torg") * 0.02));
 }
 const museumPay = it => (G.rep >= 15 ? Math.round(sellPrice(it, CHANNELS[1]) * 0.25) : 0);
 const GRADES = [
@@ -142,7 +147,7 @@ const priceRange = it => {
     Math.round((it.base * GRADES[4].m * k) / 10) * 10
   ];
 };
-const dirtyPrice = it => Math.max(10, Math.round((it.base * Math.min(1, it.cond + 0.1) * 0.35) / 10) * 10);
+const dirtyPrice = it => Math.max(10, Math.round((it.base * Math.min(1, it.cond + 0.1) * 0.35 * brokeM(it)) / 10) * 10);
 function rollGrade(it, self, rm, careful) {
   let g = pickW(GR_W.map(x => x / 100)),
     note = "";

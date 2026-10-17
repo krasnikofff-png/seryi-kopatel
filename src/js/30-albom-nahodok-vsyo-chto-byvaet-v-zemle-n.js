@@ -141,10 +141,11 @@ function renderFindSheet() {
   let body;
   if (!it.clean) {
     const risk = own("bath") ? 0 : Math.max(0, 35 - sk("master") * 3 - (own("bench") ? 10 : 0) + (it.wet ? 10 : 0));
-    body = `<div class="fs-head"><span class="slot big mud"><img class="fs-pic" src="${findPic(it)}" alt=""></span><div class="fs-hb"><span class="frow"><span class="tag">В земле</span>${it.leg ? `<span class="tag leg">Легенда</span>` : it.story ? "" : `<span class="tag k${it.c}">${CLASSES[it.c].name}</span>`}</span><h2 class="fs-name">${shownName(it)}</h2><p class="fs-meta">${meta}</p></div></div><p class="fs-note">${it.leg ? "★ Легендарная находка — такое бывает раз в жизни. Почистите: ей ничего не грозит." : it.story ? "Под грязью и ржавчиной может быть что угодно." : it.c === 0 ? "Мусор — сохранность ему не поможет." : `${rangeCh().id === "ant" ? "Антиквар" : "Скупщик"} даст от ${rub(priceRange(it)[0])} до ${rub(priceRange(it)[1])} — всё решит сохранность. Почистите и узнаете. Редкая разновидность — ×${rareM(it)}, но её видно, только если чистить самому: мастер чистит на потоке и такое не замечает.`}</p>
+    body = `<div class="fs-head"><span class="slot big mud"><img class="fs-pic" src="${findPic(it)}" alt=""></span><div class="fs-hb"><span class="frow"><span class="tag">В земле</span>${it.broken ? `<span class="tag brk">Обломки</span>` : ""}${it.leg ? `<span class="tag leg">Легенда</span>` : it.story ? "" : `<span class="tag k${it.c}">${CLASSES[it.c].name}</span>`}</span><h2 class="fs-name">${shownName(it)}</h2><p class="fs-meta">${meta}</p></div></div><p class="fs-note">${it.leg ? "★ Легендарная находка — такое бывает раз в жизни. Почистите: ей ничего не грозит." : it.story ? "Под грязью и ржавчиной может быть что угодно." : it.c === 0 ? "Мусор — сохранность ему не поможет." : `${rangeCh().id === "ant" ? "Антиквар" : "Скупщик"} даст от ${rub(priceRange(it)[0])} до ${rub(priceRange(it)[1])} — всё решит сохранность. Почистите и узнаете. Редкая разновидность — ×${rareM(it)}, но её видно, только если чистить самому: мастер чистит на потоке и такое не замечает.`}</p>
       <h3 class="fs-q">Что сделать</h3>
       ${opt("green", FI.brush, "Отдать мастеру", "Ничего не испортит", rub(CLEAN_FEE), `SK.clean(${i},false)`, G.money < CLEAN_FEE)}
       ${opt("plain", FI.hand, "Почистить самому", `Бесплатно, риск испортить ${risk}%${sk("master") || own("bench") || own("bath") ? " · шанс улучшить сохранность" : ""}`, "0 ₽", `SK.clean(${i},true)`)}
+      ${elOk(it) ? opt("plain", FI.brush, "Электролиз", "Ржавчину снимет ток — вынуть вовремя, и сохранность выше", "0 ₽", `SK.elOpen(${i})`) : ""}
       ${it.story || it.leg ? "" : opt("amber", FI.coins, "Скупщику как есть", "Верные деньги, без риска и без сюрпризов", rub(dirtyPrice(it)), `SK.sellDirty(${i})`)}`;
   } else if (it.leg) {
     body = legSheet(it, i, opt, meta);
@@ -156,6 +157,15 @@ function renderFindSheet() {
     if (n) n.anim = 0;
     const SI = it.story && STORY_ITEMS[it.story];
     let opts = "";
+    if (it.broken)
+      opts += opt(
+        "gold",
+        FI.hand,
+        "Склеить",
+        `${it.broken} ${plural(it.broken, "обломок", "обломка", "обломков")} · сейчас цена ×0,25, склеенная ×0,85`,
+        "0 ₽",
+        `SK.glueOpen(${i})`
+      );
     if (it.nyura)
       opts += opt("gold", FI.star, "Отнести деду", "Это брошка его сестры", "+5 к совести", `SK.toDed(${i})`);
     if (SI) {
@@ -188,10 +198,23 @@ function renderFindSheet() {
           : opt(
               "gold",
               FI.star,
-              "Продать антиквару",
-              `${antWants(it) ? "Как раз ищет такое · ×1,3" : "Не в приоритете · ×0,8"} · деньги после следующей поездки`,
-              rub(sellPrice(it, CHANNELS[1])),
-              `SK.sell(${i},'ant')`
+              "Торговаться с антикваром",
+              `${antWants(it) ? "Как раз ищет такое" : "Не в приоритете"} · назовите свою цену · деньги после поездки`,
+              `от ${rub(sellPrice(it, CHANNELS[1]))}`,
+              `SK.hagOpen(${i})`
+            );
+      }
+      if (aucOk(it)) {
+        const used = G.aucT === G.trips;
+        opts += used
+          ? opt("locked", FI.coins, "Форум-аукцион", "Один лот за поездку — следующий после выезда", "—", "", true)
+          : opt(
+              "plain",
+              FI.coins,
+              "Форум-аукцион",
+              "20 секунд живых ставок · продать на пике, пока не начали снимать",
+              "?",
+              `SK.aucOpen(${i})`
             );
       }
       if (vitCap() && it.c >= 2) {
@@ -246,7 +269,7 @@ function renderFindSheet() {
           true
         );
     }
-    body = `<div class="fs-head"><span class="slot big star"><img class="fs-pic" src="${findPic(it)}" alt=""></span><div class="fs-hb"><span class="frow">${SI ? `<span class="tag leg">Про деда</span><span class="tag">Улика, ${SI.ch}</span>` : `<span class="tag ok">Опознана</span><span class="tag k${it.c}">${C.name}</span>`}</span><h2 class="fs-name">${it.name}</h2><p class="fs-meta">${meta}${n && n.self ? ", почистили сами" : n ? ", после мастера" : ""}</p></div></div>
+    body = `<div class="fs-head"><span class="slot big star"><img class="fs-pic" src="${findPic(it)}" alt=""></span><div class="fs-hb"><span class="frow">${SI ? `<span class="tag leg">Про деда</span><span class="tag">Улика, ${SI.ch}</span>` : `<span class="tag ok">Опознана</span><span class="tag k${it.c}">${C.name}</span>`}</span><h2 class="fs-name">${it.name}</h2><p class="fs-meta">${meta}${n && n.self ? ", почистили сами" : n ? ", после мастера" : ""}${it.glued ? ", склеена" : it.broken ? ", в обломках" : ""}${it.elx ? ", электролиз" : ""}</p></div></div>
       ${SI ? `<div class="fs-story"><p>${SI.note}</p><small>${SI.keep}</small></div>` : ""}${FIND_DESC[it.name] ? `<p class="fs-note">${FIND_DESC[it.name]}</p>` : ""}
       ${n && n.note ? `<p class="warn fs-warn">${n.note}</p>` : ""}
       ${
