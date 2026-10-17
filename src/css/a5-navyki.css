@@ -431,23 +431,31 @@
     0 0 0 2.5px var(--line),
     inset 0 -3px 0 var(--edge);
 }
-.tr-next,
-.tr-soon {
+/* ярлычок «следующая награда»: плоская бирка на верхней кромке карточки */
+.track li.next {
+  position: relative;
+  margin-top: 10px;
+  padding-top: 14px;
+}
+.tr-next {
+  position: absolute;
+  top: -11px;
+  left: 54px;
+  padding: 3px 9px 4px;
+  border-radius: 4px;
+  font: 900 11px/1 var(--font);
   font-style: normal;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   white-space: nowrap;
-  padding: 6px 12px 7px;
-  border-radius: 14px;
-  font: 900 13px var(--font);
-  color: var(--ink);
+  color: var(--gold-o);
   background: var(--gold);
-  box-shadow:
-    0 0 0 2.5px var(--gold-o),
-    inset 0 2px 0 var(--gold-l),
-    inset 0 -3px 0 var(--gold-d);
+  box-shadow: 0 0 0 2px var(--gold-o);
 }
 .tr-soon {
-  background: var(--parch3);
-  box-shadow: 0 0 0 2px #b8956a;
+  font: 800 12px var(--font);
+  font-style: italic;
+  white-space: nowrap;
   color: var(--ink-dim);
 }
 .antinfo.ord {

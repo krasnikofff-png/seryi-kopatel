@@ -30,6 +30,7 @@ S('gear-wd-3',async p=>{await tab('gear')(p);await p.evaluate(()=>{SK.gearTab('w
 S('wd-new',async p=>{await p.evaluate(()=>{__X.G.wearNew=['jacket:deer'];__X.G.wearGot.push('jacket:deer');SK.gearTab('wd')});await p.clock.runFor(800)});
 S('skills',async p=>{await tab('skills')(p);await p.evaluate(()=>SK.skTab('sk'))});
 S('path',async p=>{await tab('skills')(p);await p.evaluate(()=>SK.skTab('tr'))});
+S('path-2',async p=>{await tab('skills')(p);await p.evaluate(()=>{SK.skTab('tr');document.getElementById('base').scrollTop=500;const t=document.getElementById('bMsg');if(t)t.hidden=true})});
 S('maps',tab('maps'));S('maps-2',async p=>{await tab('maps')(p);await p.evaluate(()=>document.getElementById('base').scrollTop=700)});
 S('maps-3',async p=>{await tab('maps')(p);await p.evaluate(()=>document.getElementById('base').scrollTop=1500)});
 S('ded',tab('ded'));

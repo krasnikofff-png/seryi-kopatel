@@ -61,7 +61,8 @@ function trackBox() {
   const nx = TRACK.find(t => t.l > G.lvl);
   const li = t => {
     const st = G.lvl >= t.l ? (t.soon ? "soon" : "done") : t === nx ? "next" : "lock";
-    return `<li class="${st}"><span class="tr-l">${t.l}</span><div><b>${t.n}</b><small>${t.d}</small></div><span class="tr-s">${st === "done" ? pxi("check", 20) : st === "soon" ? `<em class="tr-soon">скоро</em>` : st === "next" ? `<em class="tr-next">Следующая</em>` : pxi("lock", 16)}</span></li>`;
+    // «следующая» — ярлычок на краю карточки, а не кнопка
+    return `<li class="${st}">${st === "next" ? `<em class="tr-next">следующая награда</em>` : ""}<span class="tr-l">${t.l}</span><div><b>${t.n}</b><small>${t.d}</small></div><span class="tr-s">${st === "done" ? pxi("check", 20) : st === "soon" ? `<em class="tr-soon">скоро</em>` : st === "next" ? pxi("star", 20) : pxi("lock", 16)}</span></li>`;
   };
   // пройденное сворачиваем: видны два последних шага, следующая награда и что дальше
   const past = TRACK.filter(t => G.lvl >= t.l),
