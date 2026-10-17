@@ -95,7 +95,8 @@ function openScrub(idx) {
       const dist = Math.hypot(x - L[0], y - L[1]),
         dt = Math.max(1, t - L[2]),
         v = dist / dt;
-      if (v > 2.4 && st.pct < 0.98) {
+      // царапает только очень резкое движение: обычные быстрые взмахи пальцем — без вреда
+      if (v > 4.5 && st.pct < 0.98) {
         st.scr += dist;
         st.warnT = t;
       }
