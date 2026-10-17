@@ -25,6 +25,7 @@ S('find',async p=>{await tab('sell')(p);await p.evaluate(()=>SK.openFind(0))});
 S('find-dirty',async p=>{await tab('sell')(p);await p.evaluate(()=>SK.openFind(3))});
 for(const g of ['shovel','det','transport','acc','ws','wd'])S('gear-'+g,async p=>{await tab('gear')(p);await p.evaluate(g=>SK.gearTab(g),g)});
 S('gear-wd-2',async p=>{await tab('gear')(p);await p.evaluate(()=>{SK.gearTab('wd');SK.wdTap('hat','bandana');document.getElementById('base').scrollTop=520})});
+S('gear-wd-try',async p=>{await tab('gear')(p);await p.evaluate(()=>{SK.gearTab('wd');SK.wdTap('hat','helmet');document.getElementById('base').scrollTop=300})});
 S('gear-wd-3',async p=>{await tab('gear')(p);await p.evaluate(()=>{SK.gearTab('wd');document.getElementById('base').scrollTop=1100})});
 S('wd-new',async p=>{await p.evaluate(()=>{__X.G.wearNew=['jacket:deer'];__X.G.wearGot.push('jacket:deer');SK.gearTab('wd')});await p.clock.runFor(800)});
 S('skills',async p=>{await tab('skills')(p);await p.evaluate(()=>SK.skTab('sk'))});

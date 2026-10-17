@@ -103,7 +103,21 @@ function wardrobeBox() {
       .join("")}</div></div>`;
   }).join("");
   const S = WEAR_SETS.find(x => setOn(x.id));
-  return `<section class="eco wd"><div class="eco-h"><h2>Гардероб</h2><b>открыто ${wdCount().replace("/", " из ")}</b></div><div class="wd-prev"><img src="${wearPreview()}" alt="Серый в выбранной одежде: анфас и со спины">${S ? `<span class="wd-say">${S.say}</span>` : ""}</div>${wdCard()}${slots}<h3 class="wd-h">Комплекты</h3><div class="wd-sets">${wdSets()}</div></section>`;
+  // примерка: закрытую вещь можно посмотреть на Сером, но не надеть
+  let ws = null,
+    tw = null;
+  if (wdSel) {
+    const [ts, tid] = wdSel.split(":");
+    tw = WEAR[ts] && WEAR[ts].find(x => x.id === tid);
+    if (tw && wearOn(ts) !== tw) ws = { [ts]: tid };
+    else tw = null;
+  }
+  const badge = tw
+    ? `<span class="wd-try">${pxi("lock", 12)}Примерка: ${tw.n}</span>`
+    : S
+      ? `<span class="wd-say">${S.say}</span>`
+      : "";
+  return `<section class="eco wd"><div class="eco-h"><h2>Гардероб</h2><b>открыто ${wdCount().replace("/", " из ")}</b></div><div class="wd-prev${tw ? " try" : ""}"><img src="${wearPreview(ws)}" alt="Серый${tw ? ` примеряет: ${tw.n}` : " в выбранной одежде"} — спереди и сзади">${badge}<span class="wd-lbl">спереди</span><span class="wd-lbl r">сзади</span></div>${wdCard()}${slots}<h3 class="wd-h">Комплекты</h3><div class="wd-sets">${wdSets()}</div></section>`;
 }
 function wdTap(s, id) {
   const w = WEAR[s] && WEAR[s].find(x => x.id === id);
